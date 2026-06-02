@@ -1,0 +1,389 @@
+/* ========================================
+   CASINO FES - 共通スタイル
+   ======================================== */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;700&display=swap');
+
+:root {
+  --gold:        #d4af37;
+  --gold-light:  #f0d060;
+  --gold-dark:   #8b6914;
+  --red:         #c0392b;
+  --red-bright:  #e74c3c;
+  --green:       #1a6b3a;
+  --green-felt:  #0f4a28;
+  --bg-dark:     #0a0a0f;
+  --bg-card:     #111118;
+  --bg-surface:  #1a1a24;
+  --text-main:   #f0e8d0;
+  --text-muted:  #8a7a60;
+  --border:      rgba(212,175,55,0.25);
+  --shadow-gold: 0 0 20px rgba(212,175,55,0.3);
+  --shadow-red:  0 0 20px rgba(192,57,43,0.4);
+
+  --poker:       #e74c3c;
+  --blackjack:   #3498db;
+  --chinchiro:   #e67e22;
+  --keiba:       #27ae60;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg-dark);
+  color: var(--text-main);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-weight: 300;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-image:
+    radial-gradient(ellipse at 20% 20%, rgba(212,175,55,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(192,57,43,0.04) 0%, transparent 50%),
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 40px,
+      rgba(212,175,55,0.015) 40px,
+      rgba(212,175,55,0.015) 41px
+    );
+}
+
+/* ── ヘッダー ── */
+.site-header {
+  background: linear-gradient(180deg, rgba(10,10,15,0.98) 0%, rgba(10,10,15,0.92) 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+}
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  gap: 1rem;
+}
+.site-logo {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 1.1rem;
+  color: var(--gold);
+  text-decoration: none;
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 15px rgba(212,175,55,0.5);
+  white-space: nowrap;
+}
+.site-nav { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.nav-link {
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 0.4rem 0.9rem;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  transition: all 0.2s;
+  letter-spacing: 0.08em;
+}
+.nav-link:hover, .nav-link.active {
+  color: var(--gold);
+  border-color: var(--border);
+  background: rgba(212,175,55,0.06);
+}
+
+/* ── コンテナ ── */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem;
+}
+
+/* ── ページタイトル ── */
+.page-title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: clamp(1.4rem, 4vw, 2.2rem);
+  color: var(--gold);
+  text-align: center;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 30px rgba(212,175,55,0.4);
+  margin-bottom: 0.4rem;
+}
+.page-subtitle {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 2.5rem;
+}
+.divider {
+  width: 120px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  margin: 1rem auto 2rem;
+}
+
+/* ── カード ── */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(212,175,55,0.03) 0%, transparent 60%);
+  pointer-events: none;
+}
+.card:hover {
+  border-color: rgba(212,175,55,0.5);
+  box-shadow: var(--shadow-gold);
+}
+
+/* ── ゲームカラー ── */
+.game-poker      { --game-color: var(--poker); }
+.game-blackjack  { --game-color: var(--blackjack); }
+.game-chinchiro  { --game-color: var(--chinchiro); }
+.game-keiba      { --game-color: var(--keiba); }
+
+.game-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--game-color, var(--gold));
+  letter-spacing: 0.08em;
+}
+
+/* ── ランキング行 ── */
+.rank-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid rgba(212,175,55,0.08);
+}
+.rank-row:last-child { border-bottom: none; }
+.rank-num {
+  font-family: 'Cinzel', serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  width: 2rem;
+  text-align: center;
+  flex-shrink: 0;
+}
+.rank-1 .rank-num { color: #ffd700; }
+.rank-2 .rank-num { color: #c0c0c0; }
+.rank-3 .rank-num { color: #cd7f32; }
+.rank-num.other   { color: var(--text-muted); }
+.rank-name { flex: 1; font-size: 0.95rem; }
+.rank-score {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  color: var(--gold);
+  font-size: 1rem;
+}
+
+/* ── 待ち時間バッジ ── */
+.wait-badge {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  border: 1px solid var(--game-color, var(--gold));
+  background: rgba(0,0,0,0.3);
+}
+.wait-badge .wait-num {
+  font-family: 'Cinzel', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--game-color, var(--gold));
+  line-height: 1;
+}
+.wait-badge .wait-unit {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+}
+
+/* ── ボタン ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  font-family: 'Cinzel', serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  padding: 0.6rem 1.4rem;
+  border-radius: 4px;
+  border: 1px solid;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  font-weight: 600;
+}
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  border-color: var(--gold);
+  color: #0a0a0f;
+}
+.btn-gold:hover {
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  box-shadow: var(--shadow-gold);
+}
+.btn-outline {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text-muted);
+}
+.btn-outline:hover { border-color: var(--gold); color: var(--gold); }
+.btn-danger {
+  background: transparent;
+  border-color: rgba(231,76,60,0.4);
+  color: var(--red-bright);
+}
+.btn-danger:hover { background: rgba(231,76,60,0.1); border-color: var(--red-bright); }
+.btn-sm { font-size: 0.75rem; padding: 0.4rem 0.9rem; }
+
+/* ── フォーム ── */
+.form-group { margin-bottom: 1.2rem; }
+.form-label {
+  display: block;
+  font-family: 'Cinzel', serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  margin-bottom: 0.4rem;
+}
+.form-control {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-main);
+  font-family: 'Noto Sans JP', sans-serif;
+  font-size: 0.95rem;
+  padding: 0.65rem 0.9rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+.form-control:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(212,175,55,0.12);
+}
+select.form-control option { background: var(--bg-card); color: var(--text-main); }
+
+/* ── トースト ── */
+#toast-container {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.toast {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.8rem 1.2rem;
+  font-size: 0.85rem;
+  min-width: 220px;
+  animation: slideIn 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+.toast.success { border-color: var(--green); color: #5dbb7a; }
+.toast.error   { border-color: var(--red);   color: var(--red-bright); }
+@keyframes slideIn { from { opacity:0; transform: translateX(30px); } to { opacity:1; transform: none; } }
+
+/* ── ローディング ── */
+.loading {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 2rem;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+}
+.spinner {
+  width: 32px; height: 32px;
+  border: 2px solid var(--border);
+  border-top-color: var(--gold);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 0.8rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── グリッド ── */
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+@media (max-width: 900px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) {
+  .grid-2, .grid-4 { grid-template-columns: 1fr; }
+  .container { padding: 1.5rem 1rem; }
+}
+
+/* ── テーブル ── */
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th {
+  font-family: 'Cinzel', serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  text-align: left;
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--border);
+}
+.data-table td {
+  padding: 0.75rem 0.8rem;
+  border-bottom: 1px solid rgba(212,175,55,0.06);
+  font-size: 0.9rem;
+}
+.data-table tr:hover td { background: rgba(212,175,55,0.03); }
+
+/* ── タブ ── */
+.tabs { display: flex; gap: 0.4rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+.tab-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  padding: 0.55rem 1.2rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.tab-btn.active, .tab-btn:hover {
+  border-color: var(--game-color, var(--gold));
+  color: var(--game-color, var(--gold));
+  background: rgba(212,175,55,0.06);
+}
+
+/* ── スーツ装飾 ── */
+.suit-deco {
+  position: fixed;
+  font-size: 8rem;
+  opacity: 0.015;
+  pointer-events: none;
+  z-index: 0;
+  font-family: serif;
+  user-select: none;
+}
+.suit-deco.tl { top: -1rem;  left: -1rem; }
+.suit-deco.br { bottom: -1rem; right: -1rem; }
