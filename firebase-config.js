@@ -3,12 +3,13 @@
 // ここを自分のFirebaseプロジェクトの値に書き換えてください
 // ==============================
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyCTjWRVRDRHbkKCoHUVs8mVacE-Nyoetj8",
+  authDomain: "casino-b8102.firebaseapp.com",
+  databaseURL: "https://casino-b8102-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "casino-b8102",
+  storageBucket: "casino-b8102.firebasestorage.app",
+  messagingSenderId: "737208136730",
+  appId: "1:737208136730:web:bd35fb984adbd92d818da3"
 };
 
 // Firebase初期化
