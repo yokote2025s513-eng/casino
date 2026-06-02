@@ -3,13 +3,12 @@
 // ここを自分のFirebaseプロジェクトの値に書き換えてください
 // ==============================
 const firebaseConfig = {
-  apiKey: "AIzaSyCTjWRVRDRHbkKCoHUVs8mVacE-Nyoetj8",
-  authDomain: "casino-b8102.firebaseapp.com",
-  databaseURL: "https://casino-b8102-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "casino-b8102",
-  storageBucket: "casino-b8102.firebasestorage.app",
-  messagingSenderId: "737208136730",
-  appId: "1:737208136730:web:bd35fb984adbd92d818da3"
+  apiKey: "AIzaSyBAX1uTae02ISqUl614si6sZWRLIEQsJBk",
+  authDomain: "casino-9a068.firebaseapp.com",
+  projectId: "casino-9a068",
+  storageBucket: "casino-9a068.firebasestorage.app",
+  messagingSenderId: "307945730969",
+  appId: "1:307945730969:web:fdeba132bbc42083ebd908"
 };
 
 // Firebase初期化
