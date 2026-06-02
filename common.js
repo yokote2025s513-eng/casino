@@ -46,3 +46,9 @@ function fmtTime(ts) {
   const d = ts.toDate ? ts.toDate() : new Date(ts);
   return d.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' });
 }
+
+// ログアウト
+function logout() {
+  sessionStorage.removeItem("casino_admin_auth");
+  location.replace("admin.html");
+}

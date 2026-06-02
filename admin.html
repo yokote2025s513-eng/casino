@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login ♠ Casino Night</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── カード ── */
+    .login-wrap {
+      width: min(420px, 92vw);
+      animation: fadeUp 0.5s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    .login-logo {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .login-logo-icon {
+      font-size: 3rem;
+      display: block;
+      margin-bottom: 0.6rem;
+      text-shadow: 0 0 30px rgba(212,175,55,0.6);
+    }
+    .login-logo-title {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.4rem;
+      color: var(--gold);
+      letter-spacing: 0.1em;
+      text-shadow: 0 0 20px rgba(212,175,55,0.4);
+    }
+    .login-logo-sub {
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.3em;
+      color: var(--text-muted);
+      margin-top: 0.3rem;
+      text-transform: uppercase;
+    }
+
+    .login-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .login-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(212,175,55,0.04) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .login-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 1.8rem;
+      text-transform: uppercase;
+    }
+
+    /* パスワード入力 */
+    .pw-wrap {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+    .pw-input {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-main);
+      font-family: 'Cinzel', serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.3em;
+      padding: 0.9rem 3rem 0.9rem 1.2rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      text-align: center;
+    }
+    .pw-input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(212,175,55,0.12);
+    }
+    .pw-input.error {
+      border-color: var(--red-bright);
+      box-shadow: 0 0 0 3px rgba(231,76,60,0.15);
+      animation: shake 0.35s ease;
+    }
+    @keyframes shake {
+      0%,100% { transform: none; }
+      20%      { transform: translateX(-6px); }
+      40%      { transform: translateX(6px); }
+      60%      { transform: translateX(-4px); }
+      80%      { transform: translateX(4px); }
+    }
+
+    .pw-toggle {
+      position: absolute;
+      right: 0.9rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0.2rem;
+      transition: color 0.2s;
+    }
+    .pw-toggle:hover { color: var(--gold); }
+
+    /* エラーメッセージ */
+    .error-msg {
+      display: none;
+      color: var(--red-bright);
+      font-size: 0.78rem;
+      text-align: center;
+      margin-bottom: 1rem;
+      letter-spacing: 0.05em;
+    }
+    .error-msg.show { display: block; animation: fadeUp 0.2s ease; }
+
+    /* ログインボタン */
+    .login-btn {
+      width: 100%;
+      font-family: 'Cinzel', serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      padding: 0.9rem;
+      border-radius: 6px;
+      border: 1px solid var(--gold);
+      background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+      color: #0a0a0f;
+      cursor: pointer;
+      transition: all 0.25s;
+      margin-bottom: 1rem;
+    }
+    .login-btn:hover {
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      box-shadow: 0 0 25px rgba(212,175,55,0.35);
+      transform: translateY(-1px);
+    }
+    .login-btn:active { transform: none; }
+
+    /* 試行回数 */
+    .attempt-info {
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+    }
+    .attempt-info span { color: var(--red-bright); }
+
+    /* ロックアウト */
+    .lockout-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(10,10,15,0.9);
+      border-radius: 10px;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 0.6rem;
+      z-index: 10;
+      backdrop-filter: blur(4px);
+    }
+    .lockout-overlay.show { display: flex; }
+    .lockout-icon { font-size: 2.5rem; }
+    .lockout-msg {
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      color: var(--red-bright);
+      letter-spacing: 0.08em;
+    }
+    .lockout-timer {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 2rem;
+      color: var(--gold);
+    }
+    .lockout-sub { font-size: 0.72rem; color: var(--text-muted); }
+
+    /* 移動先選択 */
+    .dest-select {
+      margin-bottom: 1.5rem;
+    }
+    .dest-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    .dest-btns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+    }
+    .dest-btn {
+      padding: 0.6rem 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .dest-btn.selected {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(212,175,55,0.08);
+    }
+    .dest-btn:hover:not(.selected) { border-color: rgba(212,175,55,0.4); color: var(--text-main); }
+
+    /* 戻るリンク */
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 1.2rem;
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .back-link:hover { color: var(--gold); }
+
+    /* スーツ装飾（大） */
+    .bg-suit {
+      position: fixed;
+      font-size: 20rem;
+      opacity: 0.012;
+      pointer-events: none;
+      font-family: serif;
+      user-select: none;
+      z-index: 0;
+    }
+    .bg-suit.tl { top: -4rem;  left: -4rem; }
+    .bg-suit.br { bottom: -4rem; right: -4rem; }
+  </style>
+</head>
+<body>
+
+<div class="bg-suit tl">♠</div>
+<div class="bg-suit br">♦</div>
+
+<div class="login-wrap">
+  <!-- ロゴ -->
+  <div class="login-logo">
+    <span class="login-logo-icon">🃏</span>
+    <div class="login-logo-title">Casino Night</div>
+    <div class="login-logo-sub">Staff Admin Panel</div>
+  </div>
+
+  <!-- ログインカード -->
+  <div class="login-card">
+    <!-- ロックアウト表示 -->
+    <div class="lockout-overlay" id="lockout-overlay">
+      <div class="lockout-icon">🔒</div>
+      <div class="lockout-msg">アクセスをロックしました</div>
+      <div class="lockout-timer" id="lockout-timer">—</div>
+      <div class="lockout-sub">秒後に再試行できます</div>
+    </div>
+
+    <div class="login-title">— Staff Only —</div>
+
+    <!-- 移動先選択 -->
+    <div class="dest-select">
+      <span class="dest-label">移動先ページ</span>
+      <div class="dest-btns">
+        <button class="dest-btn selected" data-dest="admin-ranking.html" onclick="selectDest(this)">
+          ♠ Ranking 管理
+        </button>
+        <button class="dest-btn" data-dest="admin-reserve.html" onclick="selectDest(this)">
+          🎟 整理番号 / 待ち時間
+        </button>
+      </div>
+    </div>
+
+    <!-- パスワード -->
+    <div class="pw-wrap">
+      <input
+        class="pw-input"
+        type="password"
+        id="pw-input"
+        placeholder="••••••••"
+        maxlength="32"
+        autocomplete="current-password"
+        onkeydown="if(event.key==='Enter') doLogin()"
+      >
+      <button class="pw-toggle" onclick="togglePw()" id="pw-toggle" title="表示切替">👁</button>
+    </div>
+
+    <div class="error-msg" id="error-msg">パスワードが違います</div>
+
+    <button class="login-btn" onclick="doLogin()">ENTER ▶</button>
+
+    <div class="attempt-info" id="attempt-info" style="display:none;">
+      残り試行回数: <span id="remain-count">—</span> 回
+    </div>
+  </div>
+
+  <a class="back-link" href="index.html">← TOPに戻る</a>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+// ==============================
+// ⚙️  パスワード設定
+// ここを変更してください
+const ADMIN_PASSWORD = "casino2025";
+// ==============================
+
+const MAX_ATTEMPTS  = 5;   // 最大試行回数
+const LOCKOUT_SEC   = 60;  // ロック時間（秒）
+const STORAGE_KEY   = 'casino_admin_auth';
+const LOCK_KEY      = 'casino_admin_lock';
+
+let selectedDest = 'admin-ranking.html';
+
+// 既にログイン済みなら自動転送
+if (sessionStorage.getItem(STORAGE_KEY) === 'ok') {
+  location.replace(selectedDest);
+}
+
+// ── 移動先選択 ──
+function selectDest(btn) {
+  document.querySelectorAll('.dest-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedDest = btn.dataset.dest;
+}
+
+// ── パスワード表示切替 ──
+function togglePw() {
+  const inp = document.getElementById('pw-input');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  document.getElementById('pw-toggle').textContent = inp.type === 'password' ? '👁' : '🙈';
+}
+
+// ── ロックアウト確認 ──
+function checkLock() {
+  const lock = JSON.parse(localStorage.getItem(LOCK_KEY) || 'null');
+  if (!lock) return false;
+  const remaining = Math.ceil((lock.until - Date.now()) / 1000);
+  if (remaining <= 0) {
+    localStorage.removeItem(LOCK_KEY);
+    return false;
+  }
+  showLockout(remaining);
+  return true;
+}
+
+function showLockout(sec) {
+  document.getElementById('lockout-overlay').classList.add('show');
+  let s = sec;
+  document.getElementById('lockout-timer').textContent = s;
+  const t = setInterval(() => {
+    s--;
+    document.getElementById('lockout-timer').textContent = s;
+    if (s <= 0) {
+      clearInterval(t);
+      document.getElementById('lockout-overlay').classList.remove('show');
+      localStorage.removeItem(LOCK_KEY);
+      updateAttemptDisplay(MAX_ATTEMPTS);
+    }
+  }, 1000);
+}
+
+// ── 試行回数管理 ──
+function getAttempts() {
+  return parseInt(sessionStorage.getItem('casino_attempts') || '0');
+}
+function addAttempt() {
+  const n = getAttempts() + 1;
+  sessionStorage.setItem('casino_attempts', n);
+  return n;
+}
+function resetAttempts() {
+  sessionStorage.removeItem('casino_attempts');
+}
+function updateAttemptDisplay(remain) {
+  const el = document.getElementById('attempt-info');
+  const ct = document.getElementById('remain-count');
+  if (remain < MAX_ATTEMPTS) {
+    el.style.display = 'block';
+    ct.textContent = remain;
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+// ── ログイン処理 ──
+function doLogin() {
+  if (checkLock()) return;
+
+  const inp = document.getElementById('pw-input');
+  const pw  = inp.value;
+  const errEl = document.getElementById('error-msg');
+
+  if (pw === ADMIN_PASSWORD) {
+    // 成功
+    sessionStorage.setItem(STORAGE_KEY, 'ok');
+    resetAttempts();
+    inp.style.borderColor = 'var(--green)';
+    document.querySelector('.login-btn').textContent = '✓ ログイン成功';
+    setTimeout(() => location.replace(selectedDest), 500);
+    return;
+  }
+
+  // 失敗
+  const count   = addAttempt();
+  const remain  = MAX_ATTEMPTS - count;
+
+  inp.classList.remove('error');
+  void inp.offsetWidth; // reflow for re-animation
+  inp.classList.add('error');
+  inp.value = '';
+  errEl.classList.add('show');
+
+  if (remain <= 0) {
+    // ロックアウト
+    const until = Date.now() + LOCKOUT_SEC * 1000;
+    localStorage.setItem(LOCK_KEY, JSON.stringify({ until }));
+    resetAttempts();
+    showLockout(LOCKOUT_SEC);
+  } else {
+    updateAttemptDisplay(remain);
+  }
+
+  setTimeout(() => { inp.classList.remove('error'); }, 400);
+}
+
+// 初期チェック
+checkLock();
+updateAttemptDisplay(MAX_ATTEMPTS - getAttempts());
+</script>
+</body>
+</html>

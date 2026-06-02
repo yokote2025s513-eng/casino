@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin: Reserve ♠ Casino Night</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* ── セクション構造 ── */
+    .ops-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    @media (max-width: 900px) { .ops-grid { grid-template-columns: 1fr; } }
+
+    /* 来場者カウンター */
+    .visitor-counter-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .visitor-counter-card::before {
+      content: '♟';
+      position: absolute;
+      font-size: 8rem;
+      opacity: 0.03;
+      right: -1rem; bottom: -2rem;
+    }
+    .vc-label { font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 0.2em; color: var(--text-muted); margin-bottom: 0.5rem; }
+    .vc-num {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 4rem;
+      font-weight: 900;
+      color: var(--gold);
+      text-shadow: 0 0 30px rgba(212,175,55,0.4);
+      line-height: 1;
+      margin-bottom: 0.3rem;
+    }
+    .vc-unit { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem; }
+    .vc-btns { display: flex; gap: 0.6rem; justify-content: center; flex-wrap: wrap; }
+    .vc-btn {
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      border: 1px solid;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .vc-btn.plus { background: rgba(93,187,122,0.12); border-color: #5dbb7a; color: #5dbb7a; }
+    .vc-btn.plus:hover { background: rgba(93,187,122,0.25); box-shadow: 0 0 15px rgba(93,187,122,0.3); }
+    .vc-btn.minus { background: rgba(231,76,60,0.1); border-color: var(--red-bright); color: var(--red-bright); }
+    .vc-btn.minus:hover { background: rgba(231,76,60,0.2); }
+    .vc-btn.reset { background: transparent; border-color: var(--border); color: var(--text-muted); font-size: 0.7rem; }
+
+    /* 待ち時間管理 */
+    .wait-mgr-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+    }
+    .wait-mgr-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      color: var(--gold);
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.8rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .wait-row {
+      display: flex; align-items: center; gap: 0.8rem;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid rgba(212,175,55,0.07);
+    }
+    .wait-row:last-child { border-bottom: none; }
+    .wait-game-name {
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      color: var(--game-color, var(--gold));
+      width: 100px;
+      flex-shrink: 0;
+    }
+    .wait-input-wrap { display: flex; align-items: center; gap: 0.5rem; flex: 1; }
+    .wait-input {
+      width: 70px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-main);
+      font-family: 'Cinzel', serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      padding: 0.4rem 0.5rem;
+      text-align: center;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    .wait-input:focus { border-color: var(--gold); }
+    .wait-mins-label { font-size: 0.75rem; color: var(--text-muted); }
+    .status-sel {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-main);
+      font-size: 0.78rem;
+      padding: 0.35rem 0.5rem;
+      outline: none;
+      cursor: pointer;
+    }
+    .status-sel:focus { border-color: var(--gold); }
+    .wait-save-btn {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      padding: 0.35rem 0.8rem;
+      border: 1px solid var(--gold-dark);
+      border-radius: 4px;
+      background: rgba(212,175,55,0.1);
+      color: var(--gold);
+      cursor: pointer;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .wait-save-btn:hover { background: rgba(212,175,55,0.2); border-color: var(--gold); }
+
+    /* 整理番号 */
+    .reserve-section { margin-top: 2rem; }
+    .reserve-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      color: var(--gold);
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .reserve-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    @media (max-width: 700px) { .reserve-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    .reserve-game-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.2rem;
+      text-align: center;
+      transition: border-color 0.25s;
+    }
+    .reserve-game-card:hover { border-color: var(--game-color, var(--gold)); }
+    .rg-icon { font-size: 1.8rem; margin-bottom: 0.3rem; }
+    .rg-name {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      color: var(--game-color, var(--gold));
+      margin-bottom: 0.8rem;
+    }
+    .rg-next {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1;
+      margin-bottom: 0.2rem;
+    }
+    .rg-prefix {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      margin-bottom: 0.8rem;
+    }
+    .rg-issue-btn {
+      width: 100%;
+      font-family: 'Cinzel', serif;
+      font-size: 0.78rem;
+      padding: 0.5rem;
+      border: 1px solid var(--game-color, var(--gold));
+      border-radius: 4px;
+      background: rgba(212,175,55,0.08);
+      color: var(--game-color, var(--gold));
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 0.4rem;
+    }
+    .rg-issue-btn:hover {
+      background: rgba(212,175,55,0.18);
+      box-shadow: 0 0 12px rgba(212,175,55,0.2);
+    }
+    .rg-reset-btn {
+      width: 100%;
+      font-size: 0.7rem;
+      padding: 0.3rem;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .rg-reset-btn:hover { color: var(--red-bright); border-color: var(--red-bright); }
+
+    /* 発行履歴 */
+    .history-section { margin-top: 2rem; }
+    .history-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      color: var(--gold);
+      margin-bottom: 1rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .ticket-badge {
+      display: inline-block;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.4rem 0.8rem;
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      color: var(--game-color, var(--gold));
+      margin: 0.15rem;
+    }
+
+    /* 大票表示モーダル */
+    .ticket-modal {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 300;
+      align-items: center; justify-content: center;
+    }
+    .ticket-modal.open { display: flex; }
+    .ticket-display {
+      background: var(--bg-card);
+      border: 2px solid var(--gold);
+      border-radius: 16px;
+      padding: 3rem;
+      text-align: center;
+      box-shadow: 0 0 60px rgba(212,175,55,0.3);
+      min-width: 280px;
+      cursor: pointer;
+    }
+    .ticket-game { font-family: 'Cinzel', serif; font-size: 0.9rem; letter-spacing: 0.15em; color: var(--text-muted); margin-bottom: 0.5rem; }
+    .ticket-num-big {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 5rem;
+      font-weight: 900;
+      color: var(--gold);
+      text-shadow: 0 0 40px rgba(212,175,55,0.6);
+      line-height: 1;
+    }
+    .ticket-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; }
+    .ticket-close { font-size: 0.75rem; color: var(--text-muted); margin-top: 1.5rem; }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-logo" href="index.html">♠ Casino Night</a>
+    <nav class="site-nav">
+      <a class="nav-link" href="index.html">TOP</a>
+      <a class="nav-link" href="ranking.html">Ranking</a>
+      <a class="nav-link" href="admin-ranking.html">Admin:Ranking</a>
+      <a class="nav-link active" href="admin-reserve.html">Admin:Reserve</a>
+      <button class="nav-link" onclick="logout()" style="cursor:pointer;background:none;">ログアウト</button>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+  <h1 class="page-title">ADMIN — RESERVE</h1>
+  <p class="page-subtitle">来場者管理・整理番号・待ち時間</p>
+  <div class="divider"></div>
+
+  <div class="ops-grid">
+
+    <!-- 来場者カウンター -->
+    <div class="visitor-counter-card">
+      <div class="vc-label">TOTAL VISITORS</div>
+      <div class="vc-num" id="vc-num">—</div>
+      <div class="vc-unit">人来場</div>
+      <div class="vc-btns">
+        <button class="vc-btn minus" onclick="changeVisitor(-10)" title="-10">−10</button>
+        <button class="vc-btn minus" onclick="changeVisitor(-1)"  title="-1">−</button>
+        <button class="vc-btn plus"  onclick="changeVisitor(1)"   title="+1">＋</button>
+        <button class="vc-btn plus"  onclick="changeVisitor(10)"  title="+10">＋10</button>
+      </div>
+      <div style="margin-top:1rem;">
+        <button class="vc-btn reset" style="width:auto; padding:0 1rem; border-radius:20px;" onclick="resetVisitor()">リセット</button>
+      </div>
+    </div>
+
+    <!-- 待ち時間管理 -->
+    <div class="wait-mgr-card">
+      <div class="wait-mgr-title">⏱ 待ち時間管理</div>
+      <div id="wait-mgr-rows"></div>
+    </div>
+
+  </div>
+
+  <!-- 整理番号 -->
+  <div class="reserve-section">
+    <div class="reserve-title">🎟 整理番号発行</div>
+    <div class="reserve-grid" id="reserve-grid"></div>
+  </div>
+
+  <!-- 発行履歴 -->
+  <div class="history-section">
+    <div class="history-title">
+      <span>発行履歴（本日）</span>
+      <button class="btn btn-outline btn-sm" onclick="loadHistory()">更新</button>
+    </div>
+    <div id="history-wrap">
+      <div class="loading"><div class="spinner"></div>Loading...</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 整理番号表示モーダル -->
+<div class="ticket-modal" id="ticket-modal" onclick="closeTicket()">
+  <div class="ticket-display" onclick="event.stopPropagation()">
+    <div class="ticket-game" id="tk-game"></div>
+    <div class="ticket-num-big" id="tk-num"></div>
+    <div class="ticket-label">整理番号</div>
+    <div class="ticket-close" onclick="closeTicket()">タップで閉じる</div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+// セッションチェック: admin.htmlを通ってない場合はログインページへ
+if (sessionStorage.getItem('casino_admin_auth') !== 'ok') {
+  location.replace('admin.html');
+}
+</script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="common.js"></script>
+<script>
+// ── 来場者カウンター ──
+let currentVisitors = 0;
+
+db.collection('visitors').doc('total').onSnapshot(snap => {
+  const d = snap.data() ?? {};
+  currentVisitors = d.count ?? 0;
+  document.getElementById('vc-num').textContent = currentVisitors.toLocaleString();
+});
+
+async function changeVisitor(delta) {
+  const next = Math.max(0, currentVisitors + delta);
+  try {
+    await db.collection('visitors').doc('total').set({
+      count: next,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch(e) { showToast('エラー: ' + e.message, 'error'); }
+}
+
+async function resetVisitor() {
+  if (!confirm('来場者数をリセットしますか？')) return;
+  await db.collection('visitors').doc('total').set({ count: 0, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+  showToast('リセットしました');
+}
+
+// ── 待ち時間管理 ──
+const waitState = {}; // gameId -> {minutes, status}
+
+const waitMgrEl = document.getElementById('wait-mgr-rows');
+waitMgrEl.innerHTML = GAMES.map(g => `
+  <div class="wait-row game-${g.id}">
+    <div class="wait-game-name">${g.icon} ${g.label}</div>
+    <div class="wait-input-wrap">
+      <input class="wait-input" type="number" id="wt-${g.id}" min="0" max="999" value="0">
+      <span class="wait-mins-label">分</span>
+      <select class="status-sel" id="ws-${g.id}">
+        <option value="open">空き</option>
+        <option value="busy">混雑</option>
+        <option value="full">満員</option>
+      </select>
+      <button class="wait-save-btn" onclick="saveWait('${g.id}')">保存</button>
+    </div>
+  </div>`).join('');
+
+// 現在値をロード
+db.collection('waitTimes').onSnapshot(snap => {
+  snap.forEach(doc => {
+    const d = doc.data();
+    const inp = document.getElementById('wt-' + doc.id);
+    const sel = document.getElementById('ws-' + doc.id);
+    if (inp) inp.value = d.minutes ?? 0;
+    if (sel) sel.value = d.status ?? 'open';
+    waitState[doc.id] = d;
+  });
+});
+
+async function saveWait(gameId) {
+  const mins   = parseInt(document.getElementById('wt-' + gameId).value) || 0;
+  const status = document.getElementById('ws-' + gameId).value;
+  try {
+    await db.collection('waitTimes').doc(gameId).set({
+      minutes: mins,
+      status: status,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    showToast(`${gameLabel(gameId)}の待ち時間を更新 ✓`);
+  } catch(e) { showToast('エラー: ' + e.message, 'error'); }
+}
+
+// ── 整理番号 ──
+const reserveGrid = document.getElementById('reserve-grid');
+const prefixMap = { poker:'P', blackjack:'B', chinchiro:'C', keiba:'K' };
+
+// 各ゲームの次番号をリアルタイム取得
+const nextNums = {};
+GAMES.forEach(g => {
+  nextNums[g.id] = 1;
+  db.collection('reserves').doc(g.id).onSnapshot(snap => {
+    const d = snap.data() ?? {};
+    nextNums[g.id] = (d.next ?? 1);
+    renderReserveGrid();
+  });
+});
+
+function renderReserveGrid() {
+  reserveGrid.innerHTML = GAMES.map(g => {
+    const prefix = prefixMap[g.id];
+    const next   = nextNums[g.id];
+    const numStr = String(next).padStart(3, '0');
+    return `
+      <div class="reserve-game-card game-${g.id}">
+        <div class="rg-icon">${g.icon}</div>
+        <div class="rg-name">${g.label}</div>
+        <div class="rg-next">${prefix}-${numStr}</div>
+        <div class="rg-prefix">次の番号</div>
+        <button class="rg-issue-btn" onclick="issueTicket('${g.id}')">発行する</button>
+        <button class="rg-reset-btn" onclick="resetTickets('${g.id}')">リセット</button>
+      </div>`;
+  }).join('');
+}
+
+async function issueTicket(gameId) {
+  const prefix  = prefixMap[gameId];
+  const current = nextNums[gameId];
+  const numStr  = String(current).padStart(3, '0');
+  const ticketId = `${prefix}-${numStr}`;
+
+  try {
+    const batch = db.batch();
+    // カウンターを進める
+    batch.set(db.collection('reserves').doc(gameId), { next: current + 1 }, { merge: true });
+    // 履歴に記録
+    batch.set(db.collection('reserveHistory').doc(), {
+      gameId,
+      ticketId,
+      issuedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    await batch.commit();
+
+    // 大きく表示
+    showTicket(gameId, ticketId);
+    showToast(`発行: ${ticketId}`);
+  } catch(e) { showToast('エラー: ' + e.message, 'error'); }
+}
+
+async function resetTickets(gameId) {
+  if (!confirm(`${gameLabel(gameId)}の整理番号をリセットしますか？`)) return;
+  await db.collection('reserves').doc(gameId).set({ next: 1 });
+  showToast(`${gameLabel(gameId)}をリセット`);
+}
+
+// チケット大表示
+function showTicket(gameId, ticketId) {
+  const g = GAMES.find(x => x.id === gameId);
+  document.getElementById('tk-game').textContent = `${g.icon} ${g.label}`;
+  document.getElementById('tk-num').textContent   = ticketId;
+  document.getElementById('ticket-modal').classList.add('open');
+}
+function closeTicket() {
+  document.getElementById('ticket-modal').classList.remove('open');
+  loadHistory();
+}
+
+// 発行履歴
+async function loadHistory() {
+  const wrap = document.getElementById('history-wrap');
+  try {
+    const snap = await db.collection('reserveHistory')
+      .orderBy('issuedAt', 'desc')
+      .limit(100)
+      .get();
+    if (snap.empty) {
+      wrap.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;padding:1rem;">まだ発行がありません</div>';
+      return;
+    }
+    // ゲーム別にグループ化
+    const groups = {};
+    GAMES.forEach(g => { groups[g.id] = []; });
+    snap.forEach(d => {
+      const item = d.data();
+      if (groups[item.gameId]) groups[item.gameId].push(item);
+    });
+
+    wrap.innerHTML = `
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:1rem;">
+        ${GAMES.map(g => `
+          <div>
+            <div style="font-family:'Cinzel',serif; font-size:0.75rem; letter-spacing:0.1em; color:var(--${g.id}); margin-bottom:0.5rem;">
+              ${g.icon} ${g.label}（${groups[g.id].length}枚）
+            </div>
+            <div>
+              ${groups[g.id].slice(0, 20).map(it =>
+                `<span class="ticket-badge game-${it.gameId}">${it.ticketId}</span>`
+              ).join('')}
+              ${groups[g.id].length === 0 ? '<span style="color:var(--text-muted);font-size:0.78rem;">なし</span>' : ''}
+            </div>
+          </div>`).join('')}
+      </div>`;
+  } catch(e) {
+    wrap.innerHTML = `<div style="color:var(--red-bright);font-size:0.8rem;">エラー: ${e.message}</div>`;
+  }
+}
+loadHistory();
+</script>
+</body>
+</html>

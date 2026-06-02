@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin: Ranking ♠ Casino Night</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .admin-layout { display: grid; grid-template-columns: 360px 1fr; gap: 2rem; }
+    @media (max-width: 900px) { .admin-layout { grid-template-columns: 1fr; } }
+
+    /* 入力フォームカード */
+    .form-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      position: sticky;
+      top: 80px;
+      align-self: start;
+    }
+    .form-card-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      color: var(--gold);
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.8rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* テーブル側 */
+    .list-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;
+    }
+    .list-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.12em;
+      color: var(--gold);
+    }
+    .filter-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+    .filter-btn {
+      font-family: 'Cinzel', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      padding: 0.35rem 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-btn.active { color: var(--gold); border-color: var(--gold); background: rgba(212,175,55,0.08); }
+    .filter-btn:hover:not(.active) { color: var(--text-main); }
+
+    .action-cell { display: flex; gap: 0.4rem; }
+    .edit-btn-inline {
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem;
+      padding: 0.25rem 0.7rem;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .edit-btn-inline.edit { color: var(--gold); border-color: rgba(212,175,55,0.3); }
+    .edit-btn-inline.edit:hover { background: rgba(212,175,55,0.1); border-color: var(--gold); }
+    .edit-btn-inline.del  { color: var(--red-bright); border-color: rgba(231,76,60,0.3); }
+    .edit-btn-inline.del:hover { background: rgba(231,76,60,0.1); border-color: var(--red-bright); }
+
+    .game-dot {
+      display: inline-block;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      margin-right: 0.4rem;
+      flex-shrink: 0;
+    }
+    .dot-poker      { background: var(--poker); }
+    .dot-blackjack  { background: var(--blackjack); }
+    .dot-chinchiro  { background: var(--chinchiro); }
+    .dot-keiba      { background: var(--keiba); }
+
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      z-index: 200;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.8rem;
+      width: min(440px, 90vw);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+    }
+    .modal h3 {
+      font-family: 'Cinzel', serif;
+      color: var(--gold);
+      margin-bottom: 1.2rem;
+      font-size: 1rem;
+      letter-spacing: 0.1em;
+    }
+    .modal-actions { display: flex; gap: 0.6rem; justify-content: flex-end; margin-top: 1.2rem; }
+    .count-chip {
+      background: rgba(212,175,55,0.12);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 0.2rem 0.7rem;
+      font-size: 0.75rem;
+      color: var(--gold);
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-logo" href="index.html">♠ Casino Night</a>
+    <nav class="site-nav">
+      <a class="nav-link" href="index.html">TOP</a>
+      <a class="nav-link" href="ranking.html">Ranking</a>
+      <a class="nav-link active" href="admin-ranking.html">Admin:Ranking</a>
+      <a class="nav-link" href="admin-reserve.html">Admin:Reserve</a>
+      <button class="nav-link" onclick="logout()" style="cursor:pointer;background:none;">ログアウト</button>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+  <h1 class="page-title">ADMIN — RANKING</h1>
+  <p class="page-subtitle">スコア登録・編集・削除</p>
+  <div class="divider"></div>
+
+  <div class="admin-layout">
+
+    <!-- 入力フォーム -->
+    <div class="form-card">
+      <div class="form-card-title" id="form-mode-label">▸ 新規スコア登録</div>
+      <input type="hidden" id="edit-id">
+
+      <div class="form-group">
+        <label class="form-label">GAME</label>
+        <select class="form-control" id="f-game">
+          <option value="">ゲームを選択</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">NAME（参加者名）</label>
+        <input class="form-control" type="text" id="f-name" placeholder="例: 山田 太郎" maxlength="30">
+      </div>
+      <div class="form-group">
+        <label class="form-label">SCORE（得点）</label>
+        <input class="form-control" type="number" id="f-score" placeholder="例: 1500" min="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">NOTE（メモ・任意）</label>
+        <input class="form-control" type="text" id="f-note" placeholder="例: 整理番号 A-05" maxlength="50">
+      </div>
+
+      <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+        <button class="btn btn-gold" onclick="submitScore()" style="flex:1">
+          <span id="submit-label">登録する</span>
+        </button>
+        <button class="btn btn-outline" onclick="resetForm()" id="cancel-btn" style="display:none">キャンセル</button>
+      </div>
+    </div>
+
+    <!-- 一覧 -->
+    <div>
+      <div class="list-header">
+        <div style="display:flex;align-items:center;gap:0.8rem;">
+          <span class="list-title">スコア一覧</span>
+          <span class="count-chip" id="count-chip">0 件</span>
+        </div>
+        <div class="filter-row" id="filter-row"></div>
+      </div>
+
+      <div class="card" style="padding:0; overflow:hidden;">
+        <div id="table-wrap">
+          <div class="loading"><div class="spinner"></div>Loading...</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 削除確認モーダル -->
+<div class="modal-overlay" id="del-modal">
+  <div class="modal">
+    <h3>⚠ 削除の確認</h3>
+    <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:0.5rem;">
+      このスコアを削除しますか？この操作は元に戻せません。
+    </p>
+    <p id="del-target-info" style="font-size:0.9rem; color:var(--text-main);"></p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeDelModal()">キャンセル</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">削除する</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script>
+// セッションチェック: admin.htmlを通ってない場合はログインページへ
+if (sessionStorage.getItem('casino_admin_auth') !== 'ok') {
+  location.replace('admin.html');
+}
+</script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="common.js"></script>
+<script>
+// ゲームセレクト初期化
+const sel = document.getElementById('f-game');
+GAMES.forEach(g => {
+  sel.innerHTML += `<option value="${g.id}">${g.icon} ${g.label}</option>`;
+});
+
+// フィルターボタン
+let filterGame = 'all';
+const filterRow = document.getElementById('filter-row');
+[{id:'all', label:'全て', icon:''}].concat(GAMES).forEach(g => {
+  const btn = document.createElement('button');
+  btn.className = 'filter-btn' + (g.id === 'all' ? ' active' : '');
+  btn.dataset.id = g.id;
+  btn.textContent = (g.icon ? g.icon + ' ' : '') + g.label;
+  btn.onclick = () => {
+    filterGame = g.id;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.id === g.id));
+    renderTable(allDocs);
+  };
+  filterRow.appendChild(btn);
+});
+
+let allDocs = [];
+let delId = null;
+
+// リアルタイム取得
+db.collection('rankings').orderBy('score', 'desc').onSnapshot(snap => {
+  allDocs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  renderTable(allDocs);
+  document.getElementById('count-chip').textContent = allDocs.length + ' 件';
+});
+
+function renderTable(docs) {
+  const filtered = filterGame === 'all' ? docs : docs.filter(d => d.gameId === filterGame);
+  if (filtered.length === 0) {
+    document.getElementById('table-wrap').innerHTML =
+      '<div class="loading" style="padding:2.5rem;">データがありません</div>';
+    return;
+  }
+  // ゲーム別順位付け
+  const rankMap = {};
+  GAMES.forEach(g => {
+    let r = 1;
+    docs.filter(d => d.gameId === g.id).forEach(d => { rankMap[d.id] = r++; });
+  });
+
+  document.getElementById('table-wrap').innerHTML = `
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>順位</th><th>ゲーム</th><th>名前</th><th>スコア</th><th>メモ</th><th>登録</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        ${filtered.map(it => `
+          <tr>
+            <td style="font-family:'Cinzel',serif; font-weight:700; color:${rankMap[it.id]<=3?'var(--gold)':'var(--text-muted)'}">
+              ${rankMap[it.id]}
+            </td>
+            <td>
+              <span class="game-dot dot-${it.gameId}"></span>
+              ${gameLabel(it.gameId)}
+            </td>
+            <td style="font-weight:700">${it.name}</td>
+            <td style="font-family:'Cinzel',serif; color:var(--gold); font-weight:700">
+              ${it.score.toLocaleString()}
+            </td>
+            <td style="color:var(--text-muted); font-size:0.8rem">${it.note || '—'}</td>
+            <td style="color:var(--text-muted); font-size:0.78rem">${fmtTime(it.createdAt)}</td>
+            <td>
+              <div class="action-cell">
+                <button class="edit-btn-inline edit" onclick="startEdit('${it.id}')">編集</button>
+                <button class="edit-btn-inline del"  onclick="openDelModal('${it.id}','${it.name}',${it.score})">削除</button>
+              </div>
+            </td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+// フォーム送信
+async function submitScore() {
+  const gameId = document.getElementById('f-game').value;
+  const name   = document.getElementById('f-name').value.trim();
+  const score  = parseInt(document.getElementById('f-score').value);
+  const note   = document.getElementById('f-note').value.trim();
+  const editId = document.getElementById('edit-id').value;
+
+  if (!gameId) return showToast('ゲームを選択してください', 'error');
+  if (!name)   return showToast('名前を入力してください', 'error');
+  if (isNaN(score) || score < 0) return showToast('スコアを正しく入力してください', 'error');
+
+  const data = {
+    gameId, name, score, note,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  };
+
+  try {
+    if (editId) {
+      await db.collection('rankings').doc(editId).update(data);
+      showToast('スコアを更新しました ✓');
+    } else {
+      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+      await db.collection('rankings').add(data);
+      showToast('スコアを登録しました ✓');
+    }
+    resetForm();
+  } catch (e) {
+    showToast('エラー: ' + e.message, 'error');
+  }
+}
+
+function startEdit(id) {
+  const doc = allDocs.find(d => d.id === id);
+  if (!doc) return;
+  document.getElementById('edit-id').value = id;
+  document.getElementById('f-game').value  = doc.gameId;
+  document.getElementById('f-name').value  = doc.name;
+  document.getElementById('f-score').value = doc.score;
+  document.getElementById('f-note').value  = doc.note || '';
+  document.getElementById('form-mode-label').textContent = '▸ スコア編集中';
+  document.getElementById('submit-label').textContent = '更新する';
+  document.getElementById('cancel-btn').style.display = 'inline-flex';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetForm() {
+  document.getElementById('edit-id').value  = '';
+  document.getElementById('f-game').value   = '';
+  document.getElementById('f-name').value   = '';
+  document.getElementById('f-score').value  = '';
+  document.getElementById('f-note').value   = '';
+  document.getElementById('form-mode-label').textContent = '▸ 新規スコア登録';
+  document.getElementById('submit-label').textContent = '登録する';
+  document.getElementById('cancel-btn').style.display = 'none';
+}
+
+// 削除モーダル
+function openDelModal(id, name, score) {
+  delId = id;
+  document.getElementById('del-target-info').textContent = `「${name}」 — ${score.toLocaleString()} pt`;
+  document.getElementById('del-modal').classList.add('open');
+}
+function closeDelModal() {
+  delId = null;
+  document.getElementById('del-modal').classList.remove('open');
+}
+async function confirmDelete() {
+  if (!delId) return;
+  try {
+    await db.collection('rankings').doc(delId).delete();
+    showToast('削除しました');
+  } catch (e) {
+    showToast('エラー: ' + e.message, 'error');
+  }
+  closeDelModal();
+}
+</script>
+</body>
+</html>
