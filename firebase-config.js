@@ -13,6 +13,8 @@ const firebaseConfig = {
 
 // Firebase初期化
 firebase.initializeApp(firebaseConfig);
+// ※ データベース名が (default) 以外の場合は databaseId を指定
+// 例: const db = firebase.firestore(firebase.app(), 'your-database-name');
 const db = firebase.firestore();
 
 // ゲーム定義
