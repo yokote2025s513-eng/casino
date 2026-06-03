@@ -277,6 +277,23 @@
     }
     .nick-hint { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 1.2rem; margin-top: -0.8rem; }
     .nick-actions { display: flex; gap: 0.6rem; }
+    .nick-error { font-size: 0.75rem; color: var(--red-bright); margin-top: 0.3rem; min-height: 1.2em; margin-bottom: 0.5rem; }
+    .nick-input-wrap { position: relative; margin-bottom: 0.3rem; }
+    .nick-suggestions {
+      position: absolute; top: 100%; left: 0; right: 0;
+      background: var(--bg-surface);
+      border: 1px solid var(--border); border-top: none;
+      border-radius: 0 0 6px 6px;
+      z-index: 50; max-height: 160px; overflow-y: auto;
+    }
+    .nick-sug-item {
+      padding: 0.55rem 0.9rem; font-size: 0.85rem;
+      cursor: pointer; color: var(--text-muted);
+      transition: background 0.15s;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .nick-sug-item:hover { background: rgba(212,175,55,0.08); color: var(--text-main); }
+    .nick-sug-item.taken { color: rgba(231,76,60,0.6); cursor: not-allowed; font-size: 0.78rem; }
 
     /* 大票表示モーダル */
     .ticket-modal {
@@ -387,8 +404,12 @@
   <div class="nick-card">
     <div class="nick-title">NICKNAME を入力</div>
     <div class="nick-game-badge" id="nick-game-badge"></div>
-    <input class="nick-input" type="text" id="nick-input" placeholder="例: やまだたろう" maxlength="20"
-      onkeydown="if(event.key==='Enter') confirmIssue()">
+    <div class="nick-input-wrap">
+      <input class="nick-input" type="text" id="nick-input" placeholder="例: やまだたろう" maxlength="20"
+        autocomplete="off" oninput="onNickInput()" onkeydown="if(event.key==='Enter') confirmIssue()">
+      <div class="nick-suggestions" id="nick-sug" style="display:none"></div>
+    </div>
+    <div class="nick-error" id="nick-error"></div>
     <div class="nick-hint">ランキングにこの名前で表示されます</div>
     <div class="nick-actions">
       <button class="btn btn-gold" style="flex:1" onclick="confirmIssue()">発行する ▶</button>
@@ -528,6 +549,8 @@ async function issueTicket(gameId) {
   document.getElementById('nick-game-badge').innerHTML =
     `${g.icon} ${g.label} &nbsp;—&nbsp; 次の番号: <strong style="color:var(--${gameId})">${prefixMap[gameId]}-${String(nextNums[gameId]).padStart(3,'0')}</strong>`;
   document.getElementById('nick-input').value = '';
+  document.getElementById('nick-error').textContent = '';
+  document.getElementById('nick-sug').style.display = 'none';
   document.getElementById('nick-modal').classList.add('open');
   setTimeout(() => document.getElementById('nick-input').focus(), 80);
   // 発行対象を保存
@@ -535,17 +558,60 @@ async function issueTicket(gameId) {
 }
 
 let pendingGameId = null;
+let existingNicknames = new Set();
+
+// 登録済みニックネームをリアルタイム取得
+db.collection('reserveHistory').onSnapshot(snap => {
+  existingNicknames = new Set(snap.docs.map(d => d.data().nickname).filter(Boolean));
+});
+
+// ニックネーム入力時のサジェスト＆重複チェック
+function onNickInput() {
+  const val = document.getElementById('nick-input').value.trim();
+  const sugEl  = document.getElementById('nick-sug');
+  const errEl  = document.getElementById('nick-error');
+  errEl.textContent = '';
+
+  if (!val) { sugEl.style.display = 'none'; return; }
+
+  // 重複チェック
+  if (existingNicknames.has(val)) {
+    errEl.textContent = '⚠ このニックネームは既に使用されています';
+  }
+
+  // 前方一致サジェスト（使用中のもの）
+  const matches = [...existingNicknames].filter(n => n.startsWith(val) && n !== val).slice(0, 6);
+  if (matches.length > 0) {
+    sugEl.style.display = 'block';
+    sugEl.innerHTML = matches.map(n =>
+      `<div class="nick-sug-item taken">✗ ${n}（使用中）</div>`
+    ).join('');
+  } else {
+    sugEl.style.display = 'none';
+  }
+}
+
+// モーダル外クリックでサジェストを閉じる
+document.addEventListener('click', e => {
+  if (!e.target.closest('.nick-input-wrap')) {
+    const s = document.getElementById('nick-sug');
+    if (s) s.style.display = 'none';
+  }
+});
 
 async function confirmIssue() {
   const gameId   = pendingGameId;
   if (!gameId) return;
   const nickname = document.getElementById('nick-input').value.trim();
   if (!nickname) {
+    document.getElementById('nick-error').textContent = '名前を入力してください';
     document.getElementById('nick-input').style.borderColor = 'var(--red-bright)';
-    document.getElementById('nick-input').placeholder = '名前を入力してください';
-    setTimeout(() => {
-      document.getElementById('nick-input').style.borderColor = '';
-    }, 1000);
+    setTimeout(() => { document.getElementById('nick-input').style.borderColor = ''; }, 1000);
+    return;
+  }
+  if (existingNicknames.has(nickname)) {
+    document.getElementById('nick-error').textContent = '⚠ このニックネームは既に使用されています';
+    document.getElementById('nick-input').style.borderColor = 'var(--red-bright)';
     return;
   }
   closeNickModal();

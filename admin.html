@@ -216,6 +216,7 @@
       grid-template-columns: 1fr 1fr;
       gap: 0.5rem;
     }
+    @media (max-width: 400px) { .dest-btns { grid-template-columns: 1fr; } }
     .dest-btn {
       padding: 0.6rem 0.5rem;
       border: 1px solid var(--border);
@@ -298,6 +299,12 @@
         </button>
         <button class="dest-btn" data-dest="admin-reserve.html" onclick="selectDest(this)">
           🎟 整理番号 / 待ち時間
+        </button>
+        <button class="dest-btn" data-dest="obs.html" onclick="selectDest(this)">
+          📺 OBS 表示
+        </button>
+        <button class="dest-btn" data-dest="super-admin.html" onclick="selectDest(this)">
+          🔐 Super Admin
         </button>
       </div>
     </div>

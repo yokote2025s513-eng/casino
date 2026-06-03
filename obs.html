@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OBS — Casino Night</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --gold:       #d4af37;
+      --gold-light: #f0d060;
+      --bg:         #0a0a0f;
+      --poker:      #e74c3c;
+      --blackjack:  #3498db;
+      --chinchiro:  #e67e22;
+      --keiba:      #27ae60;
+    }
+
+    html, body {
+      width: 1920px; height: 1080px;
+      overflow: hidden;
+      background: transparent;
+      font-family: 'Noto Sans JP', sans-serif;
+    }
+
+    /* ── 背景 ── */
+    .bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 50% 50%, rgba(212,175,55,0.06) 0%, transparent 70%),
+        linear-gradient(180deg, rgba(10,10,15,0.95) 0%, rgba(10,10,15,0.98) 100%);
+    }
+
+    /* ── ヘッダー ── */
+    .header {
+      position: relative; z-index: 10;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 28px 80px 0;
+      border-bottom: 1px solid rgba(212,175,55,0.2);
+      padding-bottom: 20px;
+    }
+    .header-logo {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 2rem;
+      color: var(--gold);
+      text-shadow: 0 0 30px rgba(212,175,55,0.5);
+      letter-spacing: 0.1em;
+    }
+    .header-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.3em;
+      color: rgba(212,175,55,0.6);
+      text-transform: uppercase;
+    }
+    .header-time {
+      font-family: 'Cinzel', serif;
+      font-size: 1.3rem;
+      color: rgba(255,255,255,0.5);
+      letter-spacing: 0.1em;
+    }
+
+    /* ── メインエリア ── */
+    .main {
+      position: relative; z-index: 10;
+      display: flex;
+      height: calc(1080px - 110px);
+      padding: 0 60px;
+      gap: 40px;
+      align-items: stretch;
+    }
+
+    /* ── ゲームパネル ── */
+    .game-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 32px 28px;
+      border-radius: 12px;
+      border: 1px solid rgba(212,175,55,0.15);
+      background: rgba(17,17,24,0.8);
+      position: relative;
+      overflow: hidden;
+      margin-top: 30px;
+      margin-bottom: 30px;
+      transition: all 0.5s ease;
+    }
+    .game-panel::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(212,175,55,0.04) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .game-panel.active {
+      border-color: var(--game-color);
+      box-shadow: 0 0 40px rgba(0,0,0,0.5), inset 0 0 30px rgba(0,0,0,0.3);
+      transform: scaleY(1.02);
+    }
+    .game-panel::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--game-color, var(--gold));
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    .game-panel.active::after { opacity: 1; }
+
+    /* ゲームヘッダー */
+    .panel-head {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(212,175,55,0.12);
+    }
+    .panel-icon { font-size: 2rem; line-height: 1; }
+    .panel-name {
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      letter-spacing: 0.15em;
+      color: var(--game-color, var(--gold));
+      font-weight: 700;
+    }
+    .panel-count {
+      margin-left: auto;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.3);
+      letter-spacing: 0.1em;
+    }
+
+    /* ランキング行 */
+    .rank-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      animation: fadeIn 0.4s ease both;
+    }
+    .rank-item:last-child { border-bottom: none; }
+    @keyframes fadeIn { from { opacity:0; transform:translateX(-8px); } to { opacity:1; transform:none; } }
+
+    .rank-num {
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      width: 44px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .r1 { color: #ffd700; text-shadow: 0 0 12px rgba(255,215,0,0.6); font-size: 1.3rem; }
+    .r2 { color: #c0c0c0; }
+    .r3 { color: #cd7f32; }
+    .rn { color: rgba(255,255,255,0.3); font-size: 0.9rem; }
+
+    .rank-bar-wrap {
+      flex: 1;
+      position: relative;
+      height: 36px;
+      display: flex; align-items: center;
+    }
+    .rank-bar {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      border-radius: 4px;
+      opacity: 0.15;
+      transition: width 1s ease;
+    }
+    .rank-name {
+      position: relative; z-index: 1;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.9);
+      padding-left: 10px;
+    }
+    .rank-score {
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--game-color, var(--gold));
+      flex-shrink: 0;
+      min-width: 80px;
+      text-align: right;
+    }
+
+    .empty-msg {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,0.2);
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+    }
+
+    /* ゲームカラー */
+    .g-poker     { --game-color: var(--poker); }
+    .g-blackjack { --game-color: var(--blackjack); }
+    .g-chinchiro { --game-color: var(--chinchiro); }
+    .g-keiba     { --game-color: var(--keiba); }
+
+    /* ── フッター ── */
+    .footer {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 4px;
+      background: linear-gradient(90deg,
+        var(--poker) 0%, var(--poker) 25%,
+        var(--blackjack) 25%, var(--blackjack) 50%,
+        var(--chinchiro) 50%, var(--chinchiro) 75%,
+        var(--keiba) 75%, var(--keiba) 100%
+      );
+      z-index: 10;
+    }
+
+    /* ── スポットライト（アクティブゲーム） ── */
+    .spotlight {
+      position: absolute;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(212,175,55,0.04) 0%, transparent 70%);
+      pointer-events: none;
+      transition: all 1s ease;
+      z-index: 1;
+    }
+
+    /* ── クラウン装飾 ── */
+    .crown-deco {
+      position: absolute;
+      top: -8px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 1.4rem;
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    .game-panel.active .crown-deco { opacity: 1; }
+  </style>
+</head>
+<body>
+
+<div class="bg"></div>
+<div class="spotlight" id="spotlight"></div>
+
+<div class="header">
+  <div class="header-logo">♠ Casino Night</div>
+  <div class="header-title">— RANKING TOP 5 —</div>
+  <div class="header-time" id="clock">00:00:00</div>
+</div>
+
+<div class="main" id="main-panels"></div>
+<div class="footer"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script>
+const GAMES_OBS = [
+  { id: 'poker',     label: 'ポーカー',       icon: '♠', cls: 'g-poker' },
+  { id: 'blackjack', label: 'ブラックジャック', icon: '♥', cls: 'g-blackjack' },
+  { id: 'chinchiro', label: 'チンチロ',         icon: '🎲', cls: 'g-chinchiro' },
+  { id: 'keiba',     label: '競馬',             icon: '🏇', cls: 'g-keiba' },
+];
+
+const medals = ['👑','🥈','🥉','4','5'];
+const rankCls = ['r1','r2','r3','rn','rn'];
+
+let allRankings = {};
+let activeIdx = 0;
+
+// パネル描画
+const mainEl = document.getElementById('main-panels');
+GAMES_OBS.forEach((g, i) => {
+  mainEl.innerHTML += `
+    <div class="game-panel ${g.cls}" id="panel-${g.id}">
+      <div class="crown-deco">👑</div>
+      <div class="panel-head">
+        <span class="panel-icon">${g.icon}</span>
+        <span class="panel-name">${g.label}</span>
+        <span class="panel-count" id="cnt-${g.id}">0 人参加</span>
+      </div>
+      <div id="rows-${g.id}" class="rank-rows" style="flex:1;display:flex;flex-direction:column;justify-content:center;"></div>
+    </div>`;
+});
+
+function renderRows(gameId, items) {
+  const g = GAMES_OBS.find(x => x.id === gameId);
+  const el = document.getElementById(`rows-${gameId}`);
+  const cntEl = document.getElementById(`cnt-${gameId}`);
+  if (cntEl) cntEl.textContent = items.length + ' 人参加';
+
+  if (items.length === 0) {
+    el.innerHTML = '<div class="empty-msg">— まだスコアがありません —</div>';
+    return;
+  }
+  const top = items.slice(0, 5);
+  const maxScore = top[0]?.score || 1;
+  el.innerHTML = top.map((it, i) => `
+    <div class="rank-item" style="animation-delay:${i * 0.07}s">
+      <div class="rank-num ${rankCls[i]}">${medals[i]}</div>
+      <div class="rank-bar-wrap">
+        <div class="rank-bar" style="width:${(it.score/maxScore*100).toFixed(1)}%; background:var(--game-color)"></div>
+        <div class="rank-name">${it.name}</div>
+      </div>
+      <div class="rank-score">${it.score.toLocaleString()}</div>
+    </div>`).join('');
+}
+
+// Firestoreリアルタイム
+GAMES_OBS.forEach(g => {
+  db.collection('rankings')
+    .where('gameId', '==', g.id)
+    .orderBy('score', 'desc')
+    .limit(5)
+    .onSnapshot(snap => {
+      allRankings[g.id] = snap.docs.map(d => d.data());
+      renderRows(g.id, allRankings[g.id]);
+    });
+});
+
+// アクティブパネル切り替え（8秒ごと）
+function setActive(idx) {
+  GAMES_OBS.forEach((g, i) => {
+    const panel = document.getElementById(`panel-${g.id}`);
+    panel.classList.toggle('active', i === idx);
+  });
+  // スポットライト移動
+  const panels = document.querySelectorAll('.game-panel');
+  const activePanel = panels[idx];
+  if (activePanel) {
+    const rect = activePanel.getBoundingClientRect();
+    const sp = document.getElementById('spotlight');
+    sp.style.left = (rect.left + rect.width/2 - 200) + 'px';
+    sp.style.top  = (rect.top  + rect.height/2 - 200) + 'px';
+  }
+}
+setActive(0);
+setInterval(() => {
+  activeIdx = (activeIdx + 1) % GAMES_OBS.length;
+  setActive(activeIdx);
+}, 8000);
+
+// 時計
+function updateClock() {
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toLocaleTimeString('ja-JP', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+}
+updateClock();
+setInterval(updateClock, 1000);
+</script>
+</body>
+</html>

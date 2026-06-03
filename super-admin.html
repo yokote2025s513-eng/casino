@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Super Admin ♠ Casino Night</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+
+    /* ── ログイン ── */
+    .login-wrap { width: min(400px, 92vw); animation: fadeUp 0.4s ease; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+    .login-logo { text-align: center; margin-bottom: 1.8rem; }
+    .login-icon { font-size: 2.5rem; margin-bottom: 0.4rem; display: block; }
+    .login-title {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.1rem; color: var(--red-bright);
+      text-shadow: 0 0 20px rgba(231,76,60,0.4);
+      letter-spacing: 0.08em;
+    }
+    .login-sub { font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.15em; margin-top: 0.3rem; }
+    .login-card {
+      background: var(--bg-card);
+      border: 1px solid rgba(231,76,60,0.3);
+      border-radius: 10px; padding: 2rem;
+    }
+    .pw-input {
+      width: 100%; background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border); border-radius: 6px;
+      color: var(--text-main); font-family: 'Cinzel', serif;
+      font-size: 1.4rem; letter-spacing: 0.3em;
+      padding: 0.8rem 1rem; outline: none; text-align: center;
+      transition: border-color 0.2s; margin-bottom: 1rem;
+    }
+    .pw-input:focus { border-color: var(--red-bright); box-shadow: 0 0 0 3px rgba(231,76,60,0.15); }
+    .pw-input.shake { animation: shake 0.35s ease; }
+    @keyframes shake { 0%,100%{transform:none} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+    .err-msg { color: var(--red-bright); font-size: 0.78rem; text-align: center; margin-bottom: 0.8rem; min-height: 1.2em; }
+    .login-btn {
+      width: 100%; font-family: 'Cinzel', serif; font-size: 0.9rem; font-weight: 700;
+      letter-spacing: 0.15em; padding: 0.85rem; border-radius: 6px;
+      border: 1px solid var(--red-bright);
+      background: linear-gradient(135deg, rgba(192,57,43,0.8), var(--red-bright));
+      color: #fff; cursor: pointer; transition: all 0.2s;
+    }
+    .login-btn:hover { box-shadow: 0 0 20px rgba(231,76,60,0.4); transform: translateY(-1px); }
+
+    /* ── 管理パネル ── */
+    #admin-panel { display: none; width: min(800px, 96vw); }
+    .panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 2rem; flex-wrap: wrap; gap: 0.5rem;
+    }
+    .panel-title {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.2rem; color: var(--red-bright);
+      letter-spacing: 0.08em;
+    }
+
+    /* セクション */
+    .danger-section {
+      background: var(--bg-card);
+      border: 1px solid rgba(231,76,60,0.2);
+      border-radius: 10px; padding: 1.5rem;
+      margin-bottom: 1.2rem;
+    }
+    .ds-title {
+      font-family: 'Cinzel', serif; font-size: 0.8rem;
+      letter-spacing: 0.15em; color: var(--red-bright);
+      margin-bottom: 0.5rem;
+    }
+    .ds-desc { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.2rem; }
+
+    .action-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
+    @media (max-width: 500px) { .action-grid { grid-template-columns: 1fr; } }
+
+    .action-btn {
+      font-family: 'Cinzel', serif; font-size: 0.78rem;
+      letter-spacing: 0.06em; padding: 0.75rem 1rem;
+      border-radius: 6px; border: 1px solid rgba(231,76,60,0.4);
+      background: rgba(231,76,60,0.06); color: var(--red-bright);
+      cursor: pointer; transition: all 0.2s; text-align: left;
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .action-btn:hover { background: rgba(231,76,60,0.15); border-color: var(--red-bright); }
+    .action-btn.safe {
+      border-color: rgba(93,187,122,0.3); background: rgba(93,187,122,0.05);
+      color: #5dbb7a;
+    }
+    .action-btn.safe:hover { background: rgba(93,187,122,0.12); border-color: #5dbb7a; }
+    .action-btn .btn-icon { font-size: 1.1rem; }
+
+    /* 確認モーダル */
+    .confirm-modal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.8); backdrop-filter: blur(6px);
+      z-index: 200; align-items: center; justify-content: center;
+    }
+    .confirm-modal.open { display: flex; }
+    .confirm-card {
+      background: var(--bg-surface);
+      border: 1px solid rgba(231,76,60,0.4);
+      border-radius: 12px; padding: 2rem;
+      width: min(400px, 90vw);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+    }
+    .confirm-card h3 {
+      font-family: 'Cinzel', serif; color: var(--red-bright);
+      font-size: 1rem; letter-spacing: 0.1em; margin-bottom: 0.8rem;
+    }
+    .confirm-card p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6; }
+    .confirm-actions { display: flex; gap: 0.6rem; justify-content: flex-end; }
+
+    /* ログ */
+    .log-area {
+      background: rgba(0,0,0,0.4); border: 1px solid var(--border);
+      border-radius: 6px; padding: 1rem;
+      font-size: 0.78rem; color: var(--text-muted);
+      max-height: 200px; overflow-y: auto;
+      font-family: monospace;
+      margin-top: 1rem;
+    }
+    .log-line { margin-bottom: 0.3rem; }
+    .log-line.ok  { color: #5dbb7a; }
+    .log-line.err { color: var(--red-bright); }
+    .log-line.info{ color: var(--gold); }
+  </style>
+</head>
+<body>
+
+<div class="suit-deco tl">⚠</div>
+
+<!-- ログイン -->
+<div id="login-section" class="login-wrap">
+  <div class="login-logo">
+    <span class="login-icon">🔐</span>
+    <div class="login-title">SUPER ADMIN</div>
+    <div class="login-sub">サイト管理者専用</div>
+  </div>
+  <div class="login-card">
+    <input class="pw-input" type="password" id="pw" placeholder="••••••••"
+      maxlength="32" onkeydown="if(event.key==='Enter') doLogin()">
+    <div class="err-msg" id="err-msg"></div>
+    <button class="login-btn" onclick="doLogin()">ENTER ▶</button>
+  </div>
+  <a href="index.html" style="display:block;text-align:center;margin-top:1rem;font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.1em;color:var(--text-muted);text-decoration:none;">← TOPに戻る</a>
+</div>
+
+<!-- 管理パネル -->
+<div id="admin-panel">
+  <div class="panel-header">
+    <div class="panel-title">🔐 SUPER ADMIN</div>
+    <div style="display:flex;gap:0.5rem;">
+      <a href="admin.html" class="btn btn-outline btn-sm">Admin →</a>
+      <button class="btn btn-outline btn-sm" onclick="doLogout()">ログアウト</button>
+    </div>
+  </div>
+
+  <!-- ランキング操作 -->
+  <div class="danger-section">
+    <div class="ds-title">⚠ RANKING</div>
+    <div class="ds-desc">ランキングデータの削除・リセット操作</div>
+    <div class="action-grid">
+      <button class="action-btn" onclick="confirmAction('deleteAllRankings')">
+        <span class="btn-icon">🗑</span> ランキング全削除
+      </button>
+      <button class="action-btn" onclick="confirmAction('deleteGameRanking', 'poker')">
+        <span class="btn-icon">♠</span> ポーカーのみ削除
+      </button>
+      <button class="action-btn" onclick="confirmAction('deleteGameRanking', 'blackjack')">
+        <span class="btn-icon">♥</span> ブラックジャックのみ削除
+      </button>
+      <button class="action-btn" onclick="confirmAction('deleteGameRanking', 'chinchiro')">
+        <span class="btn-icon">🎲</span> チンチロのみ削除
+      </button>
+      <button class="action-btn" onclick="confirmAction('deleteGameRanking', 'keiba')">
+        <span class="btn-icon">🏇</span> 競馬のみ削除
+      </button>
+    </div>
+  </div>
+
+  <!-- 整理番号・来場者 -->
+  <div class="danger-section">
+    <div class="ds-title">⚠ 整理番号 / 来場者数</div>
+    <div class="ds-desc">整理番号カウンター・発行履歴・来場者数のリセット</div>
+    <div class="action-grid">
+      <button class="action-btn" onclick="confirmAction('resetAllTickets')">
+        <span class="btn-icon">🎟</span> 整理番号 全リセット
+      </button>
+      <button class="action-btn" onclick="confirmAction('deleteAllHistory')">
+        <span class="btn-icon">📋</span> 発行履歴 全削除
+      </button>
+      <button class="action-btn" onclick="confirmAction('resetVisitors')">
+        <span class="btn-icon">👥</span> 来場者数 リセット
+      </button>
+      <button class="action-btn" onclick="confirmAction('resetWaitTimes')">
+        <span class="btn-icon">⏱</span> 待ち時間 全リセット
+      </button>
+    </div>
+  </div>
+
+  <!-- 全リセット -->
+  <div class="danger-section" style="border-color:rgba(231,76,60,0.5)">
+    <div class="ds-title">🚨 FULL RESET — 全データ削除</div>
+    <div class="ds-desc">ランキング・整理番号・来場者数・待ち時間を全て削除します。この操作は元に戻せません。</div>
+    <button class="action-btn" style="width:100%;justify-content:center;font-size:0.9rem;padding:1rem;"
+      onclick="confirmAction('fullReset')">
+      <span class="btn-icon">💥</span> 全データをリセットする
+    </button>
+  </div>
+
+  <!-- ログ -->
+  <div class="log-area" id="log-area">
+    <div class="log-line info">— 操作ログ —</div>
+  </div>
+</div>
+
+<!-- 確認モーダル -->
+<div class="confirm-modal" id="confirm-modal">
+  <div class="confirm-card">
+    <h3 id="cm-title">確認</h3>
+    <p id="cm-body"></p>
+    <div class="confirm-actions">
+      <button class="btn btn-outline" onclick="closeConfirm()">キャンセル</button>
+      <button class="btn btn-danger" id="cm-exec" onclick="execAction()">実行する</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="common.js"></script>
+<script>
+// ==============================
+// ⚙️ スーパー管理者パスワード
+const SUPER_PASSWORD = "superadmin2025";
+// ==============================
+
+const STORAGE_KEY = 'casino_super_auth';
+const GAME_IDS = ['poker','blackjack','chinchiro','keiba'];
+
+if (sessionStorage.getItem(STORAGE_KEY) === 'ok') showPanel();
+
+function doLogin() {
+  const pw = document.getElementById('pw').value;
+  if (pw === SUPER_PASSWORD) {
+    sessionStorage.setItem(STORAGE_KEY, 'ok');
+    showPanel();
+  } else {
+    const inp = document.getElementById('pw');
+    inp.classList.remove('shake');
+    void inp.offsetWidth;
+    inp.classList.add('shake');
+    inp.value = '';
+    document.getElementById('err-msg').textContent = 'パスワードが違います';
+    setTimeout(() => inp.classList.remove('shake'), 400);
+  }
+}
+function showPanel() {
+  document.getElementById('login-section').style.display = 'none';
+  document.getElementById('admin-panel').style.display = 'block';
+}
+function doLogout() {
+  sessionStorage.removeItem(STORAGE_KEY);
+  location.reload();
+}
+
+// ── 確認モーダル ──
+let pendingAction = null;
+let pendingArg = null;
+
+const actionMeta = {
+  deleteAllRankings:  { title:'ランキング全削除', body:'全ゲームのランキングデータを削除します。この操作は元に戻せません。' },
+  deleteGameRanking:  { title:'ゲームランキング削除', body: (arg) => `${gameLabel(arg)} のランキングを全件削除します。` },
+  resetAllTickets:    { title:'整理番号 全リセット', body:'全ゲームの整理番号を 001 に戻します。' },
+  deleteAllHistory:   { title:'発行履歴 全削除', body:'整理番号の発行履歴を全て削除します。ニックネーム情報も消えます。' },
+  resetVisitors:      { title:'来場者数リセット', body:'来場者数を 0 にリセットします。' },
+  resetWaitTimes:     { title:'待ち時間 全リセット', body:'全ゲームの待ち時間を 0分・空き に戻します。' },
+  fullReset:          { title:'⚠ 全データリセット', body:'ランキング・整理番号・発行履歴・来場者数・待ち時間を全て削除します。\n\nこの操作は絶対に元に戻せません。' },
+};
+
+function confirmAction(action, arg) {
+  pendingAction = action; pendingArg = arg;
+  const meta = actionMeta[action];
+  document.getElementById('cm-title').textContent = meta.title;
+  document.getElementById('cm-body').textContent = typeof meta.body === 'function' ? meta.body(arg) : meta.body;
+  document.getElementById('confirm-modal').classList.add('open');
+}
+function closeConfirm() {
+  document.getElementById('confirm-modal').classList.remove('open');
+  pendingAction = pendingArg = null;
+}
+
+async function execAction() {
+  closeConfirm();
+  const action = pendingAction; const arg = pendingArg;
+  addLog(`実行: ${action} ${arg||''}`, 'info');
+  try {
+    switch(action) {
+      case 'deleteAllRankings':
+        await deleteCollection('rankings'); break;
+      case 'deleteGameRanking':
+        await deleteCollectionWhere('rankings','gameId','==',arg); break;
+      case 'resetAllTickets':
+        await Promise.all(GAME_IDS.map(id => db.collection('reserves').doc(id).set({ next: 1 }))); break;
+      case 'deleteAllHistory':
+        await deleteCollection('reserveHistory'); break;
+      case 'resetVisitors':
+        await db.collection('visitors').doc('total').set({ count:0, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }); break;
+      case 'resetWaitTimes':
+        await Promise.all(GAME_IDS.map(id => db.collection('waitTimes').doc(id).set({ minutes:0, status:'open', updatedAt: firebase.firestore.FieldValue.serverTimestamp() }))); break;
+      case 'fullReset':
+        await deleteCollection('rankings');
+        await deleteCollection('reserveHistory');
+        await Promise.all(GAME_IDS.map(id => db.collection('reserves').doc(id).set({ next:1 })));
+        await db.collection('visitors').doc('total').set({ count:0, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
+        await Promise.all(GAME_IDS.map(id => db.collection('waitTimes').doc(id).set({ minutes:0, status:'open', updatedAt: firebase.firestore.FieldValue.serverTimestamp() })));
+        break;
+    }
+    addLog(`✓ 完了: ${action}`, 'ok');
+    showToast('完了しました ✓');
+  } catch(e) {
+    addLog(`✗ エラー: ${e.message}`, 'err');
+    showToast('エラー: ' + e.message, 'error');
+  }
+}
+
+// コレクション全削除（バッチ）
+async function deleteCollection(colName) {
+  const snap = await db.collection(colName).get();
+  if (snap.empty) return;
+  const batches = [];
+  let batch = db.batch(); let cnt = 0;
+  snap.forEach(doc => {
+    batch.delete(doc.ref); cnt++;
+    if (cnt % 500 === 0) { batches.push(batch.commit()); batch = db.batch(); cnt = 0; }
+  });
+  if (cnt > 0) batches.push(batch.commit());
+  await Promise.all(batches);
+  addLog(`  → ${colName}: ${snap.size}件削除`, 'ok');
+}
+
+// where条件付きで削除
+async function deleteCollectionWhere(col, field, op, val) {
+  const snap = await db.collection(col).where(field, op, val).get();
+  if (snap.empty) return;
+  let batch = db.batch(); let cnt = 0;
+  snap.forEach(doc => { batch.delete(doc.ref); cnt++; });
+  await batch.commit();
+  addLog(`  → ${col}[${field}=${val}]: ${cnt}件削除`, 'ok');
+}
+
+// ログ
+function addLog(msg, type='') {
+  const el = document.getElementById('log-area');
+  const line = document.createElement('div');
+  line.className = `log-line ${type}`;
+  line.textContent = `[${new Date().toLocaleTimeString('ja-JP')}] ${msg}`;
+  el.appendChild(line);
+  el.scrollTop = el.scrollHeight;
+}
+</script>
+</body>
+</html>
