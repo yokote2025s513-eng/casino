@@ -44,46 +44,6 @@
       opacity: 0.6;
     }
 
-    /* ── ゲームナビ ── */
-    .game-links { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2.5rem; }
-    @media (max-width: 700px) { .game-links { grid-template-columns: repeat(2, 1fr); } }
-    .game-link-card {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 0.5rem;
-      padding: 1.5rem 0.5rem;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background: var(--bg-card);
-      text-decoration: none;
-      color: var(--text-main);
-      transition: all 0.25s;
-      cursor: pointer;
-      position: relative;
-      overflow: hidden;
-    }
-    .game-link-card::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 2px;
-      background: var(--game-color, var(--gold));
-      transform: scaleX(0);
-      transition: transform 0.25s;
-    }
-    .game-link-card:hover::after { transform: scaleX(1); }
-    .game-link-card:hover {
-      border-color: var(--game-color, var(--gold));
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-      transform: translateY(-2px);
-    }
-    .game-icon { font-size: 2.2rem; line-height: 1; }
-    .game-name {
-      font-family: 'Cinzel', serif;
-      font-size: 0.8rem;
-      letter-spacing: 0.1em;
-      color: var(--game-color, var(--gold));
-    }
-
     /* ── セクションタイトル ── */
     .section-head {
       display: flex; align-items: center; gap: 0.8rem;
@@ -190,6 +150,7 @@
     <nav class="site-nav">
       <a class="nav-link active" href="index.html">TOP</a>
       <a class="nav-link" href="ranking.html">Ranking</a>
+      <a class="nav-link" href="admin.html">Admin</a>
     </nav>
   </div>
 </header>
@@ -215,6 +176,12 @@
     </div>
   </div>
 
+  <!-- ゲームリンク -->
+  <div class="section-head">
+    <h2>GAMES</h2><div class="section-line"></div>
+  </div>
+  <div class="game-links" id="game-links"></div>
+
   <!-- 待ち時間 -->
   <div class="section-head">
     <h2>WAIT TIME</h2><div class="section-line"></div>
@@ -235,21 +202,11 @@
 </footer>
 
 <!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script src="common.js"></script>
 <script>
-// ゲームリンク描画
-const gameLinksEl = document.getElementById('game-links');
-GAMES.forEach(g => {
-  gameLinksEl.innerHTML += `
-    <a class="game-link-card game-${g.id}" href="ranking.html#${g.id}">
-      <span class="game-icon">${g.icon}</span>
-      <span class="game-name">${g.label}</span>
-    </a>`;
-});
-
 // 待ち時間
 const waitGridEl = document.getElementById('wait-grid');
 function renderWaitGrid(data) {
