@@ -153,8 +153,17 @@
         </select>
       </div>
       <div class="form-group">
+        <label class="form-label">TICKET NO（整理番号から自動入力）</label>
+        <div style="display:flex;gap:0.4rem;">
+          <input class="form-control" type="text" id="f-ticket" placeholder="例: P-001" maxlength="10"
+            style="flex:1" oninput="this.value=this.value.toUpperCase()">
+          <button class="btn btn-outline btn-sm" onclick="lookupTicket()" style="white-space:nowrap">検索</button>
+        </div>
+        <div id="ticket-lookup-result" style="font-size:0.75rem;margin-top:0.3rem;min-height:1.2em;"></div>
+      </div>
+      <div class="form-group">
         <label class="form-label">NAME（参加者名）</label>
-        <input class="form-control" type="text" id="f-name" placeholder="例: 山田 太郎" maxlength="30">
+        <input class="form-control" type="text" id="f-name" placeholder="整理番号検索 or 直接入力" maxlength="30">
       </div>
       <div class="form-group">
         <label class="form-label">SCORE（得点）</label>
@@ -226,6 +235,38 @@ const sel = document.getElementById('f-game');
 GAMES.forEach(g => {
   sel.innerHTML += `<option value="${g.id}">${g.icon} ${g.label}</option>`;
 });
+
+// 整理番号からニックネームを検索
+async function lookupTicket() {
+  const ticketId = document.getElementById('f-ticket').value.trim().toUpperCase();
+  const resultEl = document.getElementById('ticket-lookup-result');
+  if (!ticketId) {
+    resultEl.innerHTML = '<span style="color:var(--red-bright)">整理番号を入力してください</span>';
+    return;
+  }
+  resultEl.innerHTML = '<span style="color:var(--text-muted)">検索中...</span>';
+  try {
+    const snap = await db.collection('reserveHistory')
+      .where('ticketId', '==', ticketId)
+      .orderBy('issuedAt', 'desc')
+      .limit(1)
+      .get();
+    if (snap.empty) {
+      resultEl.innerHTML = '<span style="color:var(--red-bright)">見つかりません</span>';
+      return;
+    }
+    const data = snap.docs[0].data();
+    const nickname = data.nickname || '';
+    const gameId   = data.gameId || '';
+    // ゲームとニックネームを自動入力
+    if (gameId) document.getElementById('f-game').value = gameId;
+    if (nickname) document.getElementById('f-name').value = nickname;
+    document.getElementById('f-note').value = ticketId;
+    resultEl.innerHTML = `<span style="color:#5dbb7a">✓ ${gameLabel(gameId)} — ${nickname}</span>`;
+  } catch(e) {
+    resultEl.innerHTML = `<span style="color:var(--red-bright)">エラー: ${e.message}</span>`;
+  }
+}
 
 // フィルターボタン
 let filterGame = 'all';
@@ -349,10 +390,12 @@ function startEdit(id) {
 
 function resetForm() {
   document.getElementById('edit-id').value  = '';
+  document.getElementById('f-ticket').value = '';
   document.getElementById('f-game').value   = '';
   document.getElementById('f-name').value   = '';
   document.getElementById('f-score').value  = '';
   document.getElementById('f-note').value   = '';
+  document.getElementById('ticket-lookup-result').innerHTML = '';
   document.getElementById('form-mode-label').textContent = '▸ 新規スコア登録';
   document.getElementById('submit-label').textContent = '登録する';
   document.getElementById('cancel-btn').style.display = 'none';

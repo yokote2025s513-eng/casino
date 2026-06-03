@@ -226,6 +226,58 @@
       margin: 0.15rem;
     }
 
+    /* ── ニックネーム入力モーダル ── */
+    .nick-modal {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(6px);
+      z-index: 400;
+      align-items: center; justify-content: center;
+    }
+    .nick-modal.open { display: flex; }
+    .nick-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      width: min(380px, 90vw);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+      animation: fadeUp 0.25s ease;
+    }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+    .nick-title {
+      font-family: 'Cinzel', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      margin-bottom: 0.3rem;
+    }
+    .nick-game-badge {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 1.4rem;
+    }
+    .nick-input {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-main);
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 1.1rem;
+      padding: 0.7rem 1rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      margin-bottom: 1.2rem;
+    }
+    .nick-input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(212,175,55,0.12);
+    }
+    .nick-hint { font-size: 0.72rem; color: var(--text-muted); margin-bottom: 1.2rem; margin-top: -0.8rem; }
+    .nick-actions { display: flex; gap: 0.6rem; }
+
     /* 大票表示モーダル */
     .ticket-modal {
       display: none;
@@ -254,7 +306,14 @@
       text-shadow: 0 0 40px rgba(212,175,55,0.6);
       line-height: 1;
     }
-    .ticket-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem; }
+    .ticket-nickname {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-top: 0.8rem;
+      letter-spacing: 0.05em;
+    }
+    .ticket-label { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.4rem; }
     .ticket-close { font-size: 0.75rem; color: var(--text-muted); margin-top: 1.5rem; }
   </style>
 </head>
@@ -323,11 +382,27 @@
 
 </div>
 
+<!-- ニックネーム入力モーダル -->
+<div class="nick-modal" id="nick-modal">
+  <div class="nick-card">
+    <div class="nick-title">NICKNAME を入力</div>
+    <div class="nick-game-badge" id="nick-game-badge"></div>
+    <input class="nick-input" type="text" id="nick-input" placeholder="例: やまだたろう" maxlength="20"
+      onkeydown="if(event.key==='Enter') confirmIssue()">
+    <div class="nick-hint">ランキングにこの名前で表示されます</div>
+    <div class="nick-actions">
+      <button class="btn btn-gold" style="flex:1" onclick="confirmIssue()">発行する ▶</button>
+      <button class="btn btn-outline" onclick="closeNickModal()">キャンセル</button>
+    </div>
+  </div>
+</div>
+
 <!-- 整理番号表示モーダル -->
 <div class="ticket-modal" id="ticket-modal" onclick="closeTicket()">
   <div class="ticket-display" onclick="event.stopPropagation()">
     <div class="ticket-game" id="tk-game"></div>
     <div class="ticket-num-big" id="tk-num"></div>
+    <div class="ticket-nickname" id="tk-nickname"></div>
     <div class="ticket-label">整理番号</div>
     <div class="ticket-close" onclick="closeTicket()">タップで閉じる</div>
   </div>
@@ -448,27 +523,61 @@ function renderReserveGrid() {
 }
 
 async function issueTicket(gameId) {
-  const prefix  = prefixMap[gameId];
-  const current = nextNums[gameId];
-  const numStr  = String(current).padStart(3, '0');
+  // ニックネーム入力モーダルを開く
+  const g = GAMES.find(x => x.id === gameId);
+  document.getElementById('nick-game-badge').innerHTML =
+    `${g.icon} ${g.label} &nbsp;—&nbsp; 次の番号: <strong style="color:var(--${gameId})">${prefixMap[gameId]}-${String(nextNums[gameId]).padStart(3,'0')}</strong>`;
+  document.getElementById('nick-input').value = '';
+  document.getElementById('nick-modal').classList.add('open');
+  setTimeout(() => document.getElementById('nick-input').focus(), 80);
+  // 発行対象を保存
+  pendingGameId = gameId;
+}
+
+let pendingGameId = null;
+
+async function confirmIssue() {
+  const gameId   = pendingGameId;
+  if (!gameId) return;
+  const nickname = document.getElementById('nick-input').value.trim();
+  if (!nickname) {
+    document.getElementById('nick-input').style.borderColor = 'var(--red-bright)';
+    document.getElementById('nick-input').placeholder = '名前を入力してください';
+    setTimeout(() => {
+      document.getElementById('nick-input').style.borderColor = '';
+    }, 1000);
+    return;
+  }
+  closeNickModal();
+
+  const prefix   = prefixMap[gameId];
+  const current  = nextNums[gameId];
+  const numStr   = String(current).padStart(3, '0');
   const ticketId = `${prefix}-${numStr}`;
 
   try {
     const batch = db.batch();
     // カウンターを進める
     batch.set(db.collection('reserves').doc(gameId), { next: current + 1 }, { merge: true });
-    // 履歴に記録
-    batch.set(db.collection('reserveHistory').doc(), {
+    // 履歴に記録（ニックネーム付き）
+    const histRef = db.collection('reserveHistory').doc();
+    batch.set(histRef, {
       gameId,
       ticketId,
+      nickname,
       issuedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     await batch.commit();
 
     // 大きく表示
-    showTicket(gameId, ticketId);
-    showToast(`発行: ${ticketId}`);
+    showTicket(gameId, ticketId, nickname);
+    showToast(`発行: ${ticketId} — ${nickname}`);
   } catch(e) { showToast('エラー: ' + e.message, 'error'); }
+}
+
+function closeNickModal() {
+  document.getElementById('nick-modal').classList.remove('open');
+  pendingGameId = null;
 }
 
 async function resetTickets(gameId) {
@@ -478,10 +587,11 @@ async function resetTickets(gameId) {
 }
 
 // チケット大表示
-function showTicket(gameId, ticketId) {
+function showTicket(gameId, ticketId, nickname) {
   const g = GAMES.find(x => x.id === gameId);
-  document.getElementById('tk-game').textContent = `${g.icon} ${g.label}`;
-  document.getElementById('tk-num').textContent   = ticketId;
+  document.getElementById('tk-game').textContent     = `${g.icon} ${g.label}`;
+  document.getElementById('tk-num').textContent      = ticketId;
+  document.getElementById('tk-nickname').textContent = nickname ? `👤 ${nickname}` : '';
   document.getElementById('ticket-modal').classList.add('open');
 }
 function closeTicket() {
@@ -518,7 +628,10 @@ async function loadHistory() {
             </div>
             <div>
               ${groups[g.id].slice(0, 20).map(it =>
-                `<span class="ticket-badge game-${it.gameId}">${it.ticketId}</span>`
+                `<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.3rem;">
+                  <span class="ticket-badge game-${it.gameId}" style="margin:0">${it.ticketId}</span>
+                  <span style="font-size:0.78rem;color:var(--text-muted)">${it.nickname || '—'}</span>
+                </div>`
               ).join('')}
               ${groups[g.id].length === 0 ? '<span style="color:var(--text-muted);font-size:0.78rem;">なし</span>' : ''}
             </div>
