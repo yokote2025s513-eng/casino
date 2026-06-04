@@ -217,6 +217,18 @@
   <div class="log-area" id="log-area">
     <div class="log-line info">— 操作ログ —</div>
   </div>
+
+  <!-- 発行履歴 -->
+  <div class="danger-section" style="margin-top:1.2rem; border-color:rgba(212,175,55,0.2)">
+    <div class="ds-title" style="color:var(--gold)">📋 発行履歴</div>
+    <div class="ds-desc" style="display:flex;align-items:center;justify-content:space-between;">
+      <span>各行の「削除」で1件ずつ削除できます</span>
+      <button class="action-btn safe" style="padding:0.35rem 0.8rem;font-size:0.72rem;" onclick="loadSAHistory()">🔄 更新</button>
+    </div>
+    <div id="sa-history-wrap" style="margin-top:0.8rem;">
+      <div style="color:var(--text-muted);font-size:0.8rem;">読み込み中...</div>
+    </div>
+  </div>
 </div>
 
 <!-- 確認モーダル -->
@@ -266,6 +278,7 @@ function doLogin() {
 function showPanel() {
   document.getElementById('login-section').style.display = 'none';
   document.getElementById('admin-panel').style.display = 'block';
+  loadSAHistory();
 }
 function doLogout() {
   sessionStorage.removeItem(STORAGE_KEY);
@@ -369,6 +382,60 @@ function addLog(msg, type='') {
   line.textContent = `[${new Date().toLocaleTimeString('ja-JP')}] ${msg}`;
   el.appendChild(line);
   el.scrollTop = el.scrollHeight;
+}
+
+// 発行履歴
+async function loadSAHistory() {
+  const wrap = document.getElementById('sa-history-wrap');
+  if (!wrap) return;
+  wrap.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;">読み込み中...</div>';
+  try {
+    const snap = await db.collection('reserveHistory').orderBy('issuedAt','desc').limit(200).get();
+    if (snap.empty) {
+      wrap.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;padding:0.5rem;">発行履歴がありません</div>';
+      return;
+    }
+    const groups = {};
+    GAMES.forEach(g => { groups[g.id] = []; });
+    snap.forEach(d => {
+      const item = { id: d.id, ...d.data() };
+      if (groups[item.gameId]) groups[item.gameId].push(item);
+    });
+
+    wrap.innerHTML = `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;">
+      ${GAMES.map(g => `
+        <div>
+          <div style="font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.1em;color:var(--${g.id});margin-bottom:0.5rem;">
+            ${g.icon} ${g.label}（${groups[g.id].length}枚）
+          </div>
+          ${groups[g.id].length === 0
+            ? '<div style="color:var(--text-muted);font-size:0.75rem;">なし</div>'
+            : groups[g.id].map(it => `
+              <div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.3rem;">
+                <span style="font-family:'Cinzel',serif;font-size:0.8rem;color:var(--gold);min-width:2rem;">${it.ticketId}</span>
+                <span style="font-size:0.82rem;flex:1;color:var(--text-main);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${it.nickname || '—'}</span>
+                <button onclick="deleteSAHistoryItem('${it.id}')"
+                  style="font-size:0.65rem;padding:0.15rem 0.5rem;border:1px solid rgba(231,76,60,0.4);border-radius:3px;background:transparent;color:var(--red-bright);cursor:pointer;flex-shrink:0;"
+                  onmouseover="this.style.background='rgba(231,76,60,0.15)'"
+                  onmouseout="this.style.background='transparent'">削除</button>
+              </div>`).join('')}
+        </div>`).join('')}
+    </div>`;
+  } catch(e) {
+    wrap.innerHTML = `<div style="color:var(--red-bright);font-size:0.8rem;">エラー: ${e.message}</div>`;
+  }
+}
+
+async function deleteSAHistoryItem(docId) {
+  try {
+    await db.collection('reserveHistory').doc(docId).delete();
+    addLog('発行履歴 1件削除', 'ok');
+    showToast('削除しました');
+    loadSAHistory();
+  } catch(e) {
+    addLog('削除エラー: ' + e.message, 'err');
+    showToast('エラー: ' + e.message, 'error');
+  }
 }
 </script>
 </body>

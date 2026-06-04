@@ -709,34 +709,50 @@ async function loadHistory() {
       wrap.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;padding:1rem;">まだ発行がありません</div>';
       return;
     }
-    // ゲーム別にグループ化
+    // ゲーム別にグループ化（docIDも保持）
     const groups = {};
     GAMES.forEach(g => { groups[g.id] = []; });
     snap.forEach(d => {
-      const item = d.data();
+      const item = { id: d.id, ...d.data() };
       if (groups[item.gameId]) groups[item.gameId].push(item);
     });
 
     wrap.innerHTML = `
-      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:1rem;">
+      <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:1rem;">
         ${GAMES.map(g => `
           <div>
             <div style="font-family:'Cinzel',serif; font-size:0.75rem; letter-spacing:0.1em; color:var(--${g.id}); margin-bottom:0.5rem;">
               ${g.icon} ${g.label}（${groups[g.id].length}枚）
             </div>
             <div>
-              ${groups[g.id].slice(0, 20).map(it =>
-                `<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.3rem;">
-                  <span class="ticket-badge game-${it.gameId}" style="margin:0">${it.ticketId}</span>
-                  <span style="font-size:0.78rem;color:var(--text-muted)">${it.nickname || '—'}</span>
-                </div>`
-              ).join('')}
-              ${groups[g.id].length === 0 ? '<span style="color:var(--text-muted);font-size:0.78rem;">なし</span>' : ''}
+              ${groups[g.id].length === 0
+                ? '<span style="color:var(--text-muted);font-size:0.78rem;">なし</span>'
+                : groups[g.id].slice(0, 30).map(it =>
+                  `<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.35rem;">
+                    <span class="ticket-badge game-${it.gameId}" style="margin:0;min-width:2.5rem;text-align:center">${it.ticketId}</span>
+                    <span style="font-size:0.82rem;flex:1;color:var(--text-main)">${it.nickname || '—'}</span>
+                    <button onclick="deleteHistoryItem('${it.id}')"
+                      style="font-size:0.65rem;padding:0.15rem 0.45rem;border:1px solid rgba(231,76,60,0.4);border-radius:3px;background:transparent;color:var(--red-bright);cursor:pointer;"
+                      onmouseover="this.style.background='rgba(231,76,60,0.15)'"
+                      onmouseout="this.style.background='transparent'">削除</button>
+                  </div>`
+                ).join('')}
             </div>
           </div>`).join('')}
       </div>`;
   } catch(e) {
     wrap.innerHTML = `<div style="color:var(--red-bright);font-size:0.8rem;">エラー: ${e.message}</div>`;
+  }
+}
+
+async function deleteHistoryItem(docId) {
+  if (!confirm('この発行履歴を削除しますか？')) return;
+  try {
+    await db.collection('reserveHistory').doc(docId).delete();
+    showToast('削除しました');
+    loadHistory();
+  } catch(e) {
+    showToast('エラー: ' + e.message, 'error');
   }
 }
 loadHistory();
