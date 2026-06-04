@@ -432,11 +432,11 @@ function doLogin() {
   const errEl = document.getElementById('error-msg');
 
   if (pw === ADMIN_PASSWORD) {
-    // 成功
     sessionStorage.setItem(STORAGE_KEY, 'ok');
     resetAttempts();
     inp.style.borderColor = 'var(--green)';
     document.querySelector('.login-btn').textContent = '✓ ログイン成功';
+    siteLog('login', { dest: selectedDest });
     setTimeout(() => location.replace(selectedDest), 500);
     return;
   }

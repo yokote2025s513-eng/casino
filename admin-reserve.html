@@ -517,6 +517,7 @@ async function saveWait(gameId) {
       status: status,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
+    siteLog('wait_update', { gameId, minutes: autoMins, status, minPerPerson: minPer });
     showToast(`${gameLabel(gameId)} 待ち時間 ${autoMins}分 を更新 ✓`);
   } catch(e) { showToast('エラー: ' + e.message, 'error'); }
 }
@@ -660,6 +661,7 @@ async function confirmIssue() {
     });
     await batch.commit();
 
+    siteLog('ticket_issue', { gameId, ticketId, nickname });
     showTicket(gameId, ticketId, nickname);
     showToast(`発行: No.${ticketId} — ${nickname}`);
   } catch(e) { showToast('エラー: ' + e.message, 'error'); }

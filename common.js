@@ -52,3 +52,19 @@ function logout() {
   sessionStorage.removeItem("casino_admin_auth");
   location.replace("admin.html");
 }
+
+// ==============================
+// サイトログ記録
+// ==============================
+async function siteLog(action, detail = {}) {
+  try {
+    await db.collection('siteLogs').add({
+      action,
+      ...detail,
+      page: location.pathname.split('/').pop() || 'index.html',
+      ts: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  } catch(e) {
+    console.warn('siteLog error:', e.message);
+  }
+}
