@@ -474,14 +474,16 @@ const waitMgrEl = document.getElementById('wait-mgr-rows');
 waitMgrEl.innerHTML = GAMES.map(g => `
   <div class="wait-row game-${g.id}">
     <div class="wait-game-name">${g.icon} ${g.label}</div>
-    <div class="wait-input-wrap">
-      <input class="wait-input" type="number" id="wt-${g.id}" min="0" max="999" value="0">
-      <span class="wait-mins-label">分</span>
+    <div class="wait-input-wrap" style="flex-wrap:wrap;gap:0.4rem;">
       <select class="status-sel" id="ws-${g.id}">
         <option value="open">空き</option>
         <option value="busy">混雑</option>
         <option value="full">満員</option>
       </select>
+      <input class="wait-input" type="number" id="wpp-${g.id}" min="1" max="60" value="5" title="1人あたりの目安時間（分）" style="width:50px">
+      <span class="wait-mins-label">分/人</span>
+      <span id="auto-wait-${g.id}" style="font-family:'Cinzel',serif;font-size:0.85rem;color:var(--gold);min-width:50px">—</span>
+      <span class="wait-mins-label">分待ち（自動）</span>
       <button class="wait-save-btn" onclick="saveWait('${g.id}')">保存</button>
     </div>
   </div>`).join('');
@@ -490,70 +492,98 @@ waitMgrEl.innerHTML = GAMES.map(g => `
 db.collection('waitTimes').onSnapshot(snap => {
   snap.forEach(doc => {
     const d = doc.data();
-    const inp = document.getElementById('wt-' + doc.id);
-    const sel = document.getElementById('ws-' + doc.id);
-    if (inp) inp.value = d.minutes ?? 0;
-    if (sel) sel.value = d.status ?? 'open';
+    const sel  = document.getElementById('ws-' + doc.id);
+    const wpp  = document.getElementById('wpp-' + doc.id);
+    const auto = document.getElementById('auto-wait-' + doc.id);
+    if (sel)  sel.value  = d.status ?? 'open';
+    if (wpp)  wpp.value  = d.minPerPerson ?? 5;
+    if (auto) auto.textContent = d.minutes ?? 0;
     waitState[doc.id] = d;
   });
 });
 
+// 待ち人数が変わったとき自動表示を更新
+function renderWaitGrid() {
+  GAMES.forEach(g => {
+    const wt = waitState[g.id] ?? {};
+    const minPer = wt.minPerPerson ?? 5;
+    const waiting = waitingCounts[g.id] ?? 0;
+    const autoEl = document.getElementById('auto-wait-' + g.id);
+    if (autoEl) autoEl.textContent = waiting * minPer;
+  });
+}
+
 async function saveWait(gameId) {
-  const mins   = parseInt(document.getElementById('wt-' + gameId).value) || 0;
-  const status = document.getElementById('ws-' + gameId).value;
+  const status    = document.getElementById('ws-' + gameId).value;
+  const minPer    = parseInt(document.getElementById('wpp-' + gameId).value) || 5;
+  const waiting   = waitingCounts[gameId] ?? 0;
+  const autoMins  = waiting * minPer;
   try {
     await db.collection('waitTimes').doc(gameId).set({
-      minutes: mins,
+      minutes: autoMins,
+      minPerPerson: minPer,
       status: status,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    showToast(`${gameLabel(gameId)}の待ち時間を更新 ✓`);
+    showToast(`${gameLabel(gameId)} 待ち時間 ${autoMins}分 を更新 ✓`);
   } catch(e) { showToast('エラー: ' + e.message, 'error'); }
 }
 
-// ── 整理番号 ──
+// ── 整理番号（全ゲーム通し） ──
 const reserveGrid = document.getElementById('reserve-grid');
-const prefixMap = { poker:'P', blackjack:'B', chinchiro:'C', keiba:'K' };
 
-// 各ゲームの次番号をリアルタイム取得
-const nextNums = {};
-GAMES.forEach(g => {
-  nextNums[g.id] = 1;
-  db.collection('reserves').doc(g.id).onSnapshot(snap => {
-    const d = snap.data() ?? {};
-    nextNums[g.id] = (d.next ?? 1);
-    renderReserveGrid();
+// 通し番号カウンター
+let globalNext = 1;
+db.collection('reserves').doc('global').onSnapshot(snap => {
+  globalNext = snap.data()?.next ?? 1;
+  renderReserveGrid();
+});
+
+// ゲームごとの待ち人数（reserveHistoryのdoneフラグで管理）
+const waitingCounts = {};
+db.collection('reserveHistory').onSnapshot(snap => {
+  const counts = {};
+  GAMES.forEach(g => { counts[g.id] = 0; });
+  snap.forEach(d => {
+    const data = d.data();
+    if (!data.done && data.gameId) counts[data.gameId] = (counts[data.gameId]||0) + 1;
   });
+  Object.assign(waitingCounts, counts);
+  renderReserveGrid();
 });
 
 function renderReserveGrid() {
+  const numStr = String(globalNext).padStart(3, '0');
   reserveGrid.innerHTML = GAMES.map(g => {
-    const prefix = prefixMap[g.id];
-    const next   = nextNums[g.id];
-    const numStr = String(next).padStart(3, '0');
+    const waiting = waitingCounts[g.id] ?? 0;
+    const wt = waitState[g.id] ?? {};
+    const minPer = wt.minPerPerson ?? 5;
+    const autoMins = waiting * minPer;
     return `
       <div class="reserve-game-card game-${g.id}">
         <div class="rg-icon">${g.icon}</div>
         <div class="rg-name">${g.label}</div>
-        <div class="rg-next">${prefix}-${numStr}</div>
-        <div class="rg-prefix">次の番号</div>
+        <div class="rg-next">${numStr}</div>
+        <div class="rg-prefix">次の番号（通し）</div>
+        <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:0.6rem;">
+          待ち: <strong style="color:var(--game-color,var(--gold))">${waiting}人</strong>
+          &nbsp;≈ <strong style="color:var(--game-color,var(--gold))">${autoMins}分</strong>
+        </div>
         <button class="rg-issue-btn" onclick="issueTicket('${g.id}')">発行する</button>
-        <button class="rg-reset-btn" onclick="resetTickets('${g.id}')">リセット</button>
       </div>`;
   }).join('');
 }
 
 async function issueTicket(gameId) {
-  // ニックネーム入力モーダルを開く
   const g = GAMES.find(x => x.id === gameId);
+  const numStr = String(globalNext).padStart(3,'0');
   document.getElementById('nick-game-badge').innerHTML =
-    `${g.icon} ${g.label} &nbsp;—&nbsp; 次の番号: <strong style="color:var(--${gameId})">${prefixMap[gameId]}-${String(nextNums[gameId]).padStart(3,'0')}</strong>`;
+    `${g.icon} ${g.label} &nbsp;—&nbsp; 整理番号: <strong style="color:var(--gold)">${numStr}</strong>`;
   document.getElementById('nick-input').value = '';
   document.getElementById('nick-error').textContent = '';
   document.getElementById('nick-sug').style.display = 'none';
   document.getElementById('nick-modal').classList.add('open');
   setTimeout(() => document.getElementById('nick-input').focus(), 80);
-  // 発行対象を保存
   pendingGameId = gameId;
 }
 
@@ -600,7 +630,7 @@ document.addEventListener('click', e => {
 });
 
 async function confirmIssue() {
-  const gameId   = pendingGameId;
+  const gameId = pendingGameId;
   if (!gameId) return;
   const nickname = document.getElementById('nick-input').value.trim();
   if (!nickname) {
@@ -616,28 +646,30 @@ async function confirmIssue() {
   }
   closeNickModal();
 
-  const prefix   = prefixMap[gameId];
-  const current  = nextNums[gameId];
+  const current  = globalNext;
   const numStr   = String(current).padStart(3, '0');
-  const ticketId = `${prefix}-${numStr}`;
+  const ticketId = numStr; // 通し番号のみ
 
   try {
     const batch = db.batch();
-    // カウンターを進める
-    batch.set(db.collection('reserves').doc(gameId), { next: current + 1 }, { merge: true });
-    // 履歴に記録（ニックネーム付き）
-    const histRef = db.collection('reserveHistory').doc();
-    batch.set(histRef, {
-      gameId,
-      ticketId,
-      nickname,
+    // 通し番号カウンターを進める
+    batch.set(db.collection('reserves').doc('global'), { next: current + 1 }, { merge: true });
+    // 履歴に記録
+    batch.set(db.collection('reserveHistory').doc(), {
+      gameId, ticketId, nickname, done: false,
       issuedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    // 来場者数をインクリメント
+    const visSnap = await db.collection('visitors').doc('total').get();
+    const curVis = visSnap.data()?.count ?? 0;
+    batch.set(db.collection('visitors').doc('total'), {
+      count: curVis + 1,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     await batch.commit();
 
-    // 大きく表示
     showTicket(gameId, ticketId, nickname);
-    showToast(`発行: ${ticketId} — ${nickname}`);
+    showToast(`発行: No.${ticketId} — ${nickname}`);
   } catch(e) { showToast('エラー: ' + e.message, 'error'); }
 }
 

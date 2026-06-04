@@ -284,11 +284,10 @@ db.collection('reserveHistory').onSnapshot(snap => {
   existingNicknames = new Set(snap.docs.map(d => d.data().nickname).filter(Boolean));
 });
 
-// 次の番号取得
-GAMES_SR.forEach(g => {
-  db.collection('reserves').doc(g.id).onSnapshot(snap => {
-    nextNums[g.id] = snap.data()?.next ?? 1;
-  });
+// 通し番号取得
+let globalNext = 1;
+db.collection('reserves').doc('global').onSnapshot(snap => {
+  globalNext = snap.data()?.next ?? 1;
 });
 
 // ニックネーム入力
@@ -338,17 +337,16 @@ async function doReserve() {
   }
 
   const gameId   = selectedGame;
-  const prefix   = prefixMap[gameId];
-  const current  = nextNums[gameId] ?? 1;
+  const current  = globalNext;
   const numStr   = String(current).padStart(3, '0');
-  const ticketId = `${prefix}-${numStr}`;
+  const ticketId = numStr;
   const g = GAMES_SR.find(x => x.id === gameId);
 
   try {
     const batch = db.batch();
-    batch.set(db.collection('reserves').doc(gameId), { next: current + 1 }, { merge: true });
+    batch.set(db.collection('reserves').doc('global'), { next: current + 1 }, { merge: true });
     batch.set(db.collection('reserveHistory').doc(), {
-      gameId, ticketId, nickname,
+      gameId, ticketId, nickname, done: false,
       source: 'self',
       issuedAt: firebase.firestore.FieldValue.serverTimestamp()
     });

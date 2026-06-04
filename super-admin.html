@@ -186,7 +186,10 @@
     <div class="ds-desc">整理番号カウンター・発行履歴・来場者数のリセット</div>
     <div class="action-grid">
       <button class="action-btn" onclick="confirmAction('resetAllTickets')">
-        <span class="btn-icon">🎟</span> 整理番号 全リセット
+        <span class="btn-icon">🎟</span> 整理番号 リセット（001から）
+      </button>
+      <button class="action-btn" onclick="confirmAction('resetNicknames')">
+        <span class="btn-icon">👤</span> ニックネーム 全リセット
       </button>
       <button class="action-btn" onclick="confirmAction('deleteAllHistory')">
         <span class="btn-icon">📋</span> 発行履歴 全削除
@@ -276,7 +279,8 @@ let pendingArg = null;
 const actionMeta = {
   deleteAllRankings:  { title:'ランキング全削除', body:'全ゲームのランキングデータを削除します。この操作は元に戻せません。' },
   deleteGameRanking:  { title:'ゲームランキング削除', body: (arg) => `${gameLabel(arg)} のランキングを全件削除します。` },
-  resetAllTickets:    { title:'整理番号 全リセット', body:'全ゲームの整理番号を 001 に戻します。' },
+  resetAllTickets:    { title:'整理番号 リセット', body:'整理番号を 001 に戻します（通し番号）。' },
+  resetNicknames:     { title:'ニックネーム 全リセット', body:'発行履歴を全削除してニックネームをリセットします。整理番号も 001 に戻ります。' },
   deleteAllHistory:   { title:'発行履歴 全削除', body:'整理番号の発行履歴を全て削除します。ニックネーム情報も消えます。' },
   resetVisitors:      { title:'来場者数リセット', body:'来場者数を 0 にリセットします。' },
   resetWaitTimes:     { title:'待ち時間 全リセット', body:'全ゲームの待ち時間を 0分・空き に戻します。' },
@@ -306,7 +310,10 @@ async function execAction() {
       case 'deleteGameRanking':
         await deleteCollectionWhere('rankings','gameId','==',arg); break;
       case 'resetAllTickets':
-        await Promise.all(GAME_IDS.map(id => db.collection('reserves').doc(id).set({ next: 1 }))); break;
+        await db.collection('reserves').doc('global').set({ next: 1 }); break;
+      case 'resetNicknames':
+        await deleteCollection('reserveHistory');
+        await db.collection('reserves').doc('global').set({ next: 1 }); break;
       case 'deleteAllHistory':
         await deleteCollection('reserveHistory'); break;
       case 'resetVisitors':
@@ -316,7 +323,7 @@ async function execAction() {
       case 'fullReset':
         await deleteCollection('rankings');
         await deleteCollection('reserveHistory');
-        await Promise.all(GAME_IDS.map(id => db.collection('reserves').doc(id).set({ next:1 })));
+        await db.collection('reserves').doc('global').set({ next:1 });
         await db.collection('visitors').doc('total').set({ count:0, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
         await Promise.all(GAME_IDS.map(id => db.collection('waitTimes').doc(id).set({ minutes:0, status:'open', updatedAt: firebase.firestore.FieldValue.serverTimestamp() })));
         break;
