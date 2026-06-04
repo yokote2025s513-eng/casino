@@ -341,10 +341,12 @@ function closeConfirm() {
 }
 
 async function execAction() {
+  const action = pendingAction;
+  const arg = pendingArg;
+
   closeConfirm();
-  const action = pendingAction; const arg = pendingArg;
+
   addLog(`実行: ${action} ${arg||''}`, 'info');
-  siteLog('super_action', { action, arg: arg || null });
   try {
     switch(action) {
       case 'deleteAllRankings':
