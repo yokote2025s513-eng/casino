@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin: Reserve ♠ Casino Night</title>
+  <link rel="preload" href="style.css" as="style">
+  <!-- Google Fonts: preconnect for speed -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;700&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;700&display=swap"></noscript>
   <link rel="stylesheet" href="style.css">
   <style>
     /* ── セクション構造 ── */
@@ -437,11 +443,14 @@ if (sessionStorage.getItem('casino_admin_auth') !== 'ok') {
 // ── 来場者カウンター ──
 let currentVisitors = 0;
 
-db.collection('visitors').doc('total').onSnapshot(snap => {
+// 来場者数は初回のみ取得（リアルタイム不要）
+async function loadVisitors() {
+  const snap = await db.collection('visitors').doc('total').get();
   const d = snap.data() ?? {};
   currentVisitors = d.count ?? 0;
   document.getElementById('vc-num').textContent = currentVisitors.toLocaleString();
-});
+}
+loadVisitors();
 
 async function changeVisitor(delta) {
   const next = Math.max(0, currentVisitors + delta);

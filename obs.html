@@ -329,6 +329,11 @@ function updateClock() {
 }
 updateClock();
 setInterval(updateClock, 1000);
+// ページ非表示時はFirebase接続を節約
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) db.disableNetwork();
+  else db.enableNetwork();
+});
 </script>
 </body>
 </html>

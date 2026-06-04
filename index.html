@@ -4,6 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Casino Night ♠ 文化祭</title>
+  <link rel="preload" href="style.css" as="style">
+  <!-- Google Fonts: preconnect for speed -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;700&display=swap" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;700&display=swap"></noscript>
   <link rel="stylesheet" href="style.css">
   <style>
     /* ── ヒーロー ── */
@@ -225,7 +231,12 @@ db.collection('visitors').doc('total').onSnapshot(snap => {
   document.getElementById('last-updated').textContent = fmtTime(d.updatedAt) || '—';
 });
 
-// 待ち時間リアルタイム
+// 待ち時間: 初回はgetで即表示、その後リアルタイム
+db.collection('waitTimes').get().then(snap => {
+  const data = {};
+  snap.forEach(doc => { data[doc.id] = doc.data(); });
+  renderWaitGrid(data);
+});
 db.collection('waitTimes').onSnapshot(snap => {
   const data = {};
   snap.forEach(doc => { data[doc.id] = doc.data(); });
