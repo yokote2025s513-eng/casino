@@ -6,28 +6,53 @@
   <title>Admin: Ranking ♠ Casino Night</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    .admin-layout { display: grid; grid-template-columns: 360px 1fr; gap: 2rem; }
-    @media (max-width: 900px) { .admin-layout { grid-template-columns: 1fr; } }
+    /* フォームを上、一覧を下に縦並び */
+    .admin-layout { display: flex; flex-direction: column; gap: 2rem; }
 
     /* 入力フォームカード */
     .form-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1.5rem;
-      position: sticky;
-      top: 80px;
-      align-self: start;
+      border-radius: 10px;
+      padding: 2rem;
     }
     .form-card-title {
       font-family: 'Cinzel', serif;
-      font-size: 0.85rem;
+      font-size: 1rem;
       letter-spacing: 0.12em;
       color: var(--gold);
-      margin-bottom: 1.2rem;
+      margin-bottom: 1.5rem;
       padding-bottom: 0.8rem;
       border-bottom: 1px solid var(--border);
     }
+    /* フォーム内を横並びグリッド */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 700px) { .form-grid { grid-template-columns: 1fr; } }
+    .form-grid .form-group { margin-bottom: 0; }
+    /* 大きい入力 */
+    .form-control-lg {
+      width: 100%;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-main);
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      padding: 0.9rem 1rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-control-lg:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(212,175,55,0.12);
+    }
+    select.form-control-lg option { background: var(--bg-card); }
+    .form-control-lg::placeholder { color: var(--text-muted); font-size: 1rem; font-weight: 300; }
 
     /* テーブル側 */
     .list-header {
@@ -146,39 +171,47 @@
       <div class="form-card-title" id="form-mode-label">▸ 新規スコア登録</div>
       <input type="hidden" id="edit-id">
 
-      <div class="form-group">
-        <label class="form-label">GAME</label>
-        <select class="form-control" id="f-game">
-          <option value="">ゲームを選択</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">TICKET NO（整理番号から自動入力）</label>
-        <div style="display:flex;gap:0.4rem;">
-          <input class="form-control" type="text" id="f-ticket" placeholder="例: P-001" maxlength="10"
-            style="flex:1" oninput="this.value=this.value.toUpperCase()">
-          <button class="btn btn-outline btn-sm" onclick="lookupTicket()" style="white-space:nowrap">検索</button>
+      <!-- 整理番号検索（1行目） -->
+      <div class="form-group" style="margin-bottom:1.2rem;">
+        <label class="form-label">TICKET NO — 整理番号で自動入力</label>
+        <div style="display:flex;gap:0.6rem;align-items:center;">
+          <input class="form-control-lg" type="text" id="f-ticket" placeholder="001" maxlength="10"
+            style="width:140px;text-align:center;" oninput="this.value=this.value.toUpperCase()"
+            onkeydown="if(event.key==='Enter') lookupTicket()">
+          <button class="btn btn-gold" onclick="lookupTicket()" style="height:56px;padding:0 1.5rem;font-size:1rem;">検索</button>
+          <div id="ticket-lookup-result" style="font-size:0.85rem;flex:1;"></div>
         </div>
-        <div id="ticket-lookup-result" style="font-size:0.75rem;margin-top:0.3rem;min-height:1.2em;"></div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">NAME（参加者名）</label>
-        <input class="form-control" type="text" id="f-name" placeholder="整理番号検索 or 直接入力" maxlength="30">
-      </div>
-      <div class="form-group">
-        <label class="form-label">SCORE（得点）</label>
-        <input class="form-control" type="number" id="f-score" placeholder="例: 1500" min="0">
-      </div>
-      <div class="form-group">
-        <label class="form-label">NOTE（メモ・任意）</label>
-        <input class="form-control" type="text" id="f-note" placeholder="例: 整理番号 A-05" maxlength="50">
       </div>
 
-      <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
-        <button class="btn btn-gold" onclick="submitScore()" style="flex:1">
-          <span id="submit-label">登録する</span>
+      <!-- ゲーム・名前・スコア（2行目グリッド） -->
+      <div class="form-grid" style="margin-bottom:1.2rem;">
+        <div class="form-group">
+          <label class="form-label">GAME</label>
+          <select class="form-control-lg" id="f-game">
+            <option value="">選択</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">NAME</label>
+          <input class="form-control-lg" type="text" id="f-name" placeholder="ニックネーム" maxlength="30">
+        </div>
+        <div class="form-group">
+          <label class="form-label">SCORE</label>
+          <input class="form-control-lg" type="number" id="f-score" placeholder="0" min="0"
+            onkeydown="if(event.key==='Enter') submitScore()">
+        </div>
+      </div>
+
+      <!-- メモ + ボタン -->
+      <div style="display:flex;gap:0.8rem;align-items:flex-end;flex-wrap:wrap;">
+        <div class="form-group" style="flex:1;margin-bottom:0;">
+          <label class="form-label">NOTE（任意）</label>
+          <input class="form-control" type="text" id="f-note" placeholder="メモ" maxlength="50">
+        </div>
+        <button class="btn btn-gold" onclick="submitScore()" style="height:44px;padding:0 2rem;font-size:0.95rem;white-space:nowrap;">
+          <span id="submit-label">登録する ▶</span>
         </button>
-        <button class="btn btn-outline" onclick="resetForm()" id="cancel-btn" style="display:none">キャンセル</button>
+        <button class="btn btn-outline" onclick="resetForm()" id="cancel-btn" style="display:none;height:44px;">キャンセル</button>
       </div>
     </div>
 

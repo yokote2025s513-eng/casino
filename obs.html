@@ -96,7 +96,6 @@
     .game-panel.active {
       border-color: var(--game-color);
       box-shadow: 0 0 40px rgba(0,0,0,0.5), inset 0 0 30px rgba(0,0,0,0.3);
-      transform: scaleY(1.02);
     }
     .game-panel::after {
       content: '';
@@ -237,13 +236,12 @@
       transition: opacity 0.5s;
     }
     .game-panel.active .crown-deco { opacity: 1; }
+    .crown-deco { opacity: 1 !important; }
   </style>
 </head>
 <body>
 
 <div class="bg"></div>
-<div class="spotlight" id="spotlight"></div>
-
 <div class="header">
   <div class="header-logo">♠ Casino Night</div>
   <div class="header-title">— RANKING TOP 5 —</div>
@@ -268,8 +266,6 @@ const medals = ['👑','🥈','🥉','4','5'];
 const rankCls = ['r1','r2','r3','rn','rn'];
 
 let allRankings = {};
-let activeIdx = 0;
-
 // パネル描画
 const mainEl = document.getElementById('main-panels');
 GAMES_OBS.forEach((g, i) => {
@@ -320,27 +316,10 @@ GAMES_OBS.forEach(g => {
     });
 });
 
-// アクティブパネル切り替え（8秒ごと）
-function setActive(idx) {
-  GAMES_OBS.forEach((g, i) => {
-    const panel = document.getElementById(`panel-${g.id}`);
-    panel.classList.toggle('active', i === idx);
-  });
-  // スポットライト移動
-  const panels = document.querySelectorAll('.game-panel');
-  const activePanel = panels[idx];
-  if (activePanel) {
-    const rect = activePanel.getBoundingClientRect();
-    const sp = document.getElementById('spotlight');
-    sp.style.left = (rect.left + rect.width/2 - 200) + 'px';
-    sp.style.top  = (rect.top  + rect.height/2 - 200) + 'px';
-  }
-}
-setActive(0);
-setInterval(() => {
-  activeIdx = (activeIdx + 1) % GAMES_OBS.length;
-  setActive(activeIdx);
-}, 8000);
+// 全パネルを常時表示
+GAMES_OBS.forEach(g => {
+  document.getElementById(`panel-${g.id}`)?.classList.add('active');
+});
 
 // 時計
 function updateClock() {
