@@ -4,145 +4,139 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Casino Night ♠ 文化祭</title>
-  <link rel="preload" href="style.css" as="style">
-  <!-- Google Fonts: preconnect for speed -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;700&display=swap" media="print" onload="this.media='all'">
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;700&display=swap"></noscript>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap">
   <link rel="stylesheet" href="style.css">
   <style>
     /* ── ヒーロー ── */
     .hero {
       text-align: center;
-      padding: 3.5rem 1rem 2rem;
+      padding: 4rem 1rem 2.5rem;
       position: relative;
     }
     .hero-eyebrow {
       font-family: 'Cinzel', serif;
-      font-size: 0.75rem;
-      letter-spacing: 0.3em;
+      font-size: 0.72rem;
+      letter-spacing: 0.35em;
       color: var(--text-muted);
       text-transform: uppercase;
-      margin-bottom: 0.8rem;
+      margin-bottom: 1rem;
     }
     .hero-title {
       font-family: 'Cinzel Decorative', serif;
-      font-size: clamp(2rem, 8vw, 4rem);
+      font-size: clamp(2.5rem, 10vw, 5rem);
       font-weight: 900;
       color: var(--gold);
-      text-shadow: 0 0 40px rgba(212,175,55,0.5), 0 0 80px rgba(212,175,55,0.2);
-      line-height: 1.1;
-      margin-bottom: 0.5rem;
+      text-shadow: 0 0 60px rgba(212,175,55,0.6), 0 0 120px rgba(212,175,55,0.2);
+      line-height: 1;
+      margin-bottom: 0.6rem;
+      letter-spacing: 0.05em;
     }
     .hero-sub {
       font-family: 'Cinzel', serif;
-      font-size: clamp(0.85rem, 2vw, 1.1rem);
+      font-size: clamp(0.75rem, 2vw, 0.95rem);
       color: var(--text-muted);
-      letter-spacing: 0.2em;
+      letter-spacing: 0.25em;
     }
     .suits-row {
       display: flex;
       justify-content: center;
       gap: 1.5rem;
-      font-size: 1.8rem;
-      margin: 1.2rem 0;
-      opacity: 0.6;
+      font-size: 1.6rem;
+      margin: 1.5rem 0 0;
+      opacity: 0.5;
     }
 
-    /* ── セクションタイトル ── */
-    .section-head {
-      display: flex; align-items: center; gap: 0.8rem;
-      margin-bottom: 1.2rem;
+    /* ── 来場者バー ── */
+    .visitor-bar {
+      background: linear-gradient(135deg, var(--bg-card), var(--bg-elevated));
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.2rem 1.8rem;
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 2.5rem;
+      flex-wrap: wrap; gap: 0.8rem;
+      box-shadow: var(--shadow-card);
     }
-    .section-head h2 {
-      font-family: 'Cinzel', serif;
-      font-size: 1rem;
-      letter-spacing: 0.15em;
+    .visitor-num {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 2.4rem;
       color: var(--gold);
+      text-shadow: 0 0 20px rgba(212,175,55,0.4);
+      line-height: 1;
     }
-    .section-line { flex: 1; height: 1px; background: var(--border); }
+    .visitor-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      color: var(--text-muted);
+      margin-bottom: 0.3rem;
+    }
 
-    /* ── 待ち時間 ── */
+    /* ── 待ち時間グリッド ── */
     .wait-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2.5rem; }
     @media (max-width: 700px) { .wait-grid { grid-template-columns: repeat(2, 1fr); } }
     .wait-card {
       background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1.2rem;
-      display: flex; flex-direction: column; align-items: center; gap: 0.6rem;
-      transition: border-color 0.3s;
+      border: 1px solid var(--border-dim);
+      border-radius: 10px;
+      padding: 1.3rem;
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+      transition: all 0.3s;
+      box-shadow: var(--shadow-card);
+      position: relative;
+      overflow: hidden;
     }
-    .wait-card:hover { border-color: var(--game-color, var(--gold)); }
+    .wait-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--game-color, var(--gold));
+      opacity: 0.5;
+    }
+    .wait-card:hover { border-color: var(--game-color, var(--gold)); transform: translateY(-2px); box-shadow: var(--shadow-gold); }
     .wait-label {
       font-family: 'Cinzel', serif;
       font-size: 0.75rem;
       letter-spacing: 0.1em;
       color: var(--game-color, var(--gold));
+      font-weight: 700;
     }
     .wait-mins {
       font-family: 'Cinzel Decorative', serif;
-      font-size: 2.2rem;
+      font-size: 2.5rem;
       font-weight: 700;
-      color: var(--text-main);
+      color: var(--text);
       line-height: 1;
     }
-    .wait-unit-small { font-size: 0.7rem; color: var(--text-muted); }
-    .wait-status {
-      font-size: 0.72rem;
-      padding: 0.15rem 0.6rem;
-      border-radius: 20px;
-      border: 1px solid;
-    }
-    .status-open  { color: #5dbb7a; border-color: #5dbb7a; background: rgba(93,187,122,0.1); }
-    .status-busy  { color: var(--gold); border-color: var(--gold); background: rgba(212,175,55,0.1); }
-    .status-full  { color: var(--red-bright); border-color: var(--red-bright); background: rgba(231,76,60,0.1); }
+    .wait-unit-small { font-size: 0.65rem; color: var(--text-muted); letter-spacing: 0.1em; }
 
-    /* ── ランキング ── */
+    /* ── ランキンググリッド ── */
     .ranking-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
     @media (max-width: 700px) { .ranking-grid { grid-template-columns: 1fr; } }
     .ranking-card-head {
       display: flex; align-items: center; gap: 0.6rem;
       margin-bottom: 1rem;
       padding-bottom: 0.8rem;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid var(--border-dim);
     }
-    .ranking-card-icon { font-size: 1.4rem; }
+    .ranking-card-icon { font-size: 1.3rem; }
     .ranking-card-title {
       font-family: 'Cinzel', serif;
       font-size: 0.85rem;
       letter-spacing: 0.1em;
       color: var(--game-color, var(--gold));
+      font-weight: 700;
     }
-    .empty-rank { color: var(--text-muted); font-size: 0.8rem; text-align: center; padding: 1rem; }
-
-    /* ── フッター ── */
-    .site-footer {
-      border-top: 1px solid var(--border);
-      text-align: center;
-      padding: 1.5rem;
-      margin-top: 3rem;
-      color: var(--text-muted);
-      font-size: 0.75rem;
-      letter-spacing: 0.1em;
-    }
-    .visitor-bar {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1rem 1.5rem;
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 2rem;
-      flex-wrap: wrap;
-      gap: 1rem;
-    }
-    .visitor-num {
-      font-family: 'Cinzel Decorative', serif;
-      font-size: 2rem;
+    .empty-rank { color: var(--text-muted); font-size: 0.8rem; text-align: center; padding: 1.2rem; }
+    .rank-score-val {
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
       color: var(--gold);
+      font-size: 1rem;
     }
-    .visitor-label { font-size: 0.8rem; color: var(--text-muted); }
   </style>
 </head>
 <body>
@@ -162,24 +156,25 @@
 
 <div class="container">
 
-  <!-- ヒーロー -->
   <section class="hero">
     <p class="hero-eyebrow">○○高校 文化祭 2025</p>
     <h1 class="hero-title">Casino Night</h1>
-    <p class="hero-sub">来てください・遊んでください・勝ってください</p>
+    <p class="hero-sub">来てください · 遊んでください · 勝ってください</p>
     <div class="suits-row">♠ ♥ ♦ ♣</div>
   </section>
 
   <!-- 来場者数 -->
   <div class="visitor-bar">
     <div>
-      <div class="visitor-label">本日の来場者数</div>
+      <div class="visitor-label">TOTAL VISITORS</div>
       <div class="visitor-num" id="visitor-count">—</div>
     </div>
-    <div style="font-size:0.78rem; color:var(--text-muted); text-align:right;">
-      最終更新: <span id="last-updated">—</span>
+    <div style="text-align:right;">
+      <div class="visitor-label">最終更新</div>
+      <div style="font-size:0.85rem;color:var(--text-sub);" id="last-updated">—</div>
     </div>
   </div>
+
   <!-- 待ち時間 -->
   <div class="section-head">
     <h2>WAIT TIME</h2><div class="section-line"></div>
@@ -188,20 +183,18 @@
 
   <!-- ランキング Top5 -->
   <div class="section-head">
-    <h2>RANKING TOP 5</h2><div class="section-line"></div>
+    <h2>RANKING TOP 5</h2>
+    <div class="section-line"></div>
     <a href="ranking.html" class="btn btn-outline btn-sm">全て見る →</a>
   </div>
   <div class="ranking-grid" id="ranking-grid"></div>
 
 </div>
 
-<footer class="site-footer">
-  ♠ Casino Night &nbsp;|&nbsp; ○○高校 文化祭
-</footer>
+<footer class="site-footer">♠ Casino Night &nbsp;·&nbsp; ○○高校 文化祭</footer>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script src="common.js"></script>
 <script>
@@ -211,7 +204,7 @@ function renderWaitGrid(data) {
   waitGridEl.innerHTML = GAMES.map(g => {
     const d = data[g.id] ?? { minutes: 0, status: 'open' };
     const mins = d.minutes ?? 0;
-    const statusMap = { open: ['空いてます','status-open'], busy: ['混雑中','status-busy'], full: ['満員','status-full'] };
+    const statusMap = { open:['空いてます','status-open'], busy:['混雑中','status-busy'], full:['満員','status-full'] };
     const [stLabel, stClass] = statusMap[d.status] ?? statusMap.open;
     return `
       <div class="wait-card game-${g.id}">
@@ -223,15 +216,6 @@ function renderWaitGrid(data) {
   }).join('');
 }
 renderWaitGrid({});
-
-// 来場者数
-db.collection('visitors').doc('total').onSnapshot(snap => {
-  const d = snap.data() ?? {};
-  document.getElementById('visitor-count').textContent = (d.count ?? 0).toLocaleString() + ' 人';
-  document.getElementById('last-updated').textContent = fmtTime(d.updatedAt) || '—';
-});
-
-// 待ち時間: 初回はgetで即表示、その後リアルタイム
 db.collection('waitTimes').get().then(snap => {
   const data = {};
   snap.forEach(doc => { data[doc.id] = doc.data(); });
@@ -243,18 +227,26 @@ db.collection('waitTimes').onSnapshot(snap => {
   renderWaitGrid(data);
 });
 
+// 来場者数
+db.collection('visitors').doc('total').onSnapshot(snap => {
+  const d = snap.data() ?? {};
+  document.getElementById('visitor-count').textContent = (d.count ?? 0).toLocaleString() + ' 人';
+  document.getElementById('last-updated').textContent = fmtTime(d.updatedAt) || '—';
+});
+
 // ランキングTop5
 const rankingGridEl = document.getElementById('ranking-grid');
 function renderRankingCards(allData) {
+  const medals = ['🥇','🥈','🥉','4','5'];
   rankingGridEl.innerHTML = GAMES.map(g => {
-    const items = (allData[g.id] || []).slice(0, 5);
+    const items = (allData[g.id] || []).slice(0,5);
     const rows = items.length === 0
       ? '<div class="empty-rank">まだデータがありません</div>'
-      : items.map((it, i) => `
+      : items.map((it,i) => `
           <div class="rank-row rank-${i+1}">
-            <div class="rank-num ${i < 3 ? '' : 'other'}">${rankDisplay(i+1)}</div>
+            <div class="rank-num ${i<3?'':'other'}">${medals[i]}</div>
             <div class="rank-name">${it.name}</div>
-            <div class="rank-score">${it.score.toLocaleString()}</div>
+            <div class="rank-score-val">${it.score.toLocaleString()}</div>
           </div>`).join('');
     return `
       <div class="card game-${g.id}">
@@ -266,22 +258,15 @@ function renderRankingCards(allData) {
       </div>`;
   }).join('');
 }
-
-// ランキングデータ取得
 async function loadRankings() {
   const allData = {};
   await Promise.all(GAMES.map(async g => {
-    const snap = await db.collection('rankings')
-      .where('gameId', '==', g.id)
-      .orderBy('score', 'desc')
-      .limit(5)
-      .get();
+    const snap = await db.collection('rankings').where('gameId','==',g.id).orderBy('score','desc').limit(5).get();
     allData[g.id] = snap.docs.map(d => d.data());
   }));
   renderRankingCards(allData);
 }
 loadRankings();
-// 1分ごとに更新
 setInterval(loadRankings, 60000);
 </script>
 </body>

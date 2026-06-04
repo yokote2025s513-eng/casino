@@ -4,13 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin: Ranking ♠ Casino Night</title>
-  <link rel="preload" href="style.css" as="style">
   <!-- Google Fonts: preconnect for speed -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;700&display=swap" media="print" onload="this.media='all'">
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;700&display=swap"></noscript>
-  <link rel="stylesheet" href="style.css">
+      <link rel="stylesheet" href="style.css">
   <style>
     /* フォームを上、一覧を下に縦並び */
     .admin-layout { display: flex; flex-direction: column; gap: 2rem; }
@@ -45,7 +42,7 @@
       background: rgba(255,255,255,0.05);
       border: 1px solid var(--border);
       border-radius: 6px;
-      color: var(--text-main);
+      color: var(--text);
       font-family: 'Noto Sans JP', sans-serif;
       font-size: 1.4rem;
       font-weight: 700;
@@ -85,7 +82,7 @@
       transition: all 0.2s;
     }
     .filter-btn.active { color: var(--gold); border-color: var(--gold); background: rgba(212,175,55,0.08); }
-    .filter-btn:hover:not(.active) { color: var(--text-main); }
+    .filter-btn:hover:not(.active) { color: var(--text); }
 
     .action-cell { display: flex; gap: 0.4rem; }
     .edit-btn-inline {
@@ -248,7 +245,7 @@
     <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:0.5rem;">
       このスコアを削除しますか？この操作は元に戻せません。
     </p>
-    <p id="del-target-info" style="font-size:0.9rem; color:var(--text-main);"></p>
+    <p id="del-target-info" style="font-size:0.9rem; color:var(--text);"></p>
     <div class="modal-actions">
       <button class="btn btn-outline" onclick="closeDelModal()">キャンセル</button>
       <button class="btn btn-danger" onclick="confirmDelete()">削除する</button>

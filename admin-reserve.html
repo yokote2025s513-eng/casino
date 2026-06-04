@@ -4,13 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin: Reserve ♠ Casino Night</title>
-  <link rel="preload" href="style.css" as="style">
   <!-- Google Fonts: preconnect for speed -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;700&display=swap" media="print" onload="this.media='all'">
-  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;700&display=swap"></noscript>
-  <link rel="stylesheet" href="style.css">
+      <link rel="stylesheet" href="style.css">
   <style>
     /* ── セクション構造 ── */
     .ops-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
@@ -98,7 +95,7 @@
       background: rgba(255,255,255,0.04);
       border: 1px solid var(--border);
       border-radius: 4px;
-      color: var(--text-main);
+      color: var(--text);
       font-family: 'Cinzel', serif;
       font-size: 1.1rem;
       font-weight: 700;
@@ -113,7 +110,7 @@
       background: rgba(255,255,255,0.04);
       border: 1px solid var(--border);
       border-radius: 4px;
-      color: var(--text-main);
+      color: var(--text);
       font-size: 0.78rem;
       padding: 0.35rem 0.5rem;
       outline: none;
@@ -169,7 +166,7 @@
       font-family: 'Cinzel Decorative', serif;
       font-size: 1.8rem;
       font-weight: 700;
-      color: var(--text-main);
+      color: var(--text);
       line-height: 1;
       margin-bottom: 0.2rem;
     }
@@ -269,7 +266,7 @@
       background: rgba(255,255,255,0.05);
       border: 1px solid var(--border);
       border-radius: 6px;
-      color: var(--text-main);
+      color: var(--text);
       font-family: 'Noto Sans JP', sans-serif;
       font-size: 1.1rem;
       padding: 0.7rem 1rem;
@@ -298,7 +295,7 @@
       transition: background 0.15s;
       display: flex; align-items: center; gap: 0.5rem;
     }
-    .nick-sug-item:hover { background: rgba(212,175,55,0.08); color: var(--text-main); }
+    .nick-sug-item:hover { background: rgba(212,175,55,0.08); color: var(--text); }
     .nick-sug-item.taken { color: rgba(231,76,60,0.6); cursor: not-allowed; font-size: 0.78rem; }
 
     /* 大票表示モーダル */
@@ -332,7 +329,7 @@
     .ticket-nickname {
       font-size: 1.1rem;
       font-weight: 700;
-      color: var(--text-main);
+      color: var(--text);
       margin-top: 0.8rem;
       letter-spacing: 0.05em;
     }
@@ -733,7 +730,7 @@ async function loadHistory() {
                 : groups[g.id].slice(0, 30).map(it =>
                   `<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.35rem;">
                     <span class="ticket-badge game-${it.gameId}" style="margin:0;min-width:2.5rem;text-align:center">${it.ticketId}</span>
-                    <span style="font-size:0.82rem;flex:1;color:var(--text-main)">${it.nickname || '—'}</span>
+                    <span style="font-size:0.82rem;flex:1;color:var(--text)">${it.nickname || '—'}</span>
                     <button onclick="deleteHistoryItem('${it.id}')"
                       style="font-size:0.65rem;padding:0.15rem 0.45rem;border:1px solid rgba(231,76,60,0.4);border-radius:3px;background:transparent;color:var(--red-bright);cursor:pointer;"
                       onmouseover="this.style.background='rgba(231,76,60,0.15)'"
