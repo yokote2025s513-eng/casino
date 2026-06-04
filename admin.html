@@ -430,16 +430,15 @@ function doLogin() {
   const inp = document.getElementById('pw-input');
   const pw  = inp.value;
   const errEl = document.getElementById('error-msg');
+if (pw === ADMIN_PASSWORD) {
+  sessionStorage.setItem(STORAGE_KEY, 'ok');
+  resetAttempts();
+  inp.style.borderColor = 'var(--green)';
+  document.querySelector('.login-btn').textContent = '✓ ログイン成功';
 
-  if (pw === ADMIN_PASSWORD) {
-    sessionStorage.setItem(STORAGE_KEY, 'ok');
-    resetAttempts();
-    inp.style.borderColor = 'var(--green)';
-    document.querySelector('.login-btn').textContent = '✓ ログイン成功';
-    siteLog('login', { dest: selectedDest });
-    setTimeout(() => location.replace(selectedDest), 500);
-    return;
-  }
+  setTimeout(() => location.replace(selectedDest), 500);
+  return;
+}
 
   // 失敗
   const count   = addAttempt();
