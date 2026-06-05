@@ -340,6 +340,34 @@
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script>
+// ── Firebase Auth ヘルパー ──
+const auth = () => firebase.auth();
+
+// Firestoreのrolesコレクションでロールを確認
+async function hasRole(requiredRole) {
+  const user = auth().currentUser;
+  if (!user) return false;
+  try {
+    const snap = await db.collection('roles').doc(user.uid).get();
+    const role = snap.data()?.role;
+    return role === requiredRole || role === 'superadmin';
+  } catch(e) {
+    return false;
+  }
+}
+
+// ログイン + ロール確認
+async function signInWithRole(email, password, requiredRole) {
+  const cred = await auth().signInWithEmailAndPassword(email, password);
+  const ok = await hasRole(requiredRole);
+  if (!ok) {
+    await auth().signOut();
+    throw new Error('権限がありません');
+  }
+  return cred;
+}
+</script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script src="auth.js"></script>
@@ -380,7 +408,10 @@ let selectedDest = 'admin-ranking.html';
 firebase.auth().onAuthStateChanged(async (user) => {
   if (!user) return;
   const ok = await hasRole('staff');
-  if (ok) location.replace(selectedDest);
+  if (ok) {
+    siteLog('login', { dest: selectedDest });
+    location.replace(selectedDest);
+  }
 });
 
 function selectDest(btn) {
