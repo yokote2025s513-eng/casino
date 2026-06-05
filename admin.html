@@ -370,16 +370,135 @@
 </div>
 
 
-// ==============================
-// ⚙️  パスワード設定
-// ここを変更してください
-const ADMIN_PASSWORD = "fukashi";
-// ==============================
+<script>
+const LOCK_KEY    = 'casino_admin_lock';
+const MAX_ATTEMPTS = 5;
+const LOCKOUT_SEC  = 60;
 
-const MAX_ATTEMPTS  = 5;   // 最大試行回数
-const LOCKOUT_SEC   = 60;  // ロック時間（秒）
-const STORAGE_KEY   = 'casino_admin_auth';
-const LOCK_KEY      = 'casino_admin_lock';
+let selectedDest = 'admin-ranking.html';
+
+firebase.auth().onAuthStateChanged(async (user) => {
+  if (!user) return;
+  const ok = await hasRole('staff');
+  if (ok) location.replace(selectedDest);
+});
+
+function selectDest(btn) {
+  document.querySelectorAll('.dest-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedDest = btn.dataset.dest;
+}
+
+function togglePw() {
+  const inp = document.getElementById('pw-input');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  document.getElementById('pw-toggle').textContent = inp.type === 'password' ? '👁' : '🙈';
+}
+
+function checkLock() {
+  const lock = JSON.parse(localStorage.getItem(LOCK_KEY) || 'null');
+  if (!lock) return false;
+
+  const remaining = Math.ceil((lock.until - Date.now()) / 1000);
+  if (remaining <= 0) {
+    localStorage.removeItem(LOCK_KEY);
+    return false;
+  }
+  showLockout(remaining);
+  return true;
+}
+
+function showLockout(sec) {
+  document.getElementById('lockout-overlay').classList.add('show');
+  let s = sec;
+  document.getElementById('lockout-timer').textContent = s;
+  const t = setInterval(() => {
+    s--;
+    document.getElementById('lockout-timer').textContent = s;
+    if (s <= 0) {
+      clearInterval(t);
+      document.getElementById('lockout-overlay').classList.remove('show');
+      localStorage.removeItem(LOCK_KEY);
+      updateAttemptDisplay(MAX_ATTEMPTS);
+    }
+  }, 1000);
+}
+
+function getAttempts() {
+  return parseInt(sessionStorage.getItem('casino_attempts') || '0', 10);
+}
+
+function addAttempt() {
+  const n = getAttempts() + 1;
+  sessionStorage.setItem('casino_attempts', n);
+  return n;
+}
+
+function resetAttempts() {
+  sessionStorage.removeItem('casino_attempts');
+}
+
+function updateAttemptDisplay(remain) {
+  const el = document.getElementById('attempt-info');
+  const ct = document.getElementById('remain-count');
+  if (remain < MAX_ATTEMPTS) {
+    el.style.display = 'block';
+    ct.textContent = remain;
+  } else {
+    el.style.display = 'none';
+  }
+}
+
+async function doLogin() {
+  if (checkLock()) return;
+
+  const email = document.getElementById('email-input').value.trim();
+  const inp   = document.getElementById('pw-input');
+  const pw    = inp.value;
+  const errEl = document.getElementById('error-msg');
+
+  errEl.classList.remove('show');
+
+  if (!email || !pw) {
+    errEl.textContent = 'メールアドレスとパスワードを入力してください';
+    errEl.classList.add('show');
+    return;
+  }
+
+  try {
+    await signInWithRole(email, pw, 'staff');
+    resetAttempts();
+    inp.style.borderColor = 'var(--green)';
+    document.querySelector('.login-btn').textContent = '✓ ログイン成功';
+    setTimeout(() => location.replace(selectedDest), 400);
+  } catch (e) {
+    const count = addAttempt();
+    const remain = MAX_ATTEMPTS - count;
+
+    inp.classList.remove('error');
+    void inp.offsetWidth;
+    inp.classList.add('error');
+    inp.value = '';
+
+    errEl.textContent = e.message || 'ログインに失敗しました';
+    errEl.classList.add('show');
+
+    if (remain <= 0) {
+      const until = Date.now() + LOCKOUT_SEC * 1000;
+      localStorage.setItem(LOCK_KEY, JSON.stringify({ until }));
+      resetAttempts();
+      showLockout(LOCKOUT_SEC);
+    } else {
+      updateAttemptDisplay(remain);
+    }
+
+    setTimeout(() => inp.classList.remove('error'), 400);
+  }
+}
+
+checkLock();
+updateAttemptDisplay(MAX_ATTEMPTS - getAttempts());
+</script>
 
 let selectedDest = 'admin-ranking.html';
 
