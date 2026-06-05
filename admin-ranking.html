@@ -200,7 +200,7 @@
         </div>
         <div class="form-group">
           <label class="form-label">SCORE</label>
-          <input class="form-control-lg" type="number" id="f-score" placeholder="0" min="0"
+          <input class="form-control-lg" type="number" id="f-score" placeholder="0"
             onkeydown="if(event.key==='Enter') submitScore()">
         </div>
       </div>
@@ -382,13 +382,13 @@ function renderTable(docs) {
 async function submitScore() {
   const gameId = document.getElementById('f-game').value;
   const name   = document.getElementById('f-name').value.trim();
-  const score  = parseInt(document.getElementById('f-score').value);
+  const score  = parseFloat(document.getElementById('f-score').value);
   const note   = document.getElementById('f-note').value.trim();
   const editId = document.getElementById('edit-id').value;
 
   if (!gameId) return showToast('ゲームを選択してください', 'error');
   if (!name)   return showToast('名前を入力してください', 'error');
-  if (isNaN(score) || score < 0) return showToast('スコアを正しく入力してください', 'error');
+  if (isNaN(score)) return showToast('スコアを正しく入力してください', 'error');
 
   const data = {
     gameId, name, score, note,
