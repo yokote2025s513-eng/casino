@@ -1,10 +1,10 @@
 const STAFF_EMAILS = [
   "staff@example.com",
-  "yokote2025s513@e-akita.ed.jp"
+  "super@example.com"
 ];
 
 const SUPER_EMAILS = [
-  "yokote2025s513@e-akita.ed.jp"
+  "super@example.com"
 ];
 
 function getCurrentEmail() {
