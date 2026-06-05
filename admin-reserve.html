@@ -428,10 +428,10 @@
 
 <script>
 // セッションチェック: admin.htmlを通ってない場合はログインページへ
-if (sessionStorage.getItem('casino_admin_auth') !== 'ok') {
-  location.replace('admin.html');
-}
+<script>
+requireRole('staff');
 </script>
+
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
