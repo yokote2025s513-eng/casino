@@ -1,8 +1,65 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isStaff() {
+      return isVerified() &&
+        request.auth.token.email in [
+          "staff@example.com",
+          "super@example.com"
+        ];
+    }
+
+    function isSuper() {
+      return isVerified() &&
+        request.auth.token.email in [
+          "super@example.com"
+        ];
+    }
+
+    // 公開表示用
+    match /rankings/{docId} {
+      allow read: if true;
+      allow create, update: if isStaff();
+      allow delete: if isSuper();
+    }
+
+    match /waitTimes/{docId} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+
+    match /visitors/{docId} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+
+    // 管理系のみ
+    match /reserves/{docId} {
+      allow read, write: if isStaff();
+    }
+
+    match /reserveHistory/{docId} {
+      allow read, write: if isStaff();
+    }
+
+    match /siteLogs/{docId} {
+      allow create: if isStaff();
+      allow read, delete: if isSuper();
+      allow update: if false;
+    }
+
+    // デフォルト拒否
     match /{document=**} {
-      allow read, write: if true;
+      allow read, write: if false;
     }
   }
 }
