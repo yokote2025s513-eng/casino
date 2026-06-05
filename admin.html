@@ -344,6 +344,32 @@
 <script src="firebase-config.js"></script>
 <script src="auth.js"></script>
 
+<div class="pw-wrap" style="margin-bottom:0.9rem;">
+  <input
+    class="pw-input"
+    type="email"
+    id="email-input"
+    placeholder="staff@example.com"
+    maxlength="120"
+    autocomplete="username"
+    style="letter-spacing:0.05em;font-size:1rem;"
+  >
+</div>
+
+<div class="pw-wrap">
+  <input
+    class="pw-input"
+    type="password"
+    id="pw-input"
+    placeholder="••••••••"
+    maxlength="64"
+    autocomplete="current-password"
+    onkeydown="if(event.key==='Enter') doLogin()"
+  >
+  <button class="pw-toggle" onclick="togglePw()" id="pw-toggle" title="表示切替">👁</button>
+</div>
+
+
 // ==============================
 // ⚙️  パスワード設定
 // ここを変更してください
