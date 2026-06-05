@@ -48,10 +48,14 @@ function fmtTime(ts) {
 }
 
 // ログアウト
-function logout() {
-  sessionStorage.removeItem("casino_admin_auth");
-  location.replace("admin.html");
+async function logout() {
+  try {
+    await firebase.auth().signOut();
+  } finally {
+    location.replace("admin.html");
+  }
 }
+
 
 // ==============================
 // サイトログ記録
