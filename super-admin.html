@@ -4,134 +4,84 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Super Admin ♠ Casino Night</title>
-  <!-- Google Fonts: preconnect for speed -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-      <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap">
+  <link rel="stylesheet" href="style.css">
   <style>
-    body { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+    body { display:flex; flex-direction:column; align-items:center; justify-content:flex-start; min-height:100vh; padding-top:2rem; }
 
-    /* ── ログイン ── */
-    .login-wrap { width: min(400px, 92vw); animation: fadeUp 0.4s ease; }
-    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
-    .login-logo { text-align: center; margin-bottom: 1.8rem; }
-    .login-icon { font-size: 2.5rem; margin-bottom: 0.4rem; display: block; }
-    .login-title {
-      font-family: 'Cinzel Decorative', serif;
-      font-size: 1.1rem; color: var(--red-bright);
-      text-shadow: 0 0 20px rgba(231,76,60,0.4);
-      letter-spacing: 0.08em;
+    /* ログイン */
+    .login-wrap { width:min(400px,92vw); animation:fadeUp 0.4s ease; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
+    .login-logo { text-align:center; margin-bottom:1.8rem; }
+    .login-icon { font-size:2.5rem; display:block; margin-bottom:0.4rem; }
+    .login-title { font-family:'Cinzel Decorative',serif; font-size:1.1rem; color:var(--red-bright); text-shadow:0 0 20px rgba(231,76,60,0.4); letter-spacing:0.08em; }
+    .login-sub { font-size:0.72rem; color:var(--text-muted); letter-spacing:0.15em; margin-top:0.3rem; }
+    .login-card { background:var(--bg-card); border:1px solid rgba(231,76,60,0.3); border-radius:12px; padding:2rem; box-shadow:var(--shadow-card); }
+    .login-input {
+      width:100%; background:rgba(255,255,255,0.05); border:1px solid var(--border);
+      border-radius:8px; color:var(--text); font-family:'Noto Sans JP',sans-serif;
+      font-size:1rem; padding:0.85rem 1rem; outline:none; margin-bottom:0.8rem;
+      transition:border-color 0.2s;
     }
-    .login-sub { font-size: 0.72rem; color: var(--text-muted); letter-spacing: 0.15em; margin-top: 0.3rem; }
-    .login-card {
-      background: var(--bg-card);
-      border: 1px solid rgba(231,76,60,0.3);
-      border-radius: 10px; padding: 2rem;
-    }
-    .pw-input {
-      width: 100%; background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border); border-radius: 6px;
-      color: var(--text); font-family: 'Cinzel', serif;
-      font-size: 1.4rem; letter-spacing: 0.3em;
-      padding: 0.8rem 1rem; outline: none; text-align: center;
-      transition: border-color 0.2s; margin-bottom: 1rem;
-    }
-    .pw-input:focus { border-color: var(--red-bright); box-shadow: 0 0 0 3px rgba(231,76,60,0.15); }
-    .pw-input.shake { animation: shake 0.35s ease; }
-    @keyframes shake { 0%,100%{transform:none} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
-    .err-msg { color: var(--red-bright); font-size: 0.78rem; text-align: center; margin-bottom: 0.8rem; min-height: 1.2em; }
+    .login-input:focus { border-color:var(--red-bright); box-shadow:0 0 0 3px rgba(231,76,60,0.1); }
+    .login-input.shake { animation:shake 0.35s ease; }
+    @keyframes shake { 0%,100%{transform:none} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} }
+    .err-msg { color:var(--red-bright); font-size:0.8rem; text-align:center; margin-bottom:0.8rem; min-height:1.2em; }
     .login-btn {
-      width: 100%; font-family: 'Cinzel', serif; font-size: 0.9rem; font-weight: 700;
-      letter-spacing: 0.15em; padding: 0.85rem; border-radius: 6px;
-      border: 1px solid var(--red-bright);
-      background: linear-gradient(135deg, rgba(192,57,43,0.8), var(--red-bright));
-      color: #fff; cursor: pointer; transition: all 0.2s;
+      width:100%; font-family:'Cinzel',serif; font-size:0.9rem; font-weight:700;
+      letter-spacing:0.15em; padding:0.85rem; border-radius:8px;
+      border:1px solid var(--red-bright);
+      background:linear-gradient(135deg, rgba(192,57,43,0.8), var(--red-bright));
+      color:#fff; cursor:pointer; transition:all 0.2s;
     }
-    .login-btn:hover { box-shadow: 0 0 20px rgba(231,76,60,0.4); transform: translateY(-1px); }
+    .login-btn:hover { box-shadow:var(--shadow-red); transform:translateY(-1px); }
+    .login-btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
 
-    /* ── 管理パネル ── */
-    #admin-panel { display: none; width: min(800px, 96vw); }
-    .panel-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 2rem; flex-wrap: wrap; gap: 0.5rem;
-    }
-    .panel-title {
-      font-family: 'Cinzel Decorative', serif;
-      font-size: 1.2rem; color: var(--red-bright);
-      letter-spacing: 0.08em;
-    }
+    /* 管理パネル */
+    #admin-panel { display:none; width:min(860px,96vw); padding-bottom:3rem; }
+    .panel-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:2rem; flex-wrap:wrap; gap:0.5rem; }
+    .panel-title { font-family:'Cinzel Decorative',serif; font-size:1.2rem; color:var(--red-bright); letter-spacing:0.08em; }
 
     /* セクション */
-    .danger-section {
-      background: var(--bg-card);
-      border: 1px solid rgba(231,76,60,0.2);
-      border-radius: 10px; padding: 1.5rem;
-      margin-bottom: 1.2rem;
-    }
-    .ds-title {
-      font-family: 'Cinzel', serif; font-size: 0.8rem;
-      letter-spacing: 0.15em; color: var(--red-bright);
-      margin-bottom: 0.5rem;
-    }
-    .ds-desc { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1.2rem; }
-
-    .action-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem; }
-    @media (max-width: 500px) { .action-grid { grid-template-columns: 1fr; } }
-
+    .danger-section { background:var(--bg-card); border:1px solid rgba(231,76,60,0.2); border-radius:10px; padding:1.5rem; margin-bottom:1.2rem; box-shadow:var(--shadow-card); }
+    .ds-title { font-family:'Cinzel',serif; font-size:0.8rem; letter-spacing:0.15em; color:var(--red-bright); margin-bottom:0.4rem; }
+    .ds-desc { font-size:0.8rem; color:var(--text-muted); margin-bottom:1.2rem; }
+    .action-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:0.8rem; }
+    @media(max-width:500px) { .action-grid { grid-template-columns:1fr; } }
     .action-btn {
-      font-family: 'Cinzel', serif; font-size: 0.78rem;
-      letter-spacing: 0.06em; padding: 0.75rem 1rem;
-      border-radius: 6px; border: 1px solid rgba(231,76,60,0.4);
-      background: rgba(231,76,60,0.06); color: var(--red-bright);
-      cursor: pointer; transition: all 0.2s; text-align: left;
-      display: flex; align-items: center; gap: 0.6rem;
+      font-family:'Cinzel',serif; font-size:0.78rem; letter-spacing:0.06em;
+      padding:0.75rem 1rem; border-radius:6px; border:1px solid rgba(231,76,60,0.4);
+      background:rgba(231,76,60,0.06); color:var(--red-bright);
+      cursor:pointer; transition:all 0.2s; text-align:left;
+      display:flex; align-items:center; gap:0.6rem;
     }
-    .action-btn:hover { background: rgba(231,76,60,0.15); border-color: var(--red-bright); }
-    .action-btn.safe {
-      border-color: rgba(93,187,122,0.3); background: rgba(93,187,122,0.05);
-      color: #5dbb7a;
-    }
-    .action-btn.safe:hover { background: rgba(93,187,122,0.12); border-color: #5dbb7a; }
-    .action-btn .btn-icon { font-size: 1.1rem; }
+    .action-btn:hover { background:rgba(231,76,60,0.15); border-color:var(--red-bright); }
+    .action-btn.safe { border-color:rgba(46,204,113,0.3); background:rgba(46,204,113,0.05); color:var(--green-bright); }
+    .action-btn.safe:hover { background:rgba(46,204,113,0.12); border-color:var(--green-bright); }
+    .btn-icon { font-size:1.1rem; }
 
     /* 確認モーダル */
-    .confirm-modal {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.8); backdrop-filter: blur(6px);
-      z-index: 200; align-items: center; justify-content: center;
-    }
-    .confirm-modal.open { display: flex; }
-    .confirm-card {
-      background: var(--bg-surface);
-      border: 1px solid rgba(231,76,60,0.4);
-      border-radius: 12px; padding: 2rem;
-      width: min(400px, 90vw);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
-    }
-    .confirm-card h3 {
-      font-family: 'Cinzel', serif; color: var(--red-bright);
-      font-size: 1rem; letter-spacing: 0.1em; margin-bottom: 0.8rem;
-    }
-    .confirm-card p { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; line-height: 1.6; }
-    .confirm-actions { display: flex; gap: 0.6rem; justify-content: flex-end; }
+    .confirm-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.8); backdrop-filter:blur(6px); z-index:200; align-items:center; justify-content:center; }
+    .confirm-modal.open { display:flex; }
+    .confirm-card { background:var(--bg-surface); border:1px solid rgba(231,76,60,0.4); border-radius:12px; padding:2rem; width:min(400px,90vw); box-shadow:0 24px 64px rgba(0,0,0,0.8); }
+    .confirm-card h3 { font-family:'Cinzel',serif; color:var(--red-bright); font-size:1rem; letter-spacing:0.1em; margin-bottom:0.8rem; }
+    .confirm-card p { font-size:0.85rem; color:var(--text-muted); margin-bottom:1.5rem; line-height:1.7; white-space:pre-line; }
+    .confirm-actions { display:flex; gap:0.6rem; justify-content:flex-end; }
 
     /* ログ */
-    .log-area {
-      background: rgba(0,0,0,0.4); border: 1px solid var(--border);
-      border-radius: 6px; padding: 1rem;
-      font-size: 0.78rem; color: var(--text-muted);
-      max-height: 200px; overflow-y: auto;
-      font-family: monospace;
-      margin-top: 1rem;
-    }
-    .log-line { margin-bottom: 0.3rem; }
-    .log-line.ok  { color: #5dbb7a; }
-    .log-line.err { color: var(--red-bright); }
-    .log-line.info{ color: var(--gold); }
+    .log-area { background:rgba(0,0,0,0.4); border:1px solid var(--border); border-radius:6px; padding:1rem; font-size:0.78rem; color:var(--text-muted); max-height:200px; overflow-y:auto; font-family:monospace; margin-top:1rem; }
+    .log-line { margin-bottom:0.3rem; }
+    .log-line.ok { color:var(--green-bright); }
+    .log-line.err { color:var(--red-bright); }
+    .log-line.info { color:var(--gold); }
+
+    /* 履歴・ログビューア */
+    .viewer-wrap { max-height:360px; overflow-y:auto; margin-top:0.8rem; }
   </style>
 </head>
 <body>
-
 <div class="suit-deco tl">⚠</div>
 
 <!-- ログイン -->
@@ -142,10 +92,10 @@
     <div class="login-sub">サイト管理者専用</div>
   </div>
   <div class="login-card">
-    <input class="pw-input" type="password" id="pw" placeholder="••••••••"
-      maxlength="32" onkeydown="if(event.key==='Enter') doLogin()">
+    <input class="login-input" type="email" id="email-input" placeholder="メールアドレス" autocomplete="email" onkeydown="if(event.key==='Enter') document.getElementById('pw-input').focus()">
+    <input class="login-input" type="password" id="pw-input" placeholder="パスワード" autocomplete="current-password" onkeydown="if(event.key==='Enter') doLogin()">
     <div class="err-msg" id="err-msg"></div>
-    <button class="login-btn" onclick="doLogin()">ENTER ▶</button>
+    <button class="login-btn" id="login-btn" onclick="doLogin()">ENTER ▶</button>
   </div>
   <a href="index.html" style="display:block;text-align:center;margin-top:1rem;font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.1em;color:var(--text-muted);text-decoration:none;">← TOPに戻る</a>
 </div>
@@ -160,75 +110,51 @@
     </div>
   </div>
 
-  <!-- ランキング操作 -->
+  <!-- ランキング -->
   <div class="danger-section">
     <div class="ds-title">⚠ RANKING</div>
-    <div class="ds-desc">ランキングデータの削除・リセット操作</div>
+    <div class="ds-desc">ランキングデータの削除操作</div>
     <div class="action-grid">
-      <button class="action-btn" onclick="confirmAction('deleteAllRankings')">
-        <span class="btn-icon">🗑</span> ランキング全削除
-      </button>
-      <button class="action-btn" onclick="confirmAction('deleteGameRanking', 'poker')">
-        <span class="btn-icon">♠</span> ポーカーのみ削除
-      </button>
-      <button class="action-btn" onclick="confirmAction('deleteGameRanking', 'blackjack')">
-        <span class="btn-icon">♥</span> ブラックジャックのみ削除
-      </button>
-      <button class="action-btn" onclick="confirmAction('deleteGameRanking', 'chinchiro')">
-        <span class="btn-icon">🎲</span> チンチロのみ削除
-      </button>
-      <button class="action-btn" onclick="confirmAction('deleteGameRanking', 'keiba')">
-        <span class="btn-icon">🏇</span> 競馬のみ削除
-      </button>
+      <button class="action-btn" onclick="confirmAction('deleteAllRankings')"><span class="btn-icon">🗑</span>ランキング全削除</button>
+      <button class="action-btn" onclick="confirmAction('deleteGameRanking','poker')"><span class="btn-icon">♠</span>ポーカーのみ削除</button>
+      <button class="action-btn" onclick="confirmAction('deleteGameRanking','blackjack')"><span class="btn-icon">♥</span>ブラックジャックのみ削除</button>
+      <button class="action-btn" onclick="confirmAction('deleteGameRanking','chinchiro')"><span class="btn-icon">🎲</span>チンチロのみ削除</button>
+      <button class="action-btn" onclick="confirmAction('deleteGameRanking','keiba')"><span class="btn-icon">🏇</span>競馬のみ削除</button>
     </div>
   </div>
 
   <!-- 整理番号・来場者 -->
   <div class="danger-section">
     <div class="ds-title">⚠ 整理番号 / 来場者数</div>
-    <div class="ds-desc">整理番号カウンター・発行履歴・来場者数のリセット</div>
+    <div class="ds-desc">整理番号・発行履歴・来場者数のリセット</div>
     <div class="action-grid">
-      <button class="action-btn" onclick="confirmAction('resetAllTickets')">
-        <span class="btn-icon">🎟</span> 整理番号 リセット（001から）
-      </button>
-      <button class="action-btn" onclick="confirmAction('resetNicknames')">
-        <span class="btn-icon">👤</span> ニックネーム 全リセット
-      </button>
-      <button class="action-btn" onclick="confirmAction('deleteAllHistory')">
-        <span class="btn-icon">📋</span> 発行履歴 全削除
-      </button>
-      <button class="action-btn" onclick="confirmAction('resetVisitors')">
-        <span class="btn-icon">👥</span> 来場者数 リセット
-      </button>
-      <button class="action-btn" onclick="confirmAction('resetWaitTimes')">
-        <span class="btn-icon">⏱</span> 待ち時間 全リセット
-      </button>
+      <button class="action-btn" onclick="confirmAction('resetAllTickets')"><span class="btn-icon">🎟</span>整理番号リセット（001から）</button>
+      <button class="action-btn" onclick="confirmAction('resetNicknames')"><span class="btn-icon">👤</span>ニックネーム全リセット</button>
+      <button class="action-btn" onclick="confirmAction('deleteAllHistory')"><span class="btn-icon">📋</span>発行履歴 全削除</button>
+      <button class="action-btn" onclick="confirmAction('resetVisitors')"><span class="btn-icon">👥</span>来場者数リセット</button>
+      <button class="action-btn" onclick="confirmAction('resetWaitTimes')"><span class="btn-icon">⏱</span>待ち時間 全リセット</button>
     </div>
   </div>
 
   <!-- 全リセット -->
   <div class="danger-section" style="border-color:rgba(231,76,60,0.5)">
-    <div class="ds-title">🚨 FULL RESET — 全データ削除</div>
-    <div class="ds-desc">ランキング・整理番号・来場者数・待ち時間を全て削除します。この操作は元に戻せません。</div>
-    <button class="action-btn" style="width:100%;justify-content:center;font-size:0.9rem;padding:1rem;"
-      onclick="confirmAction('fullReset')">
-      <span class="btn-icon">💥</span> 全データをリセットする
+    <div class="ds-title">🚨 FULL RESET</div>
+    <div class="ds-desc">全データを一括削除します。この操作は元に戻せません。</div>
+    <button class="action-btn" style="width:100%;justify-content:center;font-size:0.9rem;padding:1rem;" onclick="confirmAction('fullReset')">
+      <span class="btn-icon">💥</span>全データをリセットする
     </button>
   </div>
 
-  <!-- ログ -->
-  <div class="log-area" id="log-area">
-    <div class="log-line info">— 操作ログ —</div>
-  </div>
+  <!-- 操作ログ -->
+  <div class="log-area" id="log-area"><div class="log-line info">— 操作ログ —</div></div>
 
   <!-- サイトログ -->
-  <div class="danger-section" style="margin-top:1.2rem; border-color:rgba(52,152,219,0.3)">
+  <div class="danger-section" style="margin-top:1.2rem;border-color:rgba(52,152,219,0.3)">
     <div class="ds-title" style="color:#3498db">📡 サイト操作ログ</div>
     <div class="ds-desc" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
       <span>全ページの操作履歴（最新100件）</span>
       <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
-        <select id="log-filter" onchange="loadSiteLogs()"
-          style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:0.75rem;padding:0.3rem 0.5rem;">
+        <select id="log-filter" onchange="loadSiteLogs()" style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:4px;color:var(--text);font-size:0.75rem;padding:0.3rem 0.5rem;">
           <option value="">全アクション</option>
           <option value="login">ログイン</option>
           <option value="super_login">スーパーログイン</option>
@@ -243,19 +169,17 @@
         <button class="action-btn" style="padding:0.3rem 0.7rem;font-size:0.72rem;" onclick="confirmAction('clearLogs')">🗑 ログ削除</button>
       </div>
     </div>
-    <div id="site-log-wrap" style="margin-top:0.8rem;max-height:360px;overflow-y:auto;"></div>
+    <div class="viewer-wrap" id="site-log-wrap"><div style="color:var(--text-muted);font-size:0.8rem;padding:0.5rem;">読み込み中...</div></div>
   </div>
 
   <!-- 発行履歴 -->
-  <div class="danger-section" style="margin-top:1.2rem; border-color:rgba(212,175,55,0.2)">
+  <div class="danger-section" style="margin-top:1.2rem;border-color:rgba(212,175,55,0.2)">
     <div class="ds-title" style="color:var(--gold)">📋 発行履歴</div>
     <div class="ds-desc" style="display:flex;align-items:center;justify-content:space-between;">
       <span>各行の「削除」で1件ずつ削除できます</span>
-      <button class="action-btn safe" style="padding:0.35rem 0.8rem;font-size:0.72rem;" onclick="loadSAHistory()">🔄 更新</button>
+      <button class="action-btn safe" style="padding:0.3rem 0.7rem;font-size:0.72rem;" onclick="loadSAHistory()">🔄 更新</button>
     </div>
-    <div id="sa-history-wrap" style="margin-top:0.8rem;">
-      <div style="color:var(--text-muted);font-size:0.8rem;">読み込み中...</div>
-    </div>
+    <div class="viewer-wrap" id="sa-history-wrap"><div style="color:var(--text-muted);font-size:0.8rem;">読み込み中...</div></div>
   </div>
 </div>
 
@@ -266,7 +190,7 @@
     <p id="cm-body"></p>
     <div class="confirm-actions">
       <button class="btn btn-outline" onclick="closeConfirm()">キャンセル</button>
-      <button class="btn btn-danger" id="cm-exec" onclick="execAction()">実行する</button>
+      <button class="btn btn-danger" onclick="execAction()">実行する</button>
     </div>
   </div>
 </div>
@@ -275,125 +199,73 @@
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script>
-// ── Firebase Auth ヘルパー ──
-const auth = () => firebase.auth();
-
-async function hasRole(requiredRole) {
-  const user = auth().currentUser;
-  if (!user) return false;
-  try {
-    const snap = await db.collection('roles').doc(user.uid).get();
-    const role = snap.data()?.role;
-    return role === requiredRole || role === 'superadmin';
-  } catch(e) {
-    return false;
-  }
-}
-
-async function signInWithRole(email, password, requiredRole) {
-  const cred = await auth().signInWithEmailAndPassword(email, password);
-  const ok = await hasRole(requiredRole);
-  if (!ok) {
-    await auth().signOut();
-    throw new Error('権限がありません');
-  }
-  return cred;
-}
-</script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
-<script src="auth.js"></script>
 <script src="common.js"></script>
-
-<script>
 <script>
 const GAME_IDS = ['poker','blackjack','chinchiro','keiba'];
 
-firebase.auth().onAuthStateChanged(async (user) => {
+// ── ログイン ──
+firebase.auth().onAuthStateChanged(async user => {
   if (!user) return;
-  const ok = await hasRole('super');
-  if (ok) showPanel();
+  try {
+    const snap = await db.collection('roles').doc(user.uid).get();
+    const role = snap.data()?.role;
+    if (role === 'superadmin') showPanel();
+  } catch(e) {}
 });
 
 async function doLogin() {
-  const email = document.getElementById('email').value.trim();
-  const pw = document.getElementById('pw').value;
-
+  const email = document.getElementById('email-input').value.trim();
+  const pw    = document.getElementById('pw-input').value;
+  const errEl = document.getElementById('err-msg');
+  const btn   = document.getElementById('login-btn');
+  if (!email || !pw) { errEl.textContent = 'メールアドレスとパスワードを入力してください'; return; }
+  btn.disabled = true; btn.textContent = 'ログイン中...'; errEl.textContent = '';
   try {
-    await signInWithRole(email, pw, 'super');
+    const cred = await firebase.auth().signInWithEmailAndPassword(email, pw);
+    const snap = await db.collection('roles').doc(cred.user.uid).get();
+    const role = snap.data()?.role;
+    if (role !== 'superadmin') {
+      await firebase.auth().signOut();
+      throw new Error('管理者権限がありません');
+    }
+    siteLog('super_login');
     showPanel();
-  } catch (e) {
-    const inp = document.getElementById('pw');
-    inp.classList.remove('shake');
-    void inp.offsetWidth;
-    inp.classList.add('shake');
-    inp.value = '';
-    document.getElementById('err-msg').textContent = e.message || 'ログインに失敗しました';
-    setTimeout(() => inp.classList.remove('shake'), 400);
+  } catch(e) {
+    const msg = e.code === 'auth/invalid-credential' ? 'メールアドレスまたはパスワードが違います' : e.message;
+    errEl.textContent = msg;
+    document.getElementById('pw-input').classList.add('shake');
+    setTimeout(() => document.getElementById('pw-input').classList.remove('shake'), 400);
+    btn.disabled = false; btn.textContent = 'ENTER ▶';
   }
 }
 
 function showPanel() {
-  if (showPanel.done) return;
-  showPanel.done = true;
-
   document.getElementById('login-section').style.display = 'none';
   document.getElementById('admin-panel').style.display = 'block';
-
-  siteLog('super_login');
-  loadSAHistory();
   loadSiteLogs();
-}
-
-async function doLogout() {
-  await signOutAdmin();
-}
-</script>
-
-if (sessionStorage.getItem(STORAGE_KEY) === 'ok') showPanel();
-
-function doLogin() {
-  const pw = document.getElementById('pw').value;
-  if (pw === SUPER_PASSWORD) {
-    sessionStorage.setItem(STORAGE_KEY, 'ok');
-    showPanel();
-  } else {
-    const inp = document.getElementById('pw');
-    inp.classList.remove('shake');
-    void inp.offsetWidth;
-    inp.classList.add('shake');
-    inp.value = '';
-    document.getElementById('err-msg').textContent = 'パスワードが違います';
-    setTimeout(() => inp.classList.remove('shake'), 400);
-  }
-}
-function showPanel() {
-  document.getElementById('login-section').style.display = 'none';
-  document.getElementById('admin-panel').style.display = 'block';
-  siteLog('super_login');
   loadSAHistory();
-  loadSiteLogs();
 }
+
 function doLogout() {
-  sessionStorage.removeItem(STORAGE_KEY);
+  firebase.auth().signOut();
+  sessionStorage.removeItem('casino_admin_auth');
   location.reload();
 }
 
 // ── 確認モーダル ──
-let pendingAction = null;
-let pendingArg = null;
-
+let pendingAction = null, pendingArg = null;
 const actionMeta = {
-  deleteAllRankings:  { title:'ランキング全削除', body:'全ゲームのランキングデータを削除します。この操作は元に戻せません。' },
-  deleteGameRanking:  { title:'ゲームランキング削除', body: (arg) => `${gameLabel(arg)} のランキングを全件削除します。` },
-  resetAllTickets:    { title:'整理番号 リセット', body:'整理番号を 001 に戻します（通し番号）。' },
-  resetNicknames:     { title:'ニックネーム 全リセット', body:'発行履歴を全削除してニックネームをリセットします。整理番号も 001 に戻ります。' },
-  deleteAllHistory:   { title:'発行履歴 全削除', body:'整理番号の発行履歴を全て削除します。ニックネーム情報も消えます。' },
-  resetVisitors:      { title:'来場者数リセット', body:'来場者数を 0 にリセットします。' },
-  resetWaitTimes:     { title:'待ち時間 全リセット', body:'全ゲームの待ち時間を 0分・空き に戻します。' },
-  fullReset:          { title:'⚠ 全データリセット', body:'ランキング・整理番号・発行履歴・来場者数・待ち時間を全て削除します。\n\nこの操作は絶対に元に戻せません。' },
-  clearLogs:          { title:'ログ削除', body:'サイト操作ログを全て削除します。' },
+  deleteAllRankings: { title:'ランキング全削除', body:'全ゲームのランキングデータを削除します。\nこの操作は元に戻せません。' },
+  deleteGameRanking: { title:'ゲームランキング削除', body:(a)=>`${gameLabel(a)} のランキングを全件削除します。` },
+  resetAllTickets:   { title:'整理番号リセット', body:'整理番号を 001 に戻します。' },
+  resetNicknames:    { title:'ニックネーム全リセット', body:'発行履歴を全削除してニックネームをリセットします。\n整理番号も 001 に戻ります。' },
+  deleteAllHistory:  { title:'発行履歴 全削除', body:'整理番号の発行履歴を全て削除します。' },
+  resetVisitors:     { title:'来場者数リセット', body:'来場者数を 0 にリセットします。' },
+  resetWaitTimes:    { title:'待ち時間 全リセット', body:'全ゲームの待ち時間を 0分・空き に戻します。' },
+  fullReset:         { title:'⚠ 全データリセット', body:'ランキング・整理番号・発行履歴・来場者数・待ち時間を全て削除します。\n\nこの操作は絶対に元に戻せません。' },
+  clearLogs:         { title:'ログ削除', body:'サイト操作ログを全て削除します。' },
 };
 
 function confirmAction(action, arg) {
@@ -405,41 +277,30 @@ function confirmAction(action, arg) {
 }
 function closeConfirm() {
   document.getElementById('confirm-modal').classList.remove('open');
-  pendingAction = pendingArg = null;
 }
 
 async function execAction() {
-  const action = pendingAction;
-  const arg = pendingArg;
-
+  const action = pendingAction; const arg = pendingArg;
   closeConfirm();
-
+  pendingAction = null; pendingArg = null;
   addLog(`実行: ${action} ${arg||''}`, 'info');
+  siteLog('super_action', { action, arg: arg||null });
   try {
     switch(action) {
-      case 'deleteAllRankings':
-        await deleteCollection('rankings'); break;
-      case 'deleteGameRanking':
-        await deleteCollectionWhere('rankings','gameId','==',arg); break;
-      case 'resetAllTickets':
-        await db.collection('reserves').doc('global').set({ next: 1 }); break;
-      case 'resetNicknames':
-        await deleteCollection('reserveHistory');
-        await db.collection('reserves').doc('global').set({ next: 1 }); break;
-      case 'deleteAllHistory':
-        await deleteCollection('reserveHistory'); break;
-      case 'resetVisitors':
-        await db.collection('visitors').doc('total').set({ count:0, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }); break;
-      case 'resetWaitTimes':
-        await Promise.all(GAME_IDS.map(id => db.collection('waitTimes').doc(id).set({ minutes:0, status:'open', updatedAt: firebase.firestore.FieldValue.serverTimestamp() }))); break;
-      case 'clearLogs':
-        await deleteCollection('siteLogs'); break;
+      case 'deleteAllRankings':   await deleteCollection('rankings'); break;
+      case 'deleteGameRanking':   await deleteCollectionWhere('rankings','gameId','==',arg); break;
+      case 'resetAllTickets':     await db.collection('reserves').doc('global').set({ next:1 }); break;
+      case 'resetNicknames':      await deleteCollection('reserveHistory'); await db.collection('reserves').doc('global').set({ next:1 }); break;
+      case 'deleteAllHistory':    await deleteCollection('reserveHistory'); break;
+      case 'resetVisitors':       await db.collection('visitors').doc('total').set({ count:0, updatedAt:firebase.firestore.FieldValue.serverTimestamp() }); break;
+      case 'resetWaitTimes':      await Promise.all(GAME_IDS.map(id => db.collection('waitTimes').doc(id).set({ minutes:0, status:'open', updatedAt:firebase.firestore.FieldValue.serverTimestamp() }))); break;
+      case 'clearLogs':           await deleteCollection('siteLogs'); break;
       case 'fullReset':
         await deleteCollection('rankings');
         await deleteCollection('reserveHistory');
         await db.collection('reserves').doc('global').set({ next:1 });
-        await db.collection('visitors').doc('total').set({ count:0, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-        await Promise.all(GAME_IDS.map(id => db.collection('waitTimes').doc(id).set({ minutes:0, status:'open', updatedAt: firebase.firestore.FieldValue.serverTimestamp() })));
+        await db.collection('visitors').doc('total').set({ count:0, updatedAt:firebase.firestore.FieldValue.serverTimestamp() });
+        await Promise.all(GAME_IDS.map(id => db.collection('waitTimes').doc(id).set({ minutes:0, status:'open', updatedAt:firebase.firestore.FieldValue.serverTimestamp() })));
         break;
     }
     addLog(`✓ 完了: ${action}`, 'ok');
@@ -451,32 +312,26 @@ async function execAction() {
   }
 }
 
-// コレクション全削除（バッチ）
 async function deleteCollection(colName) {
   const snap = await db.collection(colName).get();
   if (snap.empty) return;
-  const batches = [];
   let batch = db.batch(); let cnt = 0;
   snap.forEach(doc => {
     batch.delete(doc.ref); cnt++;
-    if (cnt % 500 === 0) { batches.push(batch.commit()); batch = db.batch(); cnt = 0; }
+    if (cnt % 500 === 0) { batch.commit(); batch = db.batch(); cnt = 0; }
   });
-  if (cnt > 0) batches.push(batch.commit());
-  await Promise.all(batches);
+  if (cnt > 0) await batch.commit();
   addLog(`  → ${colName}: ${snap.size}件削除`, 'ok');
 }
-
-// where条件付きで削除
 async function deleteCollectionWhere(col, field, op, val) {
   const snap = await db.collection(col).where(field, op, val).get();
   if (snap.empty) return;
-  let batch = db.batch(); let cnt = 0;
-  snap.forEach(doc => { batch.delete(doc.ref); cnt++; });
+  let batch = db.batch();
+  snap.forEach(doc => batch.delete(doc.ref));
   await batch.commit();
-  addLog(`  → ${col}[${field}=${val}]: ${cnt}件削除`, 'ok');
+  addLog(`  → ${col}[${field}=${val}]: ${snap.size}件削除`, 'ok');
 }
 
-// ログ
 function addLog(msg, type='') {
   const el = document.getElementById('log-area');
   const line = document.createElement('div');
@@ -486,18 +341,16 @@ function addLog(msg, type='') {
   el.scrollTop = el.scrollHeight;
 }
 
-// サイトログ
+// ── サイトログ ──
 const actionLabels = {
-  login: '🔑 ログイン', super_login: '🔐 スーパーログイン',
-  ranking_add: '➕ スコア登録', ranking_update: '✏️ スコア更新', ranking_delete: '🗑 スコア削除',
-  ticket_issue: '🎟 整理番号発行', wait_update: '⏱ 待ち時間更新',
-  super_action: '⚡ 管理者操作',
+  login:'🔑 ログイン', super_login:'🔐 スーパーログイン',
+  ranking_add:'➕ スコア登録', ranking_update:'✏️ スコア更新', ranking_delete:'🗑 スコア削除',
+  ticket_issue:'🎟 整理番号発行', wait_update:'⏱ 待ち時間更新', super_action:'⚡ 管理者操作',
 };
 const actionColors = {
-  login: '#3498db', super_login: '#e74c3c',
-  ranking_add: '#27ae60', ranking_update: '#f39c12', ranking_delete: '#e74c3c',
-  ticket_issue: '#d4af37', wait_update: '#9b59b6',
-  super_action: '#e74c3c',
+  login:'#3498db', super_login:'#e74c3c',
+  ranking_add:'#2ecc71', ranking_update:'#f39c12', ranking_delete:'#e74c3c',
+  ticket_issue:'#d4af37', wait_update:'#9b59b6', super_action:'#e74c3c',
 };
 
 async function loadSiteLogs() {
@@ -506,70 +359,55 @@ async function loadSiteLogs() {
   wrap.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;padding:0.5rem;">読み込み中...</div>';
   const filter = document.getElementById('log-filter')?.value || '';
   try {
-    let query = db.collection('siteLogs').orderBy('ts', 'desc').limit(100);
-    if (filter) query = db.collection('siteLogs').where('action','==',filter).orderBy('ts','desc').limit(100);
+    let query = filter
+      ? db.collection('siteLogs').where('action','==',filter).orderBy('ts','desc').limit(100)
+      : db.collection('siteLogs').orderBy('ts','desc').limit(100);
     const snap = await query.get();
-    if (snap.empty) {
-      wrap.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;padding:0.5rem;">ログがありません</div>';
-      return;
-    }
+    if (snap.empty) { wrap.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;padding:0.5rem;">ログがありません</div>'; return; }
     wrap.innerHTML = snap.docs.map(d => {
       const data = d.data();
-      const time = data.ts?.toDate ? data.ts.toDate().toLocaleTimeString('ja-JP', {hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '—';
+      const time = data.ts?.toDate ? data.ts.toDate().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit',second:'2-digit'}) : '—';
       const label = actionLabels[data.action] || data.action;
       const color = actionColors[data.action] || 'var(--text-muted)';
-      // 詳細テキスト生成
       let detail = '';
       if (data.name)     detail += ` ${data.name}`;
-      if (data.score != null) detail += ` ${data.score}pt`;
+      if (data.score!=null) detail += ` ${data.score}pt`;
       if (data.gameId)   detail += ` [${gameLabel(data.gameId)}]`;
       if (data.nickname) detail += ` 「${data.nickname}」`;
       if (data.ticketId) detail += ` No.${data.ticketId}`;
-      if (data.minutes != null) detail += ` ${data.minutes}分`;
+      if (data.minutes!=null) detail += ` ${data.minutes}分`;
       if (data.arg)      detail += ` (${data.arg})`;
       if (data.dest)     detail += ` → ${data.dest}`;
       return `<div style="display:flex;align-items:baseline;gap:0.6rem;padding:0.35rem 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:0.78rem;">
-        <span style="color:var(--text-muted);flex-shrink:0;font-size:0.72rem;">${time}</span>
-        <span style="color:${color};flex-shrink:0;font-weight:700;">${label}</span>
-        <span style="color:var(--text-muted);font-size:0.75rem;">${data.page || ''}</span>
-        <span style="color:var(--text);flex:1;">${detail}</span>
+        <span style="color:var(--text-muted);flex-shrink:0;font-size:0.7rem;min-width:60px">${time}</span>
+        <span style="color:${color};flex-shrink:0;font-weight:700;min-width:120px">${label}</span>
+        <span style="color:var(--text-muted);font-size:0.72rem;flex-shrink:0">${data.page||''}</span>
+        <span style="color:var(--text);flex:1">${detail}</span>
       </div>`;
     }).join('');
-  } catch(e) {
-    wrap.innerHTML = `<div style="color:var(--red-bright);font-size:0.8rem;">エラー: ${e.message}</div>`;
-  }
+  } catch(e) { wrap.innerHTML = `<div style="color:var(--red-bright);font-size:0.8rem;">エラー: ${e.message}</div>`; }
 }
 
-// 発行履歴
+// ── 発行履歴 ──
 async function loadSAHistory() {
   const wrap = document.getElementById('sa-history-wrap');
   if (!wrap) return;
-  wrap.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;">読み込み中...</div>';
   try {
     const snap = await db.collection('reserveHistory').orderBy('issuedAt','desc').limit(200).get();
-    if (snap.empty) {
-      wrap.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;padding:0.5rem;">発行履歴がありません</div>';
-      return;
-    }
+    if (snap.empty) { wrap.innerHTML = '<div style="color:var(--text-muted);font-size:0.8rem;padding:0.5rem;">発行履歴がありません</div>'; return; }
     const groups = {};
     GAMES.forEach(g => { groups[g.id] = []; });
-    snap.forEach(d => {
-      const item = { id: d.id, ...d.data() };
-      if (groups[item.gameId]) groups[item.gameId].push(item);
-    });
-
+    snap.forEach(d => { const item={id:d.id,...d.data()}; if(groups[item.gameId]) groups[item.gameId].push(item); });
     wrap.innerHTML = `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;">
       ${GAMES.map(g => `
         <div>
-          <div style="font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.1em;color:var(--${g.id});margin-bottom:0.5rem;">
-            ${g.icon} ${g.label}（${groups[g.id].length}枚）
-          </div>
-          ${groups[g.id].length === 0
+          <div style="font-family:'Cinzel',serif;font-size:0.72rem;letter-spacing:0.1em;color:var(--${g.id});margin-bottom:0.5rem;">${g.icon} ${g.label}（${groups[g.id].length}枚）</div>
+          ${groups[g.id].length===0
             ? '<div style="color:var(--text-muted);font-size:0.75rem;">なし</div>'
-            : groups[g.id].map(it => `
+            : groups[g.id].map(it=>`
               <div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.3rem;">
-                <span style="font-family:'Cinzel',serif;font-size:0.8rem;color:var(--gold);min-width:2rem;">${it.ticketId}</span>
-                <span style="font-size:0.82rem;flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${it.nickname || '—'}</span>
+                <span style="font-family:'Cinzel',serif;font-size:0.8rem;color:var(--gold);min-width:2.5rem;">${it.ticketId}</span>
+                <span style="font-size:0.82rem;flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${it.nickname||'—'}</span>
                 <button onclick="deleteSAHistoryItem('${it.id}')"
                   style="font-size:0.65rem;padding:0.15rem 0.5rem;border:1px solid rgba(231,76,60,0.4);border-radius:3px;background:transparent;color:var(--red-bright);cursor:pointer;flex-shrink:0;"
                   onmouseover="this.style.background='rgba(231,76,60,0.15)'"
@@ -577,9 +415,7 @@ async function loadSAHistory() {
               </div>`).join('')}
         </div>`).join('')}
     </div>`;
-  } catch(e) {
-    wrap.innerHTML = `<div style="color:var(--red-bright);font-size:0.8rem;">エラー: ${e.message}</div>`;
-  }
+  } catch(e) { wrap.innerHTML = `<div style="color:var(--red-bright);font-size:0.8rem;">エラー: ${e.message}</div>`; }
 }
 
 async function deleteSAHistoryItem(docId) {
