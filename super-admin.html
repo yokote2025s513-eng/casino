@@ -281,13 +281,49 @@
 <script src="common.js"></script>
 
 <script>
-// ==============================
-// ⚙️ スーパー管理者パスワード
-const SUPER_PASSWORD = "0112";
-// ==============================
-
-const STORAGE_KEY = 'casino_super_auth';
+<script>
 const GAME_IDS = ['poker','blackjack','chinchiro','keiba'];
+
+firebase.auth().onAuthStateChanged(async (user) => {
+  if (!user) return;
+  const ok = await hasRole('super');
+  if (ok) showPanel();
+});
+
+async function doLogin() {
+  const email = document.getElementById('email').value.trim();
+  const pw = document.getElementById('pw').value;
+
+  try {
+    await signInWithRole(email, pw, 'super');
+    showPanel();
+  } catch (e) {
+    const inp = document.getElementById('pw');
+    inp.classList.remove('shake');
+    void inp.offsetWidth;
+    inp.classList.add('shake');
+    inp.value = '';
+    document.getElementById('err-msg').textContent = e.message || 'ログインに失敗しました';
+    setTimeout(() => inp.classList.remove('shake'), 400);
+  }
+}
+
+function showPanel() {
+  if (showPanel.done) return;
+  showPanel.done = true;
+
+  document.getElementById('login-section').style.display = 'none';
+  document.getElementById('admin-panel').style.display = 'block';
+
+  siteLog('super_login');
+  loadSAHistory();
+  loadSiteLogs();
+}
+
+async function doLogout() {
+  await signOutAdmin();
+}
+</script>
 
 if (sessionStorage.getItem(STORAGE_KEY) === 'ok') showPanel();
 
