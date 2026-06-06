@@ -19,7 +19,7 @@ async function hasRole(role) {
 
   if (!user.emailVerified) return false;
 
-  const email = getCurrentEmail();
+//  const email = getCurrentEmail();
 
   if (role === "super") {
     return SUPER_EMAILS.includes(email);
