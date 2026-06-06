@@ -6,114 +6,204 @@
   <title>不死賭 ♠ 文化祭カジノ</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700;900&family=Noto+Serif+JP:wght@700;900&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Noto+Serif+JP:wght@400;700;900&family=Noto+Sans+JP:wght@300;400;500;700&display=swap">
   <link rel="stylesheet" href="style.css">
   <style>
     /* ── ヒーロー ── */
     .hero {
       text-align: center;
-      padding: 3.5rem 1rem 2.5rem;
+      padding: 4.5rem 1rem 3rem;
       position: relative;
     }
+
+    /* カジノチップ風の装飾リング */
+    .hero-ring {
+      position: absolute;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      border: 1px solid rgba(184,0,0,0.08);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .hero-ring:nth-child(2) { width:500px; height:500px; border-color:rgba(201,168,76,0.04); }
+    .hero-ring:nth-child(3) { width:600px; height:600px; border-color:rgba(184,0,0,0.04); }
+
     .hero-eyebrow {
-      font-size: 0.72rem;
-      letter-spacing: 0.3em;
-      color: var(--text-muted);
-      margin-bottom: 1.2rem;
+      font-size: 0.7rem; letter-spacing: 0.4em;
+      color: var(--text-muted); margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      position: relative;
+      display: inline-flex; align-items: center; gap: 1rem;
     }
-    .hero-title {
+    .hero-eyebrow::before, .hero-eyebrow::after {
+      content: '—'; opacity: 0.4;
+    }
+
+    .hero-kanji {
       font-family: 'Noto Serif JP', serif;
-      font-size: clamp(3rem, 12vw, 7rem);
+      font-size: clamp(4rem, 15vw, 9rem);
       font-weight: 900;
-      color: var(--red-bright);
+      color: var(--crimson-hot);
+      display: block;
+      line-height: 0.9;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.3rem;
       text-shadow:
-        0 0 60px rgba(200,17,17,0.8),
-        0 0 120px rgba(200,17,17,0.4),
-        3px 3px 0 rgba(0,0,0,0.9),
-        -1px -1px 0 rgba(0,0,0,0.5);
-      line-height: 1;
-      margin-bottom: 0.4rem;
-      letter-spacing: 0.1em;
+        0 0 40px rgba(184,0,0,0.9),
+        0 0 80px rgba(184,0,0,0.5),
+        0 0 160px rgba(184,0,0,0.2),
+        3px 3px 0 rgba(0,0,0,1),
+        6px 6px 0 rgba(80,0,0,0.5);
+      position: relative;
     }
-    .hero-sub {
-      font-size: clamp(0.72rem, 2vw, 0.9rem);
-      color: var(--text-muted);
-      letter-spacing: 0.2em;
-      margin-bottom: 0.6rem;
-    }
-    .hero-tagline {
-      font-family: 'Noto Serif JP', serif;
-      font-size: clamp(0.7rem, 1.8vw, 0.85rem);
+
+    .hero-en {
+      font-family: 'Libre Baskerville', serif;
+      font-size: clamp(0.65rem, 1.5vw, 0.85rem);
+      letter-spacing: 0.5em;
       color: var(--gold);
-      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 0.8rem;
       opacity: 0.8;
     }
-    .deco-row {
-      display: flex; justify-content: center; gap: 1.5rem;
-      font-size: 1.8rem; margin: 1.5rem 0 0; opacity: 0.4;
+
+    .hero-tagline {
+      font-family: 'Noto Serif JP', serif;
+      font-size: clamp(0.72rem, 1.8vw, 0.88rem);
+      color: var(--text-muted);
+      letter-spacing: 0.2em;
+      margin-bottom: 2rem;
     }
+
+    /* カードスーツ装飾 */
+    .suits {
+      display: flex; justify-content: center; align-items: center;
+      gap: 0.6rem; font-size: 1.1rem; opacity: 0.35;
+    }
+    .suits span { color: var(--crimson-hot); }
+    .suits span.black { color: var(--text-warm); }
+    .suits-divider { width: 1px; height: 12px; background: var(--border-red); }
 
     /* ── 来場者バー ── */
     .visitor-bar {
-      background: linear-gradient(135deg, var(--bg-card), var(--bg-elevated));
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1.2rem 1.8rem;
+      background: linear-gradient(135deg, var(--obsidian-3), var(--obsidian-4));
+      border: 1px solid var(--border-red);
+      border-radius: 6px;
+      padding: 1.4rem 2rem;
       display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 2.5rem;
-      flex-wrap: wrap; gap: 0.8rem;
-      box-shadow: var(--shadow-card), inset 0 0 30px rgba(200,17,17,0.03);
+      margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1rem;
+      box-shadow: var(--shadow-card), inset 0 0 40px rgba(184,0,0,0.04);
+      position: relative; overflow: hidden;
+    }
+    /* 右上の装飾 */
+    .visitor-bar::after {
+      content: '♠';
+      position: absolute; right: 1.5rem; top: 50%;
+      transform: translateY(-50%);
+      font-size: 4rem; opacity: 0.04; color: var(--crimson-hot);
+      pointer-events: none;
     }
     .visitor-num {
-      font-family: 'Noto Serif JP', serif;
-      font-size: 2.8rem;
-      font-weight: 900;
-      color: var(--red-bright);
-      text-shadow: 0 0 20px rgba(200,17,17,0.5);
+      font-family: 'Libre Baskerville', serif;
+      font-size: 2.8rem; font-weight: 700;
+      color: var(--crimson-hot);
+      text-shadow: 0 0 30px rgba(184,0,0,0.6);
       line-height: 1;
     }
     .visitor-label {
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.2em;
-      color: var(--text-muted);
-      margin-bottom: 0.3rem;
-      text-transform: uppercase;
+      font-size: 0.68rem; font-weight: 700;
+      letter-spacing: 0.25em; color: var(--text-muted);
+      margin-bottom: 0.3rem; text-transform: uppercase;
     }
 
     /* ── 待ち時間 ── */
     .wait-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:2.5rem; }
     @media(max-width:700px) { .wait-grid { grid-template-columns:repeat(2,1fr); } }
     .wait-card {
-      background: var(--bg-card);
+      background: var(--obsidian-3);
       border: 1px solid var(--border-dim);
-      border-radius: 8px;
-      padding: 1.3rem;
+      border-radius: 6px;
+      padding: 1.5rem 1rem;
       display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
-      transition: all 0.3s;
-      box-shadow: var(--shadow-card);
-      position: relative; overflow: hidden;
+      transition: all 0.3s; box-shadow: var(--shadow-card);
+      position: relative; overflow: hidden; cursor: default;
     }
+    /* ゲームカラーの底部アクセント */
+    .wait-card::before {
+      content: ''; position: absolute;
+      bottom: 0; left: 0; right: 0; height: 3px;
+      background: var(--game-color, var(--crimson-hot));
+      opacity: 0.7;
+    }
+    /* カード模様の透かし */
     .wait-card::after {
-      content:''; position:absolute; bottom:0; left:0; right:0;
-      height:2px; background:var(--game-color, var(--red-bright)); opacity:0.6;
+      content: attr(data-suit);
+      position: absolute; top: 0.4rem; right: 0.6rem;
+      font-size: 1rem; opacity: 0.08;
+      color: var(--game-color, var(--crimson-hot));
     }
-    .wait-card:hover { border-color:var(--game-color, var(--red-bright)); transform:translateY(-2px); box-shadow:var(--shadow-red); }
-    .wait-label { font-size:0.78rem; font-weight:700; letter-spacing:0.08em; color:var(--game-color, var(--red-bright)); }
-    .wait-mins { font-family:'Noto Serif JP',serif; font-size:2.5rem; font-weight:900; color:var(--text); line-height:1; }
-    .wait-unit-small { font-size:0.65rem; color:var(--text-muted); letter-spacing:0.1em; }
+    .wait-card:hover {
+      border-color: var(--game-color, var(--crimson-hot));
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 20px rgba(184,0,0,0.15);
+    }
+    .wait-label {
+      font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--game-color, var(--crimson-hot));
+    }
+    .wait-mins {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 3rem; font-weight: 700;
+      color: var(--text); line-height: 1;
+    }
+    .wait-unit-small { font-size: 0.62rem; color: var(--text-muted); letter-spacing: 0.12em; }
 
     /* ── ランキング ── */
     .ranking-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1.5rem; margin-bottom:2rem; }
     @media(max-width:700px) { .ranking-grid { grid-template-columns:1fr; } }
-    .ranking-card-head {
-      display:flex; align-items:center; gap:0.6rem;
-      margin-bottom:1rem; padding-bottom:0.8rem;
-      border-bottom:1px solid var(--border-dim);
+
+    .ranking-card {
+      background: var(--obsidian-3);
+      border: 1px solid var(--border-dim);
+      border-radius: 6px; padding: 1.5rem;
+      box-shadow: var(--shadow-card);
+      position: relative; overflow: hidden;
+      transition: border-color 0.3s;
     }
-    .ranking-card-icon { font-size:1.3rem; }
-    .ranking-card-title { font-size:0.9rem; font-weight:700; letter-spacing:0.08em; color:var(--game-color, var(--red-bright)); }
-    .empty-rank { color:var(--text-muted); font-size:0.8rem; text-align:center; padding:1.2rem; }
+    .ranking-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 40%);
+      pointer-events: none;
+    }
+    .ranking-card::after {
+      content: ''; position: absolute; top: 0; left: 10%; right: 10%; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(201,168,76,0.2), transparent);
+    }
+    .ranking-card:hover { border-color: var(--border-red); }
+
+    .ranking-card-head {
+      display: flex; align-items: center; gap: 0.7rem;
+      margin-bottom: 1rem; padding-bottom: 0.8rem;
+      border-bottom: 1px solid var(--border-dim);
+    }
+    .rch-icon { font-size: 1.2rem; }
+    .rch-title {
+      font-size: 0.88rem; font-weight: 700;
+      color: var(--game-color, var(--crimson-hot));
+      letter-spacing: 0.06em;
+    }
+    .rch-count {
+      margin-left: auto; font-size: 0.68rem;
+      color: var(--text-muted); letter-spacing: 0.1em;
+    }
+    .empty-rank {
+      color: var(--text-muted); font-size: 0.8rem;
+      text-align: center; padding: 1.5rem;
+      letter-spacing: 0.1em;
+    }
   </style>
 </head>
 <body>
@@ -133,23 +223,37 @@
 
 <div class="container">
 
+  <!-- ヒーロー -->
   <section class="hero">
+    <div class="hero-ring"></div>
+    <div class="hero-ring"></div>
+    <div class="hero-ring"></div>
+
     <p class="hero-eyebrow">○○高校 文化祭 2025</p>
-    <h1 class="hero-title">不死賭</h1>
-    <p class="hero-sub">CASINO NIGHT</p>
+    <span class="hero-kanji">不死賭</span>
+    <p class="hero-en">Casino Night</p>
     <p class="hero-tagline">〜君たちは生きて帰れるのか〜</p>
-    <div class="deco-row">🃏 🎲 🐴 ♠</div>
+
+    <div class="suits">
+      <span>♠</span>
+      <div class="suits-divider"></div>
+      <span>♥</span>
+      <div class="suits-divider"></div>
+      <span class="black">♣</span>
+      <div class="suits-divider"></div>
+      <span>♦</span>
+    </div>
   </section>
 
   <!-- 来場者数 -->
   <div class="visitor-bar">
     <div>
-      <div class="visitor-label">来場者数</div>
+      <div class="visitor-label">本日の来場者</div>
       <div class="visitor-num" id="visitor-count">—</div>
     </div>
     <div style="text-align:right;">
       <div class="visitor-label">最終更新</div>
-      <div style="font-size:0.85rem;color:var(--text-sub);" id="last-updated">—</div>
+      <div style="font-size:0.85rem;color:var(--text-warm);font-family:'Libre Baskerville',serif;" id="last-updated">—</div>
     </div>
   </div>
 
@@ -169,13 +273,18 @@
 
 </div>
 
-<footer class="site-footer">不死賭 &nbsp;·&nbsp; ○○高校 文化祭 &nbsp;·&nbsp; 〜君たちは生きて帰れるのか〜</footer>
+<footer class="site-footer">
+  不死賭 &ensp;·&ensp; ○○高校 文化祭 &ensp;·&ensp; 〜君たちは生きて帰れるのか〜
+</footer>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script src="common.js"></script>
 <script>
+const SUIT_MAP = { poker:'♠', blackjack:'♥', chinchiro:'🎲', keiba:'♦' };
+
+// 待ち時間
 const waitGridEl = document.getElementById('wait-grid');
 function renderWaitGrid(data) {
   waitGridEl.innerHTML = GAMES.map(g => {
@@ -183,7 +292,7 @@ function renderWaitGrid(data) {
     const statusMap = { open:['空いてます','status-open'], busy:['混雑中','status-busy'], full:['満員','status-full'] };
     const [stLabel, stClass] = statusMap[d.status] ?? statusMap.open;
     return `
-      <div class="wait-card game-${g.id}">
+      <div class="wait-card game-${g.id}" data-suit="${SUIT_MAP[g.id]||'♠'}">
         <div class="wait-label">${g.icon} ${g.label}</div>
         <div class="wait-mins">${d.minutes??0}</div>
         <div class="wait-unit-small">分待ち</div>
@@ -199,30 +308,33 @@ db.collection('waitTimes').onSnapshot(snap => {
   const data={};snap.forEach(doc=>{data[doc.id]=doc.data();});renderWaitGrid(data);
 });
 
+// 来場者数
 db.collection('visitors').doc('total').onSnapshot(snap => {
   const d=snap.data()??{};
   document.getElementById('visitor-count').textContent=(d.count??0).toLocaleString()+' 人';
   document.getElementById('last-updated').textContent=fmtTime(d.updatedAt)||'—';
 });
 
+// ランキング
 const rankingGridEl = document.getElementById('ranking-grid');
 const medals=['🥇','🥈','🥉','4','5'];
 function renderRankingCards(allData) {
   rankingGridEl.innerHTML = GAMES.map(g => {
     const items=(allData[g.id]||[]).slice(0,5);
-    const rows=items.length===0
-      ?'<div class="empty-rank">まだデータがありません</div>'
-      :items.map((it,i)=>`
-        <div class="rank-row rank-${i+1}">
-          <div class="rank-num ${i<3?'':'other'}">${medals[i]}</div>
-          <div class="rank-name">${it.name}</div>
-          <div class="rank-score">${it.score.toLocaleString()}</div>
-        </div>`).join('');
+    const rows = items.length===0
+      ? '<div class="empty-rank">— まだデータがありません —</div>'
+      : items.map((it,i)=>`
+          <div class="rank-row rank-${i+1}">
+            <div class="rank-num ${i<3?'':'other'}">${medals[i]}</div>
+            <div class="rank-name">${it.name}</div>
+            <div class="rank-score">${it.score.toLocaleString()}</div>
+          </div>`).join('');
     return `
-      <div class="card game-${g.id}">
+      <div class="ranking-card game-${g.id}">
         <div class="ranking-card-head">
-          <span class="ranking-card-icon">${g.icon}</span>
-          <span class="ranking-card-title">${g.label}</span>
+          <span class="rch-icon">${g.icon}</span>
+          <span class="rch-title">${g.label}</span>
+          <span class="rch-count">${(allData[g.id]||[]).length}人参加</span>
         </div>
         ${rows}
       </div>`;
