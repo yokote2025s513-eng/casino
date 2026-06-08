@@ -11,21 +11,25 @@
   <style>
     body { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; }
     .login-wrap { width:min(420px, 92vw); animation:fadeUp 0.4s ease; }
-    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
-    .login-logo { text-align:center; margin-bottom:2rem; }
-    .login-logo-icon { font-size:3rem; display:block; margin-bottom:0.5rem; text-shadow:0 0 30px rgba(212,175,55,0.3); }
-    .login-logo-text { font-family:'Cinzel Decorative', serif; font-size:1.4rem; color:var(--gold); letter-spacing:0.06em; }
-    .dest-selector { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:1.5rem; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }\n    .login-logo { text-align:center; margin-bottom:2rem; }
+    .login-logo-icon { font-size:3rem; display:block; margin-bottom:0.5rem; text-shadow:0 0 30px rgba(212,175,55,0.3); color:var(--gold); }
+    .login-logo-title { font-family:'Noto Serif JP',serif; font-weight:900; font-size:1.6rem; letter-spacing:0.12em; color:var(--text); }
+    .login-logo-sub { font-family:'Cinzel',serif; font-size:0.75rem; letter-spacing:0.2em; color:var(--text-muted); margin-top:0.2rem; }
+
+    .card { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:2rem; box-shadow:0 20px 50px rgba(0,0,0,0.5); }
+    .dest-selector { display:grid; grid-template-columns:1fr 1fr; gap:0.6rem; margin-bottom:1.5rem; }
     .dest-btn {
-      background: var(--obsidian-3); border:1px solid var(--border); border-radius:4px;
-      padding:0.75rem; color:var(--text-muted); font-size:0.82rem; cursor:pointer; transition:all 0.2s;
-      text-align:center; font-family:'Noto Sans JP', sans-serif;
+      background:var(--obsidian-2); border:1px solid var(--border); padding:0.8rem 0.4rem;
+      border-radius:4px; text-align:center; cursor:pointer; font-size:0.82rem; font-weight:700; color:var(--text-muted); transition:all 0.2s;
     }
-    .dest-btn:hover { border-color:var(--gold); color:var(--text); }
-    .dest-btn.selected { background:var(--gold-dim); border-color:var(--gold); color:var(--gold-light); font-weight:500; box-shadow:0 0 15px rgba(201,168,76,0.1); }
-    .dest-btn-icon { display:block; font-size:1.1rem; margin-bottom:0.2rem; }
-    .form-group input { text-align:center; letter-spacing:0.05em; }
-    #err-msg { color:var(--red-bright); font-size:0.8rem; text-align:center; margin-top:0.8rem; min-height:1.2rem; }
+    .dest-btn.selected { border-color:var(--gold); color:var(--gold-light); background:var(--gold-dim); box-shadow:var(--shadow-gold); }
+    
+    .shake { animation: shake 0.4s ease-in-out; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
   </style>
 </head>
 <body>
@@ -33,55 +37,45 @@
   <div class="login-wrap">
     <div class="login-logo">
       <span class="login-logo-icon">♠</span>
-      <span class="login-logo-text">不賭死</span>
+      <div class="login-logo-title">不賭死</div>
+      <div class="login-logo-sub">STAFF CONTROL PORTAL</div>
     </div>
 
-    <div class="card" style="padding:2rem;">
-      <div style="font-size:0.75rem; color:var(--text-muted); font-family:'Cinzel',serif; letter-spacing:0.1em; text-align:center; margin-bottom:1rem;">SELECT DESTINATION</div>
-      
-      <div class="dest-selector">
-        <button class="dest-btn selected" data-dest="admin-reserve.html" onclick="selectDest(this)">
-          <span class="dest-btn-icon">🎟</span>受付・待機列管理
-        </button>
-        <button class="dest-btn" data-dest="admin-ranking.html" onclick="selectDest(this)">
-          <span class="dest-btn-icon">🏆</span>スコア・順位入力
-        </button>
+    <div class="card" id="login-card">
+      <div class="form-group">
+        <label>1. 管理画面の選択</label>
+        <div class="dest-selector">
+          <div class="dest-btn selected" data-dest="admin-reserve.html" onclick="selectDest(this)">♣ 受付・予約管理</div>
+          <div class="dest-btn" data-dest="admin-ranking.html" onclick="selectDest(this)">♦ スコアランキング管理</div>
+        </div>
       </div>
 
       <div class="form-group">
-        <label>EMAIL ADDRESS</label>
-        <input type="email" id="email-input" placeholder="staff@example.com" onkeydown="if(event.key==='Enter') doLogin()">
-      </div>
-      <div class="form-group" style="margin-bottom:1.5rem;">
-        <label>PASSWORD</label>
-        <input type="password" id="pw-input" placeholder="••••••••" onkeydown="if(event.key==='Enter') doLogin()">
+        <label for="email-input">メールアドレス</label>
+        <input type="email" id="email-input" placeholder="staff@example.com">
       </div>
 
-      <button id="login-btn" class="btn btn-gold" style="width:100%; letter-spacing:0.1em;" onclick="doLogin()">ENTER ▶</button>
-      <div id="err-msg"></div>
+      <div class="form-group" style="margin-bottom:1.5rem;">
+        <label for="pw-input">パスワード</label>
+        <input type="password" id="pw-input" placeholder="••••••••">
+      </div>
+
+      <div id="err-msg" style="color:var(--crimson-hot); font-size:0.82rem; font-weight:500; margin-bottom:1rem; text-align:center; min-height:1.2rem;"></div>
+
+      <button id="login-btn" onclick="doLogin()" class="btn btn-primary" style="width:100%; padding:0.85rem;">
+        <span>安全にログイン ♠</span>
+      </button>
     </div>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-  
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script src="firebase-config.js"></script>
-  <script src="common.js"></script>
-  <script src="auth.js"></script> <script>
+  <script src="auth.js"></script>
+  <script>
     const STORAGE_KEY = 'casino_admin_auth';
     let selectedDest = 'admin-reserve.html';
-
-    // ページ読み込み時にログイン済みかチェック
-    window.addEventListener('DOMContentLoaded', () => {
-      firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-          // 既にログインしている場合はセッションをセットして自動遷移
-          sessionStorage.setItem(STORAGE_KEY, 'ok');
-          location.replace(selectedDest);
-        }
-      });
-    });
 
     function selectDest(btn) {
       document.querySelectorAll('.dest-btn').forEach(b => b.classList.remove('selected'));
@@ -100,21 +94,17 @@
         return;
       }
 
-      if (btn.disabled) return; // 二重クリック防止
+      if (btn.disabled) return;
 
       btn.disabled = true;
       btn.textContent = 'ログイン中...';
       errEl.textContent = '';
 
       try {
-        // 選択された遷移先に応じて必要な権限を判断
         const requiredRole = (selectedDest === 'super-admin.html') ? 'super' : 'staff';
-        
-        // auth.js の共通認証関数を呼び出す
         await signInWithRole(email, pw, requiredRole);
 
         sessionStorage.setItem(STORAGE_KEY, 'ok');
-        
         btn.textContent = '✓ ログイン成功';
         setTimeout(() => location.replace(selectedDest), 400);
 
@@ -128,14 +118,18 @@
         }
         errEl.textContent = msg;
         
-        // パスワード入力欄をガタガタ揺らす演出
-        const pwInput = document.getElementById('pw-input');
-        pwInput.classList.add('error');
-        setTimeout(() => pwInput.classList.remove('error'), 400);
-        
+        const card = document.getElementById('login-card');
+        card.classList.add('shake');
+        setTimeout(() => card.classList.remove('shake'), 400);
+
         btn.disabled = false;
-        btn.textContent = 'ENTER ▶';
+        btn.textContent = '安全にログイン ♠';
       }
+    }
+
+    // 既に認証済みセッションがあればスキップ
+    if (sessionStorage.getItem(STORAGE_KEY) === 'ok' && firebase.auth().currentUser) {
+      location.replace(selectedDest);
     }
   </script>
 </body>
