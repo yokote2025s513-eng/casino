@@ -19,7 +19,8 @@ async function hasRole(role) {
 
   if (!user.emailVerified) return false;
 
- const email = getCurrentEmail();
+  // コメントアウトを解除し、emailを正しく取得するように修正
+  const email = getCurrentEmail();
 
   if (role === "super") {
     return SUPER_EMAILS.includes(email);
