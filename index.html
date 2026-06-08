@@ -9,14 +9,75 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Noto+Serif+JP:wght@400;700;900&family=Noto+Sans+JP:wght@300;400;500;700&display=swap">
   <link rel="stylesheet" href="style.css">
   <style>
-    .hero { text-align: center; padding: 4.5rem 1rem 3rem; position: relative; }
-    .hero-ring { position: absolute; width: 400px; height: 400px; border-radius: 50%; border: 1px solid rgba(184,0,0,0.08); top: 50%; left: 50%; transform: translate(-50%, -50%); pointer-events: none; }
-    .hero-logo-sub { font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 0.4em; color: var(--gold); margin-bottom: 0.7rem; opacity: 0.8; }
-    .hero-logo-title { font-family: 'Cinzel Decorative', serif; font-size: 3.5rem; font-weight: 900; color: var(--text); letter-spacing: 0.05em; text-shadow: 0 0 40px var(--crimson-glow); margin-bottom: 0.5rem; line-height: 1.1; }
-    .hero-tagline { font-family: 'Noto Serif JP', serif; font-size: 0.95rem; font-weight: 700; letter-spacing: 0.3em; color: var(--gold-pale); text-shadow: 0 2px 4px rgba(0,0,0,0.8); }
-    .section-head { display: flex; align-items: center; justify-content: space-between; margin-top: 3rem; margin-bottom: 1.5rem; }
-    .section-head h2 { font-size: 1.1rem; font-weight: 700; letter-spacing: 0.1em; color: var(--gold-light); display: flex; align-items: center; gap: 0.5rem; }
-    .section-line { flex: 1; height: 1px; background: linear-gradient(to right, rgba(201,168,76,0.3), transparent); margin-left: 1.5rem; margin-right: 1.5rem; }
+    /* ── ヒーロー ── */
+    .hero {
+      text-align: center;
+      padding: 4.5rem 1rem 3rem;
+      position: relative;
+    }
+
+    /* カジノチップ風の装飾リング */
+    .hero-ring {
+      position: absolute;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      border: 1px solid rgba(184,0,0,0.08);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .hero-logo-sub {
+      font-family: 'Cinzel', serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.4em;
+      color: var(--gold);
+      margin-bottom: 0.7rem;
+      opacity: 0.8;
+    }
+    .hero-logo-title {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: var(--text);
+      letter-spacing: 0.05em;
+      text-shadow: 0 0 40px var(--crimson-glow);
+      margin-bottom: 0.5rem;
+      line-height: 1.1;
+    }
+    .hero-tagline {
+      font-family: 'Noto Serif JP', serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.3em;
+      color: var(--gold-pale);
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    }
+
+    /* セクションヘッド */
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 3rem;
+      margin-bottom: 1.5rem;
+    }
+    .section-head h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--gold-light);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .section-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, rgba(201,168,76,0.3), transparent);
+      margin-left: 1.5rem;
+      margin-right: 1.5rem;
+    }
   </style>
 </head>
 <body>
@@ -43,6 +104,7 @@
 <script src="common.js"></script>
 
 <script>
+  // ランキング表示ロジック
   const rankingGridEl = document.getElementById('ranking-grid');
   const medals = ['🥇', '🥈', '🥉', '4', '5'];
 
@@ -70,7 +132,7 @@
     }).join('');
   }
 
-  // ランキングをリアルタイム監視
+  // リアルタイムでランキング同期
   function startRankingListener() {
     db.collection('rankings')
       .orderBy('score', 'desc')
