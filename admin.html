@@ -73,7 +73,6 @@
   <div class="login-card">
     <div class="login-section-title">— Staff Only —</div>
 
-    <!-- 移動先選択 -->
     <span class="dest-label">移動先ページ</span>
     <div class="dest-btns">
       <button class="dest-btn selected" data-dest="admin-ranking.html" onclick="selectDest(this)">♠ Ranking 管理</button>
@@ -81,7 +80,6 @@
       <button class="dest-btn" data-dest="obs.html" onclick="selectDest(this)" style="grid-column:span 2">📺 OBS 表示</button>
     </div>
 
-    <!-- ログインフォーム -->
     <input class="login-input" type="email" id="email-input" placeholder="メールアドレス" autocomplete="email" onkeydown="if(event.key==='Enter') document.getElementById('pw-input').focus()">
     <input class="login-input" type="password" id="pw-input" placeholder="パスワード" autocomplete="current-password" onkeydown="if(event.key==='Enter') doLogin()">
     <div class="err-msg" id="err-msg"></div>
@@ -97,21 +95,23 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
+<script src="auth.js"></script>
 <script src="common.js"></script>
 <script>
 const STORAGE_KEY = 'casino_admin_auth';
 let selectedDest = 'admin-ranking.html';
 
-// 既にログイン済みなら転送
+// 既にログイン済みなら転送（auth.jsの判定を使用）
 firebase.auth().onAuthStateChanged(async user => {
   if (!user) return;
   try {
-    const snap = await db.collection('roles').doc(user.uid).get();
-    const role = snap.data()?.role;
-    if (role === 'staff' || role === 'superadmin') {
+    const ok = await hasRole('staff');
+    if (ok) {
       sessionStorage.setItem(STORAGE_KEY, 'ok');
       siteLog('login', { dest: selectedDest });
       location.replace(selectedDest);
+    } else {
+      await firebase.auth().signOut();
     }
   } catch(e) {}
 });
@@ -122,6 +122,7 @@ function selectDest(btn) {
   selectedDest = btn.dataset.dest;
 }
 
+// auth.jsのsignInWithRoleを使ったログイン処理に修正
 async function doLogin() {
   const email = document.getElementById('email-input').value.trim();
   const pw    = document.getElementById('pw-input').value;
@@ -138,13 +139,9 @@ async function doLogin() {
   errEl.textContent = '';
 
   try {
-    const cred = await firebase.auth().signInWithEmailAndPassword(email, pw);
-    const snap = await db.collection('roles').doc(cred.user.uid).get();
-    const role = snap.data()?.role;
-    if (role !== 'staff' && role !== 'superadmin') {
-      await firebase.auth().signOut();
-      throw new Error('スタッフ権限がありません');
-    }
+    // 認証処理を auth.js に任せる
+    await signInWithRole(email, pw, 'staff');
+    
     sessionStorage.setItem(STORAGE_KEY, 'ok');
     siteLog('login', { dest: selectedDest });
     btn.textContent = '✓ ログイン成功';
