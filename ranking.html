@@ -6,109 +6,162 @@
   <title>ランキング ♠ 不賭死</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Noto+Serif+JP:wght@700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap">
   <link rel="stylesheet" href="style.css">
   <style>
-    .rank-row {
-      display: flex; align-items: center; gap: 1rem; padding: 0.85rem 0;
-      border-bottom: 1px solid rgba(212,175,55,0.07); animation: fadeIn 0.3s ease both;
+    .page-wrap { width: min(800px, 94vw); margin: 0 auto; padding: 2rem 0 5rem; }
+    
+    .page-head { text-align: center; margin-bottom: 2.5rem; }
+    .page-title { font-family: 'Noto Serif JP', serif; font-size: 1.6rem; color: var(--gold-light); letter-spacing: 0.1em; }
+    
+    /* ── 前のリッチな検索フォームの復活 ── */
+    .search-box-card {
+      background: var(--obsidian-3);
+      border: 1px solid var(--border-gold);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2.5rem;
     }
-    @keyframes fadeIn { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
-    .rank-row:last-child { border-bottom: none; }
-    .rank-num-big { font-family:'Cinzel',serif; font-size:1.3rem; font-weight:700; width:2.5rem; text-align:center; flex-shrink:0; }
-    .rank-1 .rank-num-big { color:#ffd700; text-shadow:0 0 10px rgba(255,215,0,0.5); }
-    .rank-2 .rank-num-big { color:#cccccc; text-shadow:0 0 10px rgba(255,255,255,0.3); }
-    .rank-3 .rank-num-big { color:#cd7f32; text-shadow:0 0 10px rgba(205,127,50,0.4); }
-    .other-rank { color: var(--text-muted); }
+    .search-input-group { display: flex; gap: 0.6rem; }
+    .search-input {
+      flex: 1; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1);
+      color: var(--text); padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.92rem;
+      transition: all 0.2s;
+    }
+    .search-input:focus { border-color: var(--gold); outline: none; background: rgba(0,0,0,0.6); }
+    .search-btn {
+      background: var(--gold); color: #000; font-weight: 700; border: none;
+      padding: 0 1.5rem; border-radius: 4px; cursor: pointer; font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .search-btn:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+    .search-meta-text { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem; padding-left: 0.2rem; }
+
+    /* ── 前の美しい順位行デザインの復活 ── */
+    .rank-row {
+      display: flex; align-items: center; gap: 1.2rem;
+      padding: 0.9rem 1.2rem;
+      background: rgba(255,255,255,0.01);
+      border-bottom: 1px solid rgba(212,175,55,0.08);
+      border-radius: 6px;
+      margin-bottom: 0.4rem;
+      animation: fadeIn 0.35s ease both;
+    }
+    .rank-row:nth-child(even) { background: rgba(255,255,255,0.03); } /* ストライプ効果 */
     
-    .rank-info { flex:1; min-width:0; }
-    .rank-name-big { font-size:1.05rem; font-weight:700; color:var(--text); margin-bottom:0.15rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-    .rank-time { display:flex; align-items:center; gap:0.5rem; font-size:0.75rem; color:var(--text-muted); }
-    .rank-score-big { font-family:'Cinzel',serif; font-size:1.4rem; font-weight:700; color:var(--gold-light); text-align:right; }
-    .highlight { background: rgba(184,0,0,0.3); color: #fff; padding: 0 2px; border-radius: 2px; font-weight: 700; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
     
-    .search-box-wrap { margin: 1.5rem 0 2rem; position: relative; }
-    .search-input { width:100%; padding:0.9rem 1rem; font-size:1rem; border-radius:30px; }
-    .search-count-lbl { font-size:0.78rem; color:var(--text-muted); font-weight:700; margin-bottom:0.8rem; padding-left:0.5rem; }
-    .empty-state { text-align:center; padding:4rem 1rem; color:var(--text-muted); }
-    .empty-icon { font-size:2.5rem; margin-bottom:0.5rem; opacity:0.5; }
+    /* 順位バッジ表示の復活 */
+    .rank-num-big {
+      font-family: 'Cinzel', serif; font-size: 1.25rem; font-weight: 700;
+      width: 2.4rem; height: 2.4rem; display: flex; align-items: center; justify-content: center;
+      border-radius: 50%; flex-shrink: 0;
+    }
+    .rank-1 .rank-num-big { background: linear-gradient(135deg, #ffd700, #b89700); color: #000; box-shadow: 0 0 12px rgba(255,215,0,0.3); }
+    .rank-2 .rank-num-big { background: linear-gradient(135deg, #cccccc, #888888); color: #000; }
+    .rank-3 .rank-num-big { background: linear-gradient(135deg, #cd7f32, #8a4500); color: #000; }
+    .other-rank { color: var(--text-muted); background: rgba(255,255,255,0.04); font-size: 1.05rem; }
+
+    .rank-info { flex: 1; min-width: 0; }
+    .rank-name-big { font-size: 1.05rem; font-weight: 500; color: var(--text-warm); margin-bottom: 0.2rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    
+    .rank-time { display: flex; align-items: center; gap: 0.5rem; font-size: 0.72rem; color: var(--text-muted); }
+    
+    /* 各ゲーム専用のバッジ装飾 */
+    .game-badge { padding: 0.15rem 0.45rem; border-radius: 3px; font-weight: 500; color: #fff; font-size: 0.7rem; }
+    .game-poker { background: #b80000; }
+    .game-blackjack { background: #2980b9; }
+    .game-chinchiro { background: #d35400; }
+    .game-keiba { background: #27ae60; }
+
+    .rank-score-big {
+      font-family: 'Cinzel', serif; font-size: 1.35rem; font-weight: 700; color: var(--gold); text-align: right;
+      text-shadow: 0 0 8px rgba(201,168,76,0.15);
+    }
+    
+    /* 検索キーワードのハイライト */
+    .highlight { background: rgba(201,168,76,0.25); color: var(--gold-light); padding: 0 2px; border-radius: 2px; font-weight: 700; }
+
+    .empty-state { text-align: center; padding: 4rem 0; color: var(--text-muted); }
+    .empty-icon { font-size: 2.5rem; margin-bottom: 0.8rem; opacity: 0.4; }
+    
+    .back-btn-wrap { display: flex; justify-content: center; margin-top: 3rem; }
   </style>
 </head>
 <body>
 
-  <header class="site-header">
-    <div class="container header-inner">
-      <div class="header-logo">不賭死<span>♠</span></div>
-      <nav class="header-nav">
-        <a href="index.html">TOP</a>
-        <a href="ranking.html" style="color:var(--gold-light)">検索</a>
-        <a href="self-reserve.html">順番待ち予約</a>
-      </nav>
-    </div>
-  </header>
-
-  <main class="container" style="max-width:600px; padding-top:2rem; padding-bottom:5rem;">
-    <h2 style="font-family:'Noto Serif JP',serif; font-size:1.25rem; text-align:center;">個人スコア検索</h2>
-    
-    <div class="search-box-wrap">
-      <input type="text" id="search-input" class="search-input" placeholder="ニックネームを入力..." oninput="onSearchInput()">
+  <div class="page-wrap">
+    <div class="page-head">
+      <h1 class="page-title">🏆 全ゲーム順位一覧</h1>
     </div>
 
-    <div id="search-label" class="search-count-lbl" style="display:none;"></div>
-    <div id="search-results">
-      <div class="empty-state">
-        <div class="empty-icon">🔍</div>
-        名前を入力すると、登録されているすべてのゲームの順位とスコアがリアルタイムに表示されます。
+    <div class="search-box-card">
+      <div id="search-label" class="search-meta-text">ニックネームでランキングを検索</div>
+      <div class="search-input-group">
+        <input type="text" id="search-input" class="search-input" placeholder="ニックネームを入力..." autocomplete="off">
+        <button onclick="handleSearch()" class="search-btn">🔍 検索</button>
       </div>
     </div>
-  </main>
 
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <div id="search-results">
+      <div style="text-align: center; color: var(--text-muted); font-size: 0.88rem; padding: 4rem 0;">
+        ランキングデータを読み込み中...
+      </div>
+    </div>
+
+    <div class="back-btn-wrap">
+      <a href="index.html" class="btn btn-secondary" style="text-decoration:none;">↩ メイン画面へ戻る</a>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="firebase-config.js"></script>
   <script src="common.js"></script>
   <script>
+    // メモリ保持用変数（Firebaseの通信量を極限まで抑えるため、1度読んだらこの中で処理する）
     let allDocs = [];
 
-    async function fetchAllScores() {
+    async function loadAllRankings() {
       try {
+        // 全データを1回だけ取得 (節約設計)
         const snap = await rankingCol().orderBy('score', 'desc').get();
         allDocs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        // 入力がある状態で再読込された場合の考慮
-        if(document.getElementById('search-input').value.trim()) {
-          onSearchInput();
-        }
-      } catch(e) {
+        
+        // 初回は検索ワードなし（全件表示）で描画
+        renderRows('');
+      } catch (e) {
         console.error(e);
-        showToast('データの取得に失敗しました', 'error');
+        document.getElementById('search-results').innerHTML =
+          `<div class="empty-state" style="color:var(--red-bright)">データの取得に失敗しました: ${e.message}</div>`;
       }
     }
 
-    function onSearchInput() {
+    function handleSearch() {
       const q = document.getElementById('search-input').value.trim();
-      const resultsEl = document.getElementById('search-results');
-      const labelEl = document.getElementById('search-label');
+      renderRows(q);
+    }
 
-      if (!q) {
-        labelEl.style.display = 'none';
-        resultsEl.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-icon">🔍</div>
-            名前を入力すると、登録されているすべてのゲームの順位とスコアがリアルタイムに表示されます。
-          </div>`;
-        return;
-      }
-
-      labelEl.style.display = 'block';
+    function renderRows(q) {
       const ql = q.toLowerCase();
+      
+      // フィルタリング処理
       const hits = allDocs.filter(d => (d.name || '').toLowerCase().includes(ql));
-      labelEl.textContent = `「${q}」の検索結果: ${hits.length} 件`;
+      
+      // ラベル更新
+      document.getElementById('search-label').textContent = q 
+        ? `「${q}」の検索結果: ${hits.length} 件` 
+        : `登録されているすべてのランキング: ${hits.length} 件`;
 
       if (hits.length === 0) {
-        resultsEl.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div>見つかりません</div>';
+        document.getElementById('search-results').innerHTML =
+          '<div class="empty-state"><div class="empty-icon">🔍</div>該当するプレイヤーが見つかりません</div>';
         return;
       }
 
-      // ゲームごとに順位マップを計算
+      // 🔥 【超重要】ゲーム別に全体の中での正しい順位をマッピング
       const rankMap = {};
       GAMES.forEach(g => {
         let r = 1;
@@ -117,21 +170,28 @@
         });
       });
 
-      resultsEl.innerHTML = hits.map(it => {
+      // 表示のレンダリング (前のリッチなデザインを復活)
+      document.getElementById('search-results').innerHTML = hits.map(it => {
         const g = GAMES.find(x => x.id === it.gameId);
-        const highlighted = (it.name || '').replace(
-          new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'),
-          m => `<span class="highlight">${m}</span>`
-        );
-        const rank = rankMap[it.id] || '-';
+        const currentRank = rankMap[it.id] || 999;
+        
+        // 検索文字のハイライト処理
+        let displayName = it.name || '—';
+        if (q) {
+          const regex = new RegExp(q.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\$&'), 'gi');
+          displayName = displayName.replace(regex, m => `<span class="highlight">${m}</span>`);
+        }
+
         return `
-          <div class="rank-row ${rank <= 3 ? `rank-${rank}` : ''}">
-            <div class="rank-num-big ${rank <= 3 ? '' : 'other-rank'}">${rank}</div>
+          <div class="rank-row ${currentRank <= 3 ? `rank-${currentRank}` : ''}">
+            <div class="rank-num-big ${currentRank <= 3 ? '' : 'other-rank'}">
+              ${currentRank <= 3 ? '' : currentRank}
+            </div>
             <div class="rank-info">
-              <div class="rank-name-big">${highlighted}</div>
+              <div class="rank-name-big">${displayName}</div>
               <div class="rank-time">
-                <span class="game-badge game-${it.gameId}">${g?.icon} ${g?.label}</span>
-                <span>整理券: ${it.ticketId || '—'}</span>
+                <span class="game-badge game-${it.gameId}">${g ? g.icon : '♠'} ${g ? g.label : it.gameId}</span>
+                <span>登録: ${fmtTime(it.createdAt)}</span>
               </div>
             </div>
             <div class="rank-score-big">${it.score.toLocaleString()}</div>
@@ -139,8 +199,12 @@
       }).join('');
     }
 
-    // 初回ロード
-    fetchAllScores();
+    // Enterキーでも検索できるように設定
+    document.getElementById('search-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') handleSearch();
+    });
+
+    window.addEventListener('DOMContentLoaded', loadAllRankings);
   </script>
 </body>
 </html>
