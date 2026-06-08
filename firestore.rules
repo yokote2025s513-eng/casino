@@ -1,30 +1,42 @@
-// Firebase Security Rules の設定例
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // 管理者（スタッフ）かどうかを判定する関数
+
+    // 管理者（スタッフまたはスーパー管理者）かどうかを判定
     function isStaff() {
       return request.auth != null && 
-        (request.auth.token.email == 'staff@example.com' || request.auth.token.email == 'super@example.com');
+        (request.auth.token.email == "staff@example.com" || request.auth.token.email == "super@example.com");
     }
 
-    match /reserveHistory/{doc} {
-      // 誰でも作成（予約）はできるが、削除や変更はスタッフのみ
-      allow create: if true; 
-      allow update, delete: if isStaff(); 
-      allow read: if true; // ※優先度3で後述しますが、理想はreadも制限すべきです
-    }
-
-    match /rankings/{doc} {
+    // 予約履歴コレクション（誰でも予約はできるが、削除や完了はスタッフのみ）
+    match /reserveHistory/{document} {
       allow read: if true;
-      allow write, delete: if isStaff(); // スコア登録・削除はスタッフのみ
+      allow create: if true;
+      allow update, delete: if isStaff(); 
     }
-    
-    // globalカウンターなども勝手に書き換えられないよう保護
+
+    // ランキングコレクション（誰でも見れるが、登録・編集・削除はスタッフのみ）
+    match /rankings/{document} {
+      allow read: if true;
+      allow write, delete: if isStaff();
+    }
+
+    // 整理番号カウンター（誰でも進められるが、削除は絶対禁止）
     match /reserves/global {
       allow read, update: if true;
+      allow delete: if false; 
+    }
+
+    // 来場者数カウンター（誰でも進められるが、削除は絶対禁止）
+    match /visitors/total {
+      allow read, update: if true;
       allow delete: if false;
+    }
+
+    // rolesコレクション（スタッフの権限確認用）
+    match /roles/{document} {
+      allow read: if isStaff();
+      allow write: if false;
     }
   }
 }
