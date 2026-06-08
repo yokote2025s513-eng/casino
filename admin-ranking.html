@@ -4,10 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin: ランキング ♠ 不死賭</title>
-  <!-- Google Fonts: preconnect for speed -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-      <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css">
   <style>
     /* フォームを上、一覧を下に縦並び */
     .admin-layout { display: flex; flex-direction: column; gap: 2rem; }
@@ -34,433 +33,345 @@
       grid-template-columns: 1fr 1fr 1fr;
       gap: 1rem;
     }
-    @media (max-width: 700px) { .form-grid { grid-template-columns: 1fr; } }
-    .form-grid .form-group { margin-bottom: 0; }
-    /* 大きい入力 */
-    .form-control-lg {
-      width: 100%;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text);
-      font-family: 'Noto Sans JP', sans-serif;
-      font-size: 1.4rem;
-      font-weight: 700;
-      padding: 0.9rem 1rem;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s;
+    @media (max-width: 768px) {
+      .form-grid { grid-template-columns: 1fr; }
     }
-    .form-control-lg:focus {
-      border-color: var(--gold);
-      box-shadow: 0 0 0 3px rgba(212,175,55,0.12);
-    }
-    select.form-control-lg option { background: var(--bg-card); }
-    .form-control-lg::placeholder { color: var(--text-muted); font-size: 1rem; font-weight: 300; }
 
-    /* テーブル側 */
-    .list-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;
-    }
-    .list-title {
-      font-family: 'Cinzel', serif;
-      font-size: 0.85rem;
-      letter-spacing: 0.12em;
-      color: var(--gold);
-    }
-    .filter-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-    .filter-btn {
-      font-family: 'Cinzel', serif;
-      font-size: 0.72rem;
-      letter-spacing: 0.08em;
-      padding: 0.35rem 0.9rem;
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      background: transparent;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .filter-btn.active { color: var(--gold); border-color: var(--gold); background: rgba(212,175,55,0.08); }
-    .filter-btn:hover:not(.active) { color: var(--text); }
+    /* 整理番号検索の横並び */
+    .lookup-group { display: flex; gap: 0.5rem; }
+    #ticket-lookup-result { font-size: 0.75rem; margin-top: 0.4rem; min-height: 1.2rem; }
 
-    .action-cell { display: flex; gap: 0.4rem; }
-    .edit-btn-inline {
-      font-family: 'Cinzel', serif;
-      font-size: 0.7rem;
-      padding: 0.25rem 0.7rem;
-      border: 1px solid var(--border);
-      border-radius: 3px;
-      background: transparent;
-      cursor: pointer;
-      transition: all 0.2s;
+    /* タブ切り替え */
+    .admin-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; overflow-x: auto; }
+    .admin-tab-btn {
+      background: transparent; border: 1px solid transparent; color: var(--text-muted);
+      padding: 0.5rem 1.2rem; border-radius: 4px; cursor: pointer; font-size: 0.88rem; white-space: nowrap;
     }
-    .edit-btn-inline.edit { color: var(--gold); border-color: rgba(212,175,55,0.3); }
-    .edit-btn-inline.edit:hover { background: rgba(212,175,55,0.1); border-color: var(--gold); }
-    .edit-btn-inline.del  { color: var(--red-bright); border-color: rgba(231,76,60,0.3); }
-    .edit-btn-inline.del:hover { background: rgba(231,76,60,0.1); border-color: var(--red-bright); }
+    .admin-tab-btn:hover { color: var(--text); background: var(--obsidian-3); }
+    .admin-tab-btn.active { border-color: var(--border-gold); color: var(--gold-light); background: var(--gold-dim); }
 
-    .game-dot {
-      display: inline-block;
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      margin-right: 0.4rem;
-      flex-shrink: 0;
-    }
-    .dot-poker      { background: var(--poker); }
-    .dot-blackjack  { background: var(--blackjack); }
-    .dot-chinchiro  { background: var(--chinchiro); }
-    .dot-keiba      { background: var(--keiba); }
+    /* データテーブル */
+    .admin-table-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    .admin-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+    .admin-table th { background: var(--obsidian-3); color: var(--gold); font-weight: 600; padding: 0.85rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.8rem; letter-spacing: 0.05em; }
+    .admin-table td { padding: 0.85rem 1rem; border-bottom: 1px solid rgba(212,175,55,0.05); color: var(--text); }
+    .admin-table tr:last-child td { border-bottom: none; }
+    .admin-table tr:hover td { background: rgba(255,255,255,0.01); }
 
-    .modal-overlay {
-      display: none;
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,0.7);
-      backdrop-filter: blur(4px);
-      z-index: 200;
-      align-items: center; justify-content: center;
-    }
-    .modal-overlay.open { display: flex; }
-    .modal {
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1.8rem;
-      width: min(440px, 90vw);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.7);
-    }
-    .modal h3 {
-      font-family: 'Cinzel', serif;
-      color: var(--gold);
-      margin-bottom: 1.2rem;
-      font-size: 1rem;
-      letter-spacing: 0.1em;
-    }
-    .modal-actions { display: flex; gap: 0.6rem; justify-content: flex-end; margin-top: 1.2rem; }
-    .count-chip {
-      background: rgba(212,175,55,0.12);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 0.2rem 0.7rem;
-      font-size: 0.75rem;
-      color: var(--gold);
-    }
+    .rank-cell { font-family: 'Cinzel', serif; font-weight: 700; width: 3.5rem; }
+    .score-cell { font-family: 'Cinzel', serif; font-weight: 600; color: var(--gold-light); text-align: right; }
+    .action-cell { text-align: right; width: 8rem; }
+    .action-cell button { margin-left: 0.4rem; }
   </style>
 </head>
 <body>
 
-<header class="site-header">
-  <div class="header-inner">
-    <a class="site-logo" href="index.html">不死賭</a>
-    <nav class="site-nav">
-      <a class="nav-link" href="index.html">TOP</a>
-      <a class="nav-link" href="ranking.html">Ranking</a>
-      <a class="nav-link active" href="admin-ranking.html">Admin:Ranking</a>
-      <a class="nav-link" href="admin-reserve.html">Admin:Reserve</a>
-      <button class="nav-link" onclick="logout()" style="cursor:pointer;background:none;">ログアウト</button>
-    </nav>
+<div style="width:100%; background:var(--obsidian-2); border-bottom:1px solid var(--border); padding:0.75rem 1.5rem; display:flex; justify-content:space-between; align-items:center; box-sizing:border-box;">
+  <div style="display:flex; align-items:center; gap:1rem;">
+    <span style="font-family:'Cinzel Decorative',serif; color:var(--gold); font-weight:700; font-size:1.1rem;">不死賭 STAFF</span>
+    <span style="background:rgba(212,175,55,0.1); border:1px solid var(--border-gold); color:var(--gold); font-size:0.68rem; padding:0.15rem 0.5rem; border-radius:3px;">RANKING MANAGER</span>
   </div>
-</header>
+  <div style="display:flex; gap:0.8rem; align-items:center;">
+    <a href="admin-reserve.html" class="btn-gold" style="font-size:0.75rem; padding:0.4rem 0.8rem; background:transparent; border-color:rgba(201,168,76,0.4);">➔ 受付管理へ</a>
+    <button onclick="signOutAdmin()" style="font-size:0.75rem; padding:0.4rem 0.8rem; background:transparent; border:1px solid rgba(231,76,60,0.5); color:var(--red-bright); border-radius:4px; cursor:pointer;">ログアウト</button>
+  </div>
+</div>
 
-<div class="container">
-  <h1 class="page-title">スコア管理</h1>
-  <p class="page-subtitle">スコア登録・編集・削除</p>
-  <div class="divider"></div>
-
+<div class="container" style="padding:2rem 1rem 5rem;">
   <div class="admin-layout">
 
-    <!-- 入力フォーム -->
     <div class="form-card">
       <div class="form-card-title" id="form-mode-label">▸ 新規スコア登録</div>
+      
       <input type="hidden" id="edit-id">
 
-      <!-- 整理番号検索（1行目） -->
-      <div class="form-group" style="margin-bottom:1.2rem;">
-        <label class="form-label">TICKET NO — 整理番号で自動入力</label>
-        <div style="display:flex;gap:0.6rem;align-items:center;">
-          <input class="form-control-lg" type="text" id="f-ticket" placeholder="001" maxlength="10"
-            style="width:140px;text-align:center;" oninput="this.value=this.value.toUpperCase()"
-            onkeydown="if(event.key==='Enter') lookupTicket()">
-          <button class="btn btn-gold" onclick="lookupTicket()" style="height:56px;padding:0 1.5rem;font-size:1rem;">検索</button>
-          <div id="ticket-lookup-result" style="font-size:0.85rem;flex:1;"></div>
-        </div>
-      </div>
-
-      <!-- ゲーム・名前・スコア（2行目グリッド） -->
-      <div class="form-grid" style="margin-bottom:1.2rem;">
+      <div class="form-grid">
         <div class="form-group">
-          <label class="form-label">GAME</label>
-          <select class="form-control-lg" id="f-game">
-            <option value="">選択</option>
+          <label class="form-label">整理番号から呼出 (任意)</label>
+          <div class="lookup-group">
+            <input type="text" id="f-ticket" class="form-input" placeholder="例: P001" style="text-transform: uppercase;">
+            <button type="button" onclick="lookupTicket()" class="btn-gold" style="padding:0 0.8rem; font-size:0.8rem; flex-shrink:0;">参照</button>
+          </div>
+          <div id="ticket-lookup-result"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">対象ゲーム <span style="color:var(--crimson-hot)">*</span></label>
+          <select id="f-game" class="form-input" style="background:var(--obsidian); color:var(--text);">
+            <option value="">-- 選択してください --</option>
+            <option value="poker">♠ ポーカー</option>
+            <option value="blackjack">♥ ブラックジャック</option>
+            <option value="chinchiro">🎲 チンチロ</option>
+            <option value="keiba">🏇 競馬</option>
           </select>
         </div>
+
         <div class="form-group">
-          <label class="form-label">NAME</label>
-          <input class="form-control-lg" type="text" id="f-name" placeholder="ニックネーム" maxlength="30">
+          <label class="form-label">プレイヤー名 <span style="color:var(--crimson-hot)">*</span></label>
+          <input type="text" id="f-name" class="form-input" placeholder="ニックネーム" maxlength="12">
         </div>
+
         <div class="form-group">
-          <label class="form-label">SCORE</label>
-          <input class="form-control-lg" type="number" id="f-score" placeholder="0"
-            onkeydown="if(event.key==='Enter') submitScore()">
+          <label class="form-label">獲得スコア (点数) <span style="color:var(--crimson-hot)">*</span></label>
+          <input type="number" id="f-score" class="form-input" placeholder="例: 1500" min="0">
         </div>
       </div>
 
-      <!-- メモ + ボタン -->
-      <div style="display:flex;gap:0.8rem;align-items:flex-end;flex-wrap:wrap;">
-        <div class="form-group" style="flex:1;margin-bottom:0;">
-          <label class="form-label">NOTE（任意）</label>
-          <input class="form-control" type="text" id="f-note" placeholder="メモ" maxlength="50">
-        </div>
-        <button class="btn btn-gold" onclick="submitScore()" style="height:44px;padding:0 2rem;font-size:0.95rem;white-space:nowrap;">
-          <span id="submit-label">登録する ▶</span>
-        </button>
-        <button class="btn btn-outline" onclick="resetForm()" id="cancel-btn" style="display:none;height:44px;">キャンセル</button>
+      <div style="margin-top:1.5rem; display:flex; gap:0.5rem; justify-content:flex-end;">
+        <button type="button" id="cancel-btn" onclick="resetForm()" class="btn-gold" style="background:transparent; border-color:var(--border); color:var(--text-muted); display:none; padding:0.5rem 1.5rem;">キャンセル</button>
+        <button type="button" onclick="doSubmit()" class="btn-gold" style="padding:0.5rem 2rem;"><span id="submit-label">登録する</span></button>
       </div>
     </div>
 
-    <!-- 一覧 -->
     <div>
-      <div class="list-header">
-        <div style="display:flex;align-items:center;gap:0.8rem;">
-          <span class="list-title">スコア一覧</span>
-          <span class="count-chip" id="count-chip">0 件</span>
+      <div class="admin-tabs" id="tab-container">
+        <button class="admin-tab-btn active" onclick="switchTab('all')">🏆 全ゲーム総合</button>
         </div>
-        <div class="filter-row" id="filter-row"></div>
-      </div>
 
-      <div class="card" style="padding:0; overflow:hidden;">
-        <div id="table-wrap">
-          <div class="loading"><div class="spinner"></div>Loading...</div>
-        </div>
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th class="rank-cell">順位</th>
+              <th>ゲーム</th>
+              <th>プレイヤー名</th>
+              <th style="text-align:right;">スコア</th>
+              <th class="action-cell">操作</th>
+            </tr>
+          </thead>
+          <tbody id="ranking-tbody">
+            <tr>
+              <td colspan="5" style="text-align:center; color:var(--text-muted); padding:2rem;">データを読み込み中...</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
   </div>
 </div>
 
-<!-- 削除確認モーダル -->
 <div class="modal-overlay" id="del-modal">
   <div class="modal">
-    <h3>⚠ 削除の確認</h3>
-    <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:0.5rem;">
-      このスコアを削除しますか？この操作は元に戻せません。
-    </p>
-    <p id="del-target-info" style="font-size:0.9rem; color:var(--text);"></p>
+    <h3>⚠️ スコアデータの削除</h3>
+    <p style="font-size:0.88rem; color:var(--text); margin-bottom:0.5rem;">以下のランキングデータを完全に削除しますか？</p>
+    <div id="del-target-info" style="font-size:0.9rem; font-weight:600; color:var(--crimson-hot); background:rgba(0,0,0,0.2); padding:0.6rem; border-radius:4px; margin-bottom:1.5rem;">—</div>
     <div class="modal-actions">
-      <button class="btn btn-outline" onclick="closeDelModal()">キャンセル</button>
-      <button class="btn btn-danger" onclick="confirmDelete()">削除する</button>
+      <button onclick="closeDelModal()" class="btn-gold" style="background:transparent; border-color:var(--border); color:var(--text-muted); padding:0.4rem 1rem; font-size:0.8rem;">やめる</button>
+      <button onclick="confirmDelete()" class="btn-gold" style="background:var(--crimson); border-color:var(--crimson-hot); color:#fff; padding:0.4rem 1rem; font-size:0.8rem;">削除する</button>
     </div>
   </div>
 </div>
 
-<div id="toast-container"></div>
-<script>
-requireRole('staff');
-
-</script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script src="auth.js"></script>
 <script src="common.js"></script>
-
 <script>
-// ゲームセレクト初期化
-const sel = document.getElementById('f-game');
-GAMES.forEach(g => {
-  sel.innerHTML += `<option value="${g.id}">${g.icon} ${g.label}</option>`;
-});
+  // 管理者権限チェック
+  requireRole('staff');
 
-// 整理番号からニックネームを検索
-async function lookupTicket() {
-  const ticketId = document.getElementById('f-ticket').value.trim().toUpperCase();
-  const resultEl = document.getElementById('ticket-lookup-result');
-  if (!ticketId) {
-    resultEl.innerHTML = '<span style="color:var(--red-bright)">整理番号を入力してください</span>';
-    return;
-  }
-  resultEl.innerHTML = '<span style="color:var(--text-muted)">検索中...</span>';
-  try {
-    const snap = await db.collection('reserveHistory')
-      .where('ticketId', '==', ticketId)
-      .orderBy('issuedAt', 'desc')
-      .limit(1)
-      .get();
-    if (snap.empty) {
-      resultEl.innerHTML = '<span style="color:var(--red-bright)">見つかりません</span>';
-      return;
-    }
-    const data = snap.docs[0].data();
-    const nickname = data.nickname || '';
-    const gameId   = data.gameId || '';
-    // ゲームとニックネームを自動入力
-    if (gameId) document.getElementById('f-game').value = gameId;
-    if (nickname) document.getElementById('f-name').value = nickname;
-    document.getElementById('f-note').value = ticketId;
-    resultEl.innerHTML = `<span style="color:#5dbb7a">✓ ${gameLabel(gameId)} — ${nickname}</span>`;
-  } catch(e) {
-    resultEl.innerHTML = `<span style="color:var(--red-bright)">エラー: ${e.message}</span>`;
-  }
-}
+  let allDocs = [];
+  let currentTab = 'all';
+  let delId = null;
 
-// フィルターボタン
-let filterGame = 'all';
-const filterRow = document.getElementById('filter-row');
-[{id:'all', label:'全て', icon:''}].concat(GAMES).forEach(g => {
-  const btn = document.createElement('button');
-  btn.className = 'filter-btn' + (g.id === 'all' ? ' active' : '');
-  btn.dataset.id = g.id;
-  btn.textContent = (g.icon ? g.icon + ' ' : '') + g.label;
-  btn.onclick = () => {
-    filterGame = g.id;
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.id === g.id));
-    renderTable(allDocs);
-  };
-  filterRow.appendChild(btn);
-});
+  window.addEventListener('DOMContentLoaded', () => {
+    // タブボタンの動的生成
+    const tabsWrap = document.getElementById('tab-container');
+    tabsWrap.innerHTML = `<button class="admin-tab-btn id-tab-all active" onclick="switchTab('all')">🏆 全ゲーム総合</button>` +
+      GAMES.map(g => `<button class="admin-tab-btn id-tab-${g.id}" onclick="switchTab('${g.id}')">${g.icon} ${g.label}</button>`).join('');
 
-let allDocs = [];
-let delId = null;
-
-// リアルタイム取得
-db.collection('rankings').orderBy('score', 'desc').onSnapshot(snap => {
-  allDocs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  renderTable(allDocs);
-  document.getElementById('count-chip').textContent = allDocs.length + ' 件';
-});
-
-function renderTable(docs) {
-  const filtered = filterGame === 'all' ? docs : docs.filter(d => d.gameId === filterGame);
-  if (filtered.length === 0) {
-    document.getElementById('table-wrap').innerHTML =
-      '<div class="loading" style="padding:2.5rem;">データがありません</div>';
-    return;
-  }
-  // ゲーム別順位付け
-  const rankMap = {};
-  GAMES.forEach(g => {
-    let r = 1;
-    docs.filter(d => d.gameId === g.id).forEach(d => { rankMap[d.id] = r++; });
+    // データのリアルタイム監視
+    db.collection('rankings').orderBy('score', 'desc').onSnapshot(snap => {
+      allDocs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderTable();
+    }, err => {
+      console.error("Firestore read error:", err);
+      document.getElementById('ranking-tbody').innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--red-bright);">データの読み込み権限がありません</td></tr>`;
+    });
   });
 
-  document.getElementById('table-wrap').innerHTML = `
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>順位</th><th>ゲーム</th><th>名前</th><th>スコア</th><th>メモ</th><th>登録</th><th></th>
-        </tr>
-      </thead>
-      <tbody>
-        ${filtered.map(it => `
-          <tr>
-            <td style="font-family:'Cinzel',serif; font-weight:700; color:${rankMap[it.id]<=3?'var(--gold)':'var(--text-muted)'}">
-              ${rankMap[it.id]}
-            </td>
-            <td>
-              <span class="game-dot dot-${it.gameId}"></span>
-              ${gameLabel(it.gameId)}
-            </td>
-            <td style="font-weight:700">${it.name}</td>
-            <td style="font-family:'Cinzel',serif; color:var(--gold); font-weight:700">
-              ${it.score.toLocaleString()}
-            </td>
-            <td style="color:var(--text-muted); font-size:0.8rem">${it.note || '—'}</td>
-            <td style="color:var(--text-muted); font-size:0.78rem">${fmtTime(it.createdAt)}</td>
-            <td>
-              <div class="action-cell">
-                <button class="edit-btn-inline edit" onclick="startEdit('${it.id}')">編集</button>
-                <button class="edit-btn-inline del"  onclick="openDelModal('${it.id}','${it.name}',${it.score})">削除</button>
-              </div>
-            </td>
-          </tr>`).join('')}
-      </tbody>
-    </table>`;
-}
+  function switchTab(gameId) {
+    currentTab = gameId;
+    document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
+    
+    const activeBtn = gameId === 'all' 
+      ? document.querySelector('.id-tab-all')
+      : document.querySelector(`.id-tab-${gameId}`);
+    if (activeBtn) activeBtn.classList.add('active');
 
-// フォーム送信
-async function submitScore() {
-  const gameId = document.getElementById('f-game').value;
-  const name   = document.getElementById('f-name').value.trim();
-  const score  = parseFloat(document.getElementById('f-score').value);
-  const note   = document.getElementById('f-note').value.trim();
-  const editId = document.getElementById('edit-id').value;
+    renderTable();
+  }
 
-  if (!gameId) return showToast('ゲームを選択してください', 'error');
-  if (!name)   return showToast('名前を入力してください', 'error');
-  if (isNaN(score)) return showToast('スコアを正しく入力してください', 'error');
-
-  const data = {
-    gameId, name, score, note,
-    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  };
-
-  try {
-    if (editId) {
-      await db.collection('rankings').doc(editId).update(data);
-      siteLog('ranking_update', { gameId, name, score });
-      showToast('スコアを更新しました ✓');
-    } else {
-      data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-      await db.collection('rankings').add(data);
-      siteLog('ranking_add', { gameId, name, score });
-      showToast('スコアを登録しました ✓');
+  function renderTable() {
+    const tbody = document.getElementById('ranking-tbody');
+    
+    // フィルタリング
+    let filtered = allDocs;
+    if (currentTab !== 'all') {
+      filtered = allDocs.filter(d => d.gameId === currentTab);
     }
-    resetForm();
-  } catch (e) {
-    showToast('エラー: ' + e.message, 'error');
+
+    if (filtered.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:2rem;">該当するスコアデータはありません</td></tr>`;
+      return;
+    }
+
+    // ゲームごとの順位計算用のマップを作成
+    const rankCounter = {};
+    GAMES.forEach(g => { rankCounter[g.id] = 1; });
+    let globalRank = 1;
+
+    tbody.innerHTML = filtered.map(it => {
+      const g = GAMES.find(x => x.id === it.gameId);
+      
+      // タブが総合の場合は全体順位、個別タブの場合はそのゲーム内順位を表示
+      let displayRank = 0;
+      if (currentTab === 'all') {
+        displayRank = globalRank++;
+        rankCounter[it.gameId]++; // カウンタは進めておく
+      } else {
+        displayRank = rankCounter[it.gameId]++;
+      }
+
+      return `<tr>
+        <td class="rank-cell">${rankDisplay(displayRank)}</td>
+        <td style="font-size:0.85rem;">${g ? g.icon + ' ' + g.label : it.gameId}</td>
+        <td style="font-weight:500;">${it.name || '—'}</td>
+        <td class="score-cell">${(it.score || 0).toLocaleString()} pt</td>
+        <td class="action-cell">
+          <button onclick="editForm('${it.id}')" class="btn-gold" style="font-size:0.7rem; padding:0.2rem 0.5rem; background:transparent;">編集</button>
+          <button onclick="openDelModal('${it.id}', '${it.name}', ${it.score})" class="btn-gold" style="font-size:0.7rem; padding:0.2rem 0.5rem; background:transparent; border-color:rgba(231,76,60,0.4); color:var(--red-bright);">削除</button>
+        </td>
+      </tr>`;
+    }).join('');
   }
-}
 
-function startEdit(id) {
-  const doc = allDocs.find(d => d.id === id);
-  if (!doc) return;
-  document.getElementById('edit-id').value = id;
-  document.getElementById('f-game').value  = doc.gameId;
-  document.getElementById('f-name').value  = doc.name;
-  document.getElementById('f-score').value = doc.score;
-  document.getElementById('f-note').value  = doc.note || '';
-  document.getElementById('form-mode-label').textContent = '▸ スコア編集中';
-  document.getElementById('submit-label').textContent = '更新する';
-  document.getElementById('cancel-btn').style.display = 'inline-flex';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+  // 整理番号参照
+  async function lookupTicket() {
+    const ticketInput = document.getElementById('f-ticket').value.trim().toUpperCase();
+    const resultEl = document.getElementById('ticket-lookup-result');
+    if (!ticketInput) {
+      resultEl.innerHTML = '<span style="color:var(--text-muted)">番号を入力してください</span>';
+      return;
+    }
 
-function resetForm() {
-  document.getElementById('edit-id').value  = '';
-  document.getElementById('f-ticket').value = '';
-  document.getElementById('f-game').value   = '';
-  document.getElementById('f-name').value   = '';
-  document.getElementById('f-score').value  = '';
-  document.getElementById('f-note').value   = '';
-  document.getElementById('ticket-lookup-result').innerHTML = '';
-  document.getElementById('form-mode-label').textContent = '▸ 新規スコア登録';
-  document.getElementById('submit-label').textContent = '登録する';
-  document.getElementById('cancel-btn').style.display = 'none';
-}
+    resultEl.innerHTML = '<span style="color:var(--text-muted)">検索中...</span>';
 
-// 削除モーダル
-function openDelModal(id, name, score) {
-  delId = id;
-  document.getElementById('del-target-info').textContent = `「${name}」 — ${score.toLocaleString()} pt`;
-  document.getElementById('del-modal').classList.add('open');
-}
-function closeDelModal() {
-  delId = null;
-  document.getElementById('del-modal').classList.remove('open');
-}
-async function confirmDelete() {
-  if (!delId) return;
-  try {
-    const delDoc = allDocs.find(d => d.id === delId);
-    await db.collection('rankings').doc(delId).delete();
-    siteLog('ranking_delete', { gameId: delDoc?.gameId, name: delDoc?.name, score: delDoc?.score });
-    showToast('削除しました');
-  } catch (e) {
-    showToast('エラー: ' + e.message, 'error');
+    try {
+      const snap = await db.collection('reserveHistory')
+        .where('ticketId', '==', ticketInput)
+        .limit(1)
+        .get();
+
+      if (snap.empty) {
+        resultEl.innerHTML = '<span style="color:var(--red-bright)">❌ 予約が見つかりません</span>';
+        return;
+      }
+
+      const data = snap.docs[0].data();
+      resultEl.innerHTML = `<span style="color:#27ae60">✓ 発見: ${data.nickname}さん</span>`;
+      
+      // フォームに自動セット
+      document.getElementById('f-game').value = data.gameId || '';
+      document.getElementById('f-name').value = data.nickname || '';
+    } catch (e) {
+      resultEl.innerHTML = '<span style="color:var(--red-bright)">エラーが発生しました</span>';
+    }
   }
-  closeDelModal();
-}
+
+  // 新規登録・更新送信
+  async function doSubmit() {
+    const editId = document.getElementById('edit-id').value;
+    const gameId = document.getElementById('f-game').value;
+    const name   = document.getElementById('f-name').value.trim();
+    const score  = parseInt(document.getElementById('f-score').value, 10);
+
+    if (!gameId || !name || isNaN(score)) {
+      alert('必須項目（*）を正しく入力してください');
+      return;
+    }
+
+    const payload = {
+      gameId,
+      name,
+      score,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    try {
+      if (editId) {
+        // 更新モード
+        await db.collection('rankings').doc(editId).update(payload);
+        showToast('スコアを更新しました');
+      } else {
+        // 新規登録モード
+        await db.collection('rankings').add({
+          ...payload,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        showToast('スコアを登録しました');
+      }
+      resetForm();
+    } catch (e) {
+      console.error(e);
+      alert('データの保存に失敗しました: ' + e.message);
+    }
+  }
+
+  function editForm(id) {
+    const target = allDocs.find(d => d.id === id);
+    if (!target) return;
+
+    document.getElementById('edit-id').value  = target.id;
+    document.getElementById('f-ticket').value = '';
+    document.getElementById('f-game').value   = target.gameId || '';
+    document.getElementById('f-name').value   = target.name || '';
+    document.getElementById('f-score').value  = target.score || 0;
+    
+    document.getElementById('ticket-lookup-result').innerHTML = '';
+    document.getElementById('form-mode-label').textContent = '📝 スコアデータの編集';
+    document.getElementById('submit-label').textContent = '更新する';
+    document.getElementById('cancel-btn').style.display = 'inline-flex';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function resetForm() {
+    document.getElementById('edit-id').value  = '';
+    document.getElementById('f-ticket').value = '';
+    document.getElementById('f-game').value   = '';
+    document.getElementById('f-name').value   = '';
+    document.getElementById('f-score').value  = '';
+    // ※存在しない f-note へのアクセスを削除し、クラッシュを防止
+    
+    document.getElementById('ticket-lookup-result').innerHTML = '';
+    document.getElementById('form-mode-label').textContent = '▸ 新規スコア登録';
+    document.getElementById('submit-label').textContent = '登録する';
+    document.getElementById('cancel-btn').style.display = 'none';
+  }
+
+  // 削除モーダル制御
+  function openDelModal(id, name, score) {
+    delId = id;
+    document.getElementById('del-target-info').textContent = `「${name}」 — ${score.toLocaleString()} pt`;
+    document.getElementById('del-modal').classList.add('open');
+  }
+  function closeDelModal() {
+    delId = null;
+    document.getElementById('del-modal').classList.remove('open');
+  }
+  async function confirmDelete() {
+    if (!delId) return;
+    try {
+      await db.collection('rankings').doc(delId).delete();
+      showToast('データを削除しました', 'success');
+      closeDelModal();
+    } catch (e) {
+      alert('削除に失敗しました: ' + e.message);
+    }
+  }
 </script>
 </body>
 </html>
