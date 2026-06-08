@@ -3,32 +3,43 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    match /rankings/{doc} {
+    // 1. ランキングデータと来場者数カウンターのルール
+    // 一般ゲスト(index.html / self-reserve.html)も見るため、読み込みは全員許可。
+    // 書き込みは、ログインしているスタッフ・管理者のみ許可。
+    match /rankings/{document} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    
+    match /visitors/{document} {
+      allow read: if true;
+      allow write: if true; // ゲストの自己予約時にもカウントを動かすため全員許可
+    }
+
+    // 2. 予約待機列のルール
+    // ゲストも自分自身で予約を追加・閲覧できるようにします。
+    match /reserves/{document} {
+      allow read, write: if true;
+    }
+    match /reserveHistory/{document} {
+      allow read, write: if true;
+    }
+    match /waitTimes/{document} {
       allow read: if true;
       allow write: if request.auth != null;
     }
 
-    match /reserves/{doc} {
-      allow read, write: if request.auth != null;
+    // 3. ログ用のルール（もし使っている場合）
+    match /logs/{document} {
+      allow write: if true;
+      allow read: if request.auth != null;
     }
 
-    match /waitTimes/{doc} {
-      allow read: if true;
-      allow write: if request.auth != null;
-    }
-
-    match /visitors/{doc} {
-      allow read: if true;
-      allow write: if request.auth != null;
-    }
-
-    match /siteLogs/{doc} {
-      allow create: if true;
-      allow read, update, delete: if request.auth != null;
-    }
-
-    match /{document=**} {
-      allow read, write: if false;
+    // オプション: もし元のコード（rolesコレクションを使う方法）のまま動かしたい場合
+    // ログインしているユーザーなら、自分のロール情報を読み取れるようにします。
+    match /roles/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if false; // スタッフが勝手に権限を書き換えるのを防ぐ
     }
   }
 }
