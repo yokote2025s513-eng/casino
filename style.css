@@ -1,5 +1,5 @@
 /* ========================================
-   不死賭 — Casino Night
+   不賭死 — Casino Night
    〜君たちは生きて帰れるのか〜
    ======================================== */
 @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Noto+Serif+JP:wght@400;700;900&family=Noto+Sans+JP:wght@300;400;500;700&display=swap');
@@ -19,446 +19,120 @@
   --obsidian-4:   #1a090a;
   --felt:         #0a1a0c;
   --text:         #f5ead8;
-  --text-warm:    #d4b896;
-  --text-muted:   #6b4040;
-  --border-red:   rgba(184,0,0,0.25);
-  --border-gold:  rgba(201,168,76,0.2);
-  --border-dim:   rgba(184,0,0,0.08);
+  --text-warm:    #e3d4bf;
+  --text-muted:   #8a7e71;
+  --border-red:   rgba(184,0,0,0.35);
+  --border-gold:  rgba(201,168,76,0.3);
+  --shadow-red:   0 0 20px rgba(184,0,0,0.25);
+  --shadow-gold:  0 0 25px rgba(201,168,76,0.15);
 
-  --poker:        #e84040;
-  --blackjack:    #4a8fd9;
-  --chinchiro:    #e89020;
-  --keiba:        #40c870;
-
-  --shadow-deep:  0 16px 64px rgba(0,0,0,0.8);
-  --shadow-card:  0 8px 32px rgba(0,0,0,0.6);
-  --shadow-red:   0 0 40px rgba(184,0,0,0.35);
-  --shadow-gold:  0 0 30px rgba(201,168,76,0.3);
+  /* 管理画面用ライト/ダーク兼用変数 */
+  --bg-dark:      #0b0607;
+  --bg-card:      #140b0d;
+  --border:       rgba(201,168,76,0.18);
+  --red-bright:   #ff3b30;
 }
 
-*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
-html { scroll-behavior:smooth; }
-
+/* 共通初期化 */
+* { margin:0; padding:0; box-sizing:border-box; }
 body {
   background: var(--obsidian);
   color: var(--text);
   font-family: 'Noto Sans JP', sans-serif;
-  font-weight: 400;
-  min-height: 100vh;
-  line-height: 1.65;
   overflow-x: hidden;
-  /* カジノフェルト＋暗闇の質感 */
-  background-image:
-    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(184,0,0,0.12) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 20% 80%, rgba(184,0,0,0.06) 0%, transparent 50%),
-    /* ダイヤ格子パターン */
-    repeating-linear-gradient(
-      45deg,
-      transparent 0px,
-      transparent 18px,
-      rgba(184,0,0,0.025) 18px,
-      rgba(184,0,0,0.025) 19px
-    ),
-    repeating-linear-gradient(
-      -45deg,
-      transparent 0px,
-      transparent 18px,
-      rgba(184,0,0,0.025) 18px,
-      rgba(184,0,0,0.025) 19px
-    );
+  line-height: 1.6;
 }
 
-/* ══════════════════════════════════
-   ヘッダー
-══════════════════════════════════ */
-.site-header {
-  background: linear-gradient(180deg, rgba(5,2,3,0.98) 0%, rgba(5,2,3,0.95) 100%);
-  border-bottom: 1px solid var(--border-red);
-  padding: 0 2rem;
-  position: sticky; top: 0; z-index: 100;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 1px 0 rgba(201,168,76,0.1), 0 4px 30px rgba(0,0,0,0.6);
-}
-.header-inner {
-  max-width: 1200px; margin: 0 auto;
-  display: flex; align-items: center; justify-content: space-between;
-  height: 62px; gap: 1rem;
-}
-.site-logo {
-  font-family: 'Noto Serif JP', serif;
-  font-size: 1.25rem; font-weight: 900;
-  color: var(--crimson-hot);
-  text-decoration: none; letter-spacing: 0.12em;
-  text-shadow: 0 0 20px var(--crimson-glow), 0 0 60px rgba(184,0,0,0.3);
-  white-space: nowrap;
-  position: relative;
-}
-.site-logo::after {
-  content: '';
-  position: absolute; bottom: -2px; left: 0; right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--crimson-hot), transparent);
-  opacity: 0.6;
-}
-.site-nav { display:flex; gap:0.3rem; flex-wrap:wrap; }
-.nav-link {
-  font-size: 0.78rem; font-weight: 500;
-  color: var(--text-muted); text-decoration: none;
-  padding: 0.38rem 0.9rem;
-  border: 1px solid transparent; border-radius: 3px;
-  transition: all 0.22s; letter-spacing: 0.06em;
-  position: relative;
-}
-.nav-link:hover, .nav-link.active {
-  color: var(--gold-light);
-  border-color: var(--border-gold);
-  background: var(--gold-dim);
-  text-shadow: 0 0 12px rgba(201,168,76,0.5);
-}
+a { color: inherit; text-decoration: none; }
 
-/* ══════════════════════════════════
-   コンテナ・タイトル
-══════════════════════════════════ */
-.container { max-width:1200px; margin:0 auto; padding:2rem 1.5rem; }
+/* ユーティリティ */
+.container { width: min(1200px, 92vw); margin: 0 auto; }
+.text-gold { color: var(--gold-light); }
+.font-cinzel { font-family: 'Cinzel', serif; }
 
-.page-title {
-  font-family: 'Noto Serif JP', serif;
-  font-size: clamp(1.8rem, 5vw, 3rem);
-  font-weight: 900;
-  color: var(--crimson-hot);
-  text-align: center;
-  letter-spacing: 0.18em;
-  text-shadow:
-    0 0 30px var(--crimson-glow),
-    0 0 80px rgba(184,0,0,0.25),
-    2px 2px 0 rgba(0,0,0,0.9);
-  margin-bottom: 0.3rem;
-}
-
-.page-subtitle {
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 0.72rem;
-  letter-spacing: 0.25em;
-  margin-bottom: 0.8rem;
-}
-
-/* 金の区切り線 */
-.divider {
-  width: 220px; height: 1px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  margin: 0.6rem auto 2rem;
-  position: relative;
-}
-.divider::before, .divider::after {
-  content: '◆';
-  position: absolute; top: 50%;
-  transform: translateY(-50%);
-  color: var(--gold);
-  font-size: 0.45rem;
-  background: var(--obsidian);
-  padding: 0 0.4rem;
-  text-shadow: 0 0 8px rgba(201,168,76,0.6);
-}
-.divider::before { left: 20%; }
-.divider::after  { right: 20%; }
-
-/* ══════════════════════════════════
-   カード
-══════════════════════════════════ */
-.card {
-  background: var(--obsidian-3);
-  border: 1px solid var(--border-dim);
-  border-radius: 6px;
-  padding: 1.5rem;
-  position: relative; overflow: hidden;
-  transition: border-color 0.3s, box-shadow 0.3s;
-  box-shadow: var(--shadow-card);
-}
-/* 左上の光沢 */
-.card::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: linear-gradient(135deg,
-    rgba(255,255,255,0.025) 0%,
-    transparent 40%,
-    rgba(184,0,0,0.03) 100%);
-  pointer-events: none; border-radius: inherit;
-}
-/* 上部のゴールドライン */
-.card::after {
-  content: '';
-  position: absolute; top: 0; left: 10%; right: 10%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
-}
-.card:hover {
-  border-color: var(--border-red);
-  box-shadow: var(--shadow-red), var(--shadow-card);
-}
-
-/* ══════════════════════════════════
-   ゲームカラー
-══════════════════════════════════ */
-.game-poker      { --game-color: var(--poker); }
-.game-blackjack  { --game-color: var(--blackjack); }
-.game-chinchiro  { --game-color: var(--chinchiro); }
-.game-keiba      { --game-color: var(--keiba); }
-
-.game-badge {
-  display: inline-flex; align-items: center; gap: 0.35rem;
-  font-size: 0.78rem; font-weight: 700;
-  color: var(--game-color, var(--crimson-hot));
-  letter-spacing: 0.05em;
-}
-
-/* ══════════════════════════════════
-   ランキング
-══════════════════════════════════ */
-.rank-row {
-  display: flex; align-items: center; gap: 1rem;
-  padding: 0.85rem 0;
-  border-bottom: 1px solid rgba(184,0,0,0.06);
-}
-.rank-row:last-child { border-bottom: none; }
-.rank-num {
-  font-family: 'Libre Baskerville', serif;
-  font-size: 1.1rem; font-weight: 700;
-  width: 2.2rem; text-align: center; flex-shrink: 0;
-}
-.rank-1 .rank-num { color: #ffd700; text-shadow: 0 0 15px rgba(255,215,0,0.7); font-size: 1.3rem; }
-.rank-2 .rank-num { color: #b8b8b8; }
-.rank-3 .rank-num { color: #c87832; }
-.rank-num.other   { color: var(--text-muted); font-size: 0.9rem; }
-.rank-name { flex: 1; font-size: 0.95rem; font-weight: 500; color: var(--text); }
-.rank-score {
-  font-family: 'Libre Baskerville', serif;
-  font-weight: 700; font-size: 1.05rem;
-  color: var(--gold-light);
-  text-shadow: 0 0 10px rgba(201,168,76,0.4);
-}
-
-/* ══════════════════════════════════
-   ステータス
-══════════════════════════════════ */
-.wait-status {
-  font-size: 0.7rem; font-weight: 700;
-  padding: 0.18rem 0.65rem;
-  border-radius: 2px; border: 1px solid;
-  letter-spacing: 0.08em;
-}
-.status-open  { color: #40c870; border-color: #40c870; background: rgba(64,200,112,0.1); }
-.status-busy  { color: var(--gold-light); border-color: var(--gold); background: rgba(201,168,76,0.1); }
-.status-full  { color: var(--crimson-hot); border-color: var(--crimson-hot); background: rgba(184,0,0,0.12); }
-
-/* ══════════════════════════════════
-   ボタン
-══════════════════════════════════ */
-.btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
-  font-family: 'Noto Sans JP', sans-serif;
-  font-size: 0.85rem; font-weight: 700;
-  letter-spacing: 0.06em;
-  padding: 0.65rem 1.5rem;
-  border-radius: 3px; border: 1px solid;
-  cursor: pointer; transition: all 0.2s;
-  text-decoration: none; white-space: nowrap;
-}
-.btn-gold {
-  background: linear-gradient(160deg, #6a4a10 0%, #c9a84c 45%, #f0cc70 100%);
-  border-color: var(--gold-light); color: #0a0202; font-weight: 900;
-  box-shadow: 0 2px 16px rgba(201,168,76,0.35), inset 0 1px 0 rgba(255,255,255,0.1);
-  text-shadow: 0 1px 0 rgba(255,255,255,0.2);
-}
-.btn-gold:hover {
-  background: linear-gradient(160deg, #c9a84c 0%, #f0cc70 50%, #fff8d0 100%);
-  box-shadow: var(--shadow-gold), 0 4px 20px rgba(201,168,76,0.4);
-  transform: translateY(-1px);
-}
-.btn-red {
-  background: linear-gradient(160deg, #500000 0%, #b80000 45%, #e80000 100%);
-  border-color: var(--crimson-hot); color: #fff; font-weight: 900;
-  box-shadow: 0 2px 16px rgba(184,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08);
-}
-.btn-red:hover {
-  background: linear-gradient(160deg, #b80000 0%, #e80000 50%, #ff3030 100%);
-  box-shadow: var(--shadow-red);
-  transform: translateY(-1px);
-}
-.btn-outline {
-  background: transparent; border-color: var(--border-red); color: var(--text-muted);
-}
-.btn-outline:hover { border-color: var(--gold); color: var(--gold-light); background: var(--gold-dim); }
-.btn-danger { background: transparent; border-color: rgba(184,0,0,0.4); color: var(--crimson-hot); }
-.btn-danger:hover { background: var(--crimson-dim); border-color: var(--crimson-hot); }
-.btn-sm { font-size:0.72rem; padding:0.35rem 0.8rem; }
-
-/* ══════════════════════════════════
-   フォーム
-══════════════════════════════════ */
-.form-group { margin-bottom:1.2rem; }
-.form-label {
-  display: block; font-size: 0.68rem; font-weight: 700;
-  letter-spacing: 0.2em; color: var(--text-muted);
-  margin-bottom: 0.45rem; text-transform: uppercase;
-}
-.form-control {
-  width: 100%;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid var(--border-red);
-  border-radius: 3px; color: var(--text);
-  font-family: 'Noto Sans JP', sans-serif;
-  font-size: 1rem; padding: 0.72rem 1rem;
-  outline: none; transition: border-color 0.2s, box-shadow 0.2s;
-}
-.form-control:focus {
-  border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.1);
-  background: rgba(201,168,76,0.03);
-}
-.form-control::placeholder { color: var(--text-muted); }
-select.form-control option { background: var(--obsidian-3); color: var(--text); }
-
-.form-control-lg {
-  width: 100%;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid var(--border-red);
-  border-radius: 3px; color: var(--text);
-  font-family: 'Noto Sans JP', sans-serif;
-  font-size: 1.3rem; font-weight: 700;
-  padding: 0.85rem 1rem; outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-.form-control-lg:focus {
-  border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,168,76,0.1);
-}
-.form-control-lg::placeholder { color: var(--text-muted); font-size: 1rem; font-weight: 300; }
-select.form-control-lg option { background: var(--obsidian-3); }
-
-/* ══════════════════════════════════
-   トースト
-══════════════════════════════════ */
+/* トースト通知 */
 #toast-container {
-  position: fixed; bottom: 1.5rem; right: 1.5rem;
+  position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%);
   z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem;
+  pointer-events: none;
 }
 .toast {
+  background: rgba(19,6,8,0.95); border: 1px solid var(--gold);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5), var(--shadow-gold);
+  color: var(--text); padding: 0.8rem 2rem; border-radius: 4px;
+  font-size: 0.88rem; font-weight: 500; min-width: 280px; text-align: center;
+  animation: toastUp 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+}
+.toast.error {
+  border-color: var(--crimson-hot);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5), var(--shadow-red);
+  color: #ffcccc;
+}
+@keyframes toastUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ヘッダー・ナビゲーション */
+.site-header {
+  border-bottom: 1px solid var(--border-red);
+  background: var(--obsidian-2); position: sticky; top: 0; z-index: 100;
+  backdrop-filter: blur(8px);
+}
+.header-inner {
+  display: flex; justify-content: space-between; align-items: center; height: 60px;
+}
+.header-logo {
+  font-family: 'Noto Serif JP', serif; font-weight: 900; font-size: 1.25rem;
+  letter-spacing: 0.1em; color: var(--text); display: flex; align-items: center; gap: 0.5rem;
+}
+.header-logo span { color: var(--crimson-hot); }
+.header-nav { display: flex; gap: 1.5rem; font-size: 0.85rem; font-weight: 500; }
+.header-nav a {
+  padding: 0.5rem 0; color: var(--text-warm); position: relative; transition: color 0.2s;
+}
+.header-nav a:hover { color: var(--gold-light); }
+
+/* ボタン共通 */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  padding: 0.75rem 2rem; font-size: 0.9rem; font-weight: 700; border-radius: 4px;
+  cursor: pointer; transition: all 0.25s ease; font-family: 'Noto Sans JP', sans-serif;
+  letter-spacing: 0.05em;
+}
+.btn-primary {
+  background: linear-gradient(135deg, #8a0000 0%, var(--crimson) 100%);
+  color: #ffffff; border: 1px solid rgba(255,255,255,0.15);
+  box-shadow: var(--shadow-red);
+}
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--crimson) 0%, var(--crimson-hot) 100%);
+  transform: translateY(-2px); box-shadow: 0 8px 25px rgba(232,0,0,0.4);
+}
+.btn-gold {
+  background: transparent; border: 1px solid var(--gold); color: var(--gold-light);
+  box-shadow: var(--shadow-gold);
+}
+.btn-gold:hover:not(:disabled) {
+  background: var(--gold-dim); transform: translateY(-2px);
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+/* フォームグループ */
+.form-group { margin-bottom: 1.2rem; text-align: left; }
+.form-group label {
+  display: block; font-size: 0.78rem; font-weight: 700; color: var(--text-muted);
+  margin-bottom: 0.4rem; letter-spacing: 0.05em;
+}
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%; background: var(--obsidian-2); border: 1px solid var(--border-gold);
+  border-radius: 4px; padding: 0.75rem 1rem; color: var(--text); font-size: 0.92rem;
+  transition: all 0.2s; font-family: inherit;
+}
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+  outline: none; border-color: var(--crimson-hot); box-shadow: var(--shadow-red);
   background: var(--obsidian-4);
-  border: 1px solid var(--border-red);
-  border-radius: 4px; padding: 0.85rem 1.2rem;
-  font-size: 0.85rem; min-width: 200px;
-  animation: slideIn 0.3s ease;
-  box-shadow: var(--shadow-deep); font-weight: 500;
 }
-.toast.success { border-color: #40c870; color: #40c870; }
-.toast.error   { border-color: var(--crimson-hot); color: var(--crimson-hot); }
-@keyframes slideIn { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:none} }
-
-/* ══════════════════════════════════
-   ローディング
-══════════════════════════════════ */
-.loading { text-align:center; color:var(--text-muted); padding:3rem; font-size:0.85rem; }
-.spinner {
-  width:28px; height:28px;
-  border:2px solid rgba(184,0,0,0.15);
-  border-top-color: var(--crimson-hot);
-  border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 0.8rem;
-}
-@keyframes spin { to{transform:rotate(360deg)} }
-
-/* ══════════════════════════════════
-   グリッド
-══════════════════════════════════ */
-.grid-2 { display:grid; grid-template-columns:repeat(2,1fr); gap:1.5rem; }
-.grid-4 { display:grid; grid-template-columns:repeat(4,1fr); gap:1.5rem; }
-@media(max-width:900px) { .grid-4 { grid-template-columns:repeat(2,1fr); } }
-@media(max-width:600px) {
-  .grid-2, .grid-4 { grid-template-columns:1fr; }
-  .container { padding:1.5rem 1rem; }
-}
-
-/* ══════════════════════════════════
-   テーブル
-══════════════════════════════════ */
-.data-table { width:100%; border-collapse:collapse; }
-.data-table th {
-  font-size:0.68rem; font-weight:700; letter-spacing:0.18em;
-  color:var(--text-muted); text-align:left;
-  padding:0.7rem 1rem; border-bottom:1px solid var(--border-red);
-  text-transform:uppercase;
-}
-.data-table td {
-  padding:0.85rem 1rem; border-bottom:1px solid var(--border-dim);
-  font-size:0.9rem; color:var(--text);
-}
-.data-table tr:hover td { background:rgba(184,0,0,0.03); }
-
-/* ══════════════════════════════════
-   タブ
-══════════════════════════════════ */
-.game-tabs { display:flex; gap:0.4rem; margin-bottom:1.5rem; flex-wrap:wrap; }
-.game-tab {
-  font-size:0.78rem; font-weight:700; letter-spacing:0.05em;
-  padding:0.52rem 1.1rem; border:1px solid var(--border-dim);
-  border-radius:3px; background:transparent; color:var(--text-muted);
-  cursor:pointer; transition:all 0.2s;
-}
-.game-tab.active.game-poker     { color:var(--poker);     border-color:var(--poker);     background:rgba(232,64,64,0.1); }
-.game-tab.active.game-blackjack { color:var(--blackjack); border-color:var(--blackjack); background:rgba(74,143,217,0.1); }
-.game-tab.active.game-chinchiro { color:var(--chinchiro); border-color:var(--chinchiro); background:rgba(232,144,32,0.1); }
-.game-tab.active.game-keiba     { color:var(--keiba);     border-color:var(--keiba);     background:rgba(64,200,112,0.1); }
-.game-tab:not(.active):hover { border-color:var(--border-red); color:var(--text-warm); }
-
-/* ══════════════════════════════════
-   装飾
-══════════════════════════════════ */
-.suit-deco {
-  position:fixed; font-size:14rem; opacity:0.018;
-  pointer-events:none; z-index:0; user-select:none; font-family:serif;
-  color: var(--crimson-hot);
-}
-.suit-deco.tl { top:-3rem; left:-2rem; transform:rotate(-12deg); }
-.suit-deco.br { bottom:-3rem; right:-2rem; transform:rotate(12deg); }
-
-/* セクション */
-.section-head { display:flex; align-items:center; gap:0.8rem; margin-bottom:1.2rem; }
-.section-head h2 {
-  font-family:'Noto Serif JP',serif;
-  font-size:0.82rem; font-weight:900;
-  letter-spacing:0.18em; color:var(--gold-light); white-space:nowrap;
-  text-shadow:0 0 15px rgba(201,168,76,0.5);
-}
-.section-line { flex:1; height:1px; background:linear-gradient(90deg, var(--border-gold), transparent); }
-
-/* フッター */
-.site-footer {
-  border-top:1px solid var(--border-dim);
-  text-align:center; padding:1.5rem; margin-top:4rem;
-  color:var(--text-muted); font-size:0.7rem; letter-spacing:0.18em;
-}
-
-/* ══════════════════════════════════
-   Admin
-══════════════════════════════════ */
-.admin-layout { display:flex; flex-direction:column; gap:2rem; }
-.form-card {
-  background:var(--obsidian-3); border:1px solid var(--border-dim);
-  border-radius:6px; padding:2rem; box-shadow:var(--shadow-card);
-  position:relative;
-}
-.form-card::after {
-  content:''; position:absolute; top:0; left:10%; right:10%; height:1px;
-  background:linear-gradient(90deg, transparent, rgba(201,168,76,0.25), transparent);
-}
-.form-card-title {
-  font-size:0.78rem; font-weight:700; letter-spacing:0.2em;
-  color:var(--gold-light); margin-bottom:1.5rem;
-  padding-bottom:0.8rem; border-bottom:1px solid var(--border-dim);
-  text-shadow:0 0 12px rgba(201,168,76,0.3);
-  text-transform:uppercase;
-}
-.form-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; }
-@media(max-width:700px) { .form-grid { grid-template-columns:1fr; } }
-.form-grid .form-group { margin-bottom:0; }
 
 /* モーダル */
 .modal-overlay {
@@ -480,24 +154,18 @@ select.form-control-lg option { background: var(--obsidian-3); }
   font-size:0.72rem; color:var(--crimson-hot);
 }
 
-/* チケット */
+/* チケット・バッジ */
 .ticket-badge {
   display:inline-block; background:var(--obsidian-4);
-  border:1px solid var(--border-red); border-radius:3px;
-  padding:0.28rem 0.65rem; font-size:0.8rem;
-  color:var(--game-color, var(--gold-light));
-  font-family:'Libre Baskerville',serif;
+  border:1px solid var(--border-gold); border-radius:3px;
+  padding:0.15rem 0.4rem; font-family:'Cinzel',serif;
+  font-size:0.75rem; color:var(--gold-light); margin-right:0.4rem;
 }
-
-/* レスポンシブ */
-@media(max-width:600px) {
-  .page-title { font-size:1.8rem; }
-  .btn { font-size:0.8rem; padding:0.55rem 1rem; }
-  .btn-sm { font-size:0.7rem; padding:0.3rem 0.6rem; }
-  .form-card { padding:1.2rem; }
-  .data-table th, .data-table td { padding:0.6rem; font-size:0.82rem; }
+.game-badge {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.2rem 0.6rem; border-radius: 3px; font-size: 0.75rem; font-weight: 700;
 }
-@media(max-width:400px) {
-  .site-logo { font-size:1rem; }
-  .nav-link { font-size:0.65rem; padding:0.25rem 0.5rem; }
-}
+.game-poker { background: rgba(231,76,60,0.15); border: 1px solid #e74c3c; color: #ff6b6b; }
+.game-blackjack { background: rgba(52,152,219,0.15); border: 1px solid #3498db; color: #5dade2; }
+.game-chinchiro { background: rgba(230,126,34,0.15); border: 1px solid #e67e22; color: #f5b041; }
+.game-keiba { background: rgba(39,174,96,0.15); border: 1px solid #27ae60; color: #58d68d; }
