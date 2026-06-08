@@ -3,25 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OBS Stream Overlay ♠ 不賭死</title>
+  <title>OBS Overaly — 不賭死 ♠ ALL TOP 5</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@700&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
   <style>
-    /* ── 配信専用配信枠ベース（1920x1080 固定） ── */
+    /* ── 配信専用ベース（1920x1080 固定） ── */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
     :root {
       --gold:       #d4af37;
       --gold-light: #f0d060;
       --bg-panel:   rgba(10, 4, 5, 0.85);
-      --border-glow: rgba(212, 175, 55, 0.2);
       
-      /* 各ゲームのテーマカラー（ゴリゴリ発光用） */
-      --color-poker:      #ff003c;
-      --color-blackjack:  #00a2ff;
-      --color-chinchiro:  #ff8800;
-      --color-keiba:      #00ff66;
+      /* 各ゲームのテーマカラー（ネオン発光用） */
+      --color-poker:      #ff003c; /* 鮮烈な赤 */
+      --color-blackjack:  #00a2ff; /* 鮮やかな青 */
+      --color-chinchiro:  #ff8800; /* 深いオレンジ */
+      --color-keiba:      #00ff66; /* 鮮明な緑 */
     }
 
     html, body {
@@ -32,106 +31,47 @@
       color: #f5ead8;
     }
 
-    /* 全体コンテナ：添付写真のレイアウトを再現 */
-    .obs-screen {
+    /* 全体コンテナ：正確な4分割（2x2グリッド）を構築 */
+    .obs-dashboard {
       width: 1920px; height: 1080px;
-      padding: 25px;
-      display: grid;
-      grid-template-columns: 520px 1fr;
-      grid-template-rows: 1fr 260px;
-      grid-template-areas: 
-        "left-side right-main"
-        "bottom-full bottom-full";
-      gap: 25px;
-      position: relative;
-    }
-
-    /* ── 左側：3タイトル縦並びエリア ── */
-    .left-side-container {
-      grid-area: left-side;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    /* ── 右側：メインフィーチャー（特大）エリア ── */
-    .right-main-container {
-      grid-area: right-main;
-      background: var(--bg-panel);
-      border: 2px solid rgba(0, 162, 255, 0.3);
-      box-shadow: 0 0 30px rgba(0, 162, 255, 0.15), inset 0 0 20px rgba(0, 0, 0, 0.6);
-      border-radius: 12px;
       padding: 30px;
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 30px;
       position: relative;
     }
-    .right-main-container::before {
-      content: '♠ FEATURED GAME';
-      position: absolute; top: -12px; left: 30px;
-      background: #00a2ff; color: #000; font-weight: 900;
-      font-size: 0.75rem; padding: 2px 10px; border-radius: 4px; letter-spacing: 0.1em;
-    }
 
-    /* ── 最下部：横長「競馬」エリア ── */
-    .bottom-full-container {
-      grid-area: bottom-full;
-      background: var(--bg-panel);
-      border: 2px solid rgba(0, 255, 102, 0.3);
-      box-shadow: 0 0 35px rgba(0, 255, 102, 0.15);
-      border-radius: 12px;
-      padding: 20px 30px;
-    }
-    /* 競馬専用の横長ランキング行配置 */
-    .keiba-horizontal-wrap {
-      display: flex;
-      gap: 20px;
-      width: 100%;
-      height: 120px;
-      align-items: center;
-      margin-top: 15px;
-    }
-    .keiba-horizontal-card {
-      flex: 1;
-      background: rgba(0,0,0,0.4);
-      border: 1px solid rgba(0, 255, 102, 0.15);
-      border-radius: 8px;
-      padding: 15px;
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    /* ── パネルの共通ゴリゴリUIデザイン ── */
+    /* ── 各ゲームパネルのゴリゴリUIデザイン ── */
     .game-panel {
       background: var(--bg-panel);
-      border: 2px solid var(--border-glow);
       border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 15px 40px rgba(0,0,0,0.8);
-      position: relative;
-      overflow: hidden;
-      flex: 1; /* 縦並び内で均等に伸ばす */
+      padding: 25px;
       display: flex;
       flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      /* パネル共通の影 */
+      box-shadow: 0 15px 45px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,0,0,0.6);
+      transition: all 0.3s ease;
+      animation: popIn 0.4s ease both;
     }
+    @keyframes popIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
 
-    /* 各ゲームごとのテーマネオンエフェクト */
-    .panel-poker { border-color: rgba(255, 0, 60, 0.25); box-shadow: 0 0 25px rgba(255,0,60,0.08); }
-    .panel-blackjack { border-color: rgba(0, 162, 255, 0.25); box-shadow: 0 0 25px rgba(0,162,255,0.08); }
-    .panel-chinchiro { border-color: rgba(255, 136, 0, 0.25); box-shadow: 0 0 25px rgba(255,136,0,0.08); }
+    /* 各ゲームごとのネオンエフェクトと枠線 */
+    .panel-poker { border: 2px solid rgba(255, 0, 60, 0.3); box-shadow: 0 0 25px rgba(255, 0, 60, 0.1), inset 0 0 10px rgba(255,0,60,0.05); }
+    .panel-blackjack { border: 2px solid rgba(0, 162, 255, 0.3); box-shadow: 0 0 25px rgba(0, 162, 255, 0.1), inset 0 0 10px rgba(0,162,255,0.05); }
+    .panel-chinchiro { border: 2px solid rgba(255, 136, 0, 0.3); box-shadow: 0 0 25px rgba(255, 136, 0, 0.1), inset 0 0 10px rgba(255,136,0,0.05); }
+    .panel-keiba { border: 2px solid rgba(0, 255, 102, 0.3); box-shadow: 0 0 25px rgba(0, 255, 102, 0.1), inset 0 0 10px rgba(0,255,102,0.05); }
 
     /* パネルヘッダー */
     .panel-head {
       display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 15px; padding-bottom: 8px;
-      border-bottom: 2px solid rgba(255,255,255,0.08);
+      margin-bottom: 20px; border-bottom: 2px solid rgba(255,255,255,0.08); padding-bottom: 12px;
     }
     .ph-left { display: flex; align-items: center; gap: 10px; }
-    .ph-icon { font-size: 1.6rem; text-shadow: 0 0 10px currentColor; }
-    .ph-title { font-family: 'Noto Serif JP', serif; font-weight: 900; font-size: 1.25rem; letter-spacing: 0.05em; }
+    .ph-icon { font-size: 1.8rem; text-shadow: 0 0 15px currentColor; }
+    .ph-title { font-family: 'Noto Serif JP', serif; font-weight: 900; font-size: 1.4rem; letter-spacing: 0.1em; }
     .panel-poker .ph-icon { color: var(--color-poker); }
     .panel-blackjack .ph-icon { color: var(--color-blackjack); }
     .panel-chinchiro .ph-icon { color: var(--color-chinchiro); }
@@ -140,98 +80,79 @@
     .ph-count { font-family: 'Cinzel', serif; font-size: 0.8rem; color: var(--gold-light); opacity: 0.8; }
 
     /* ── ランキング行（通常） ── */
-    .rank-rows-container {
-      display: flex; flex-direction: column; gap: 8px; flex: 1; justify-content: center;
+    .rank-rows-wrap {
+      display: flex; flex-direction: column; gap: 10px; flex: 1; justify-content: center;
     }
     .rank-item {
-      display: flex; align-items: center; gap: 12px;
+      display: flex; align-items: center; gap: 15px;
       background: rgba(255,255,255,0.02);
-      padding: 8px 12px; border-radius: 6px;
-      border-left: 4px solid transparent;
+      padding: 10px 15px; border-radius: 6px;
       animation: slideIn 0.3s ease both;
     }
     @keyframes slideIn { from { opacity: 0; transform: translateX(-15px); } to { opacity: 1; transform: none; } }
 
     .rank-num {
-      font-family: 'Cinzel', serif; font-size: 1.1rem; font-weight: 900;
-      width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+      font-family: 'Cinzel Decorative', serif; font-size: 1.3rem; font-weight: 900;
+      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
       border-radius: 50%; flex-shrink: 0;
     }
     /* 金銀銅ゴリゴリメダル */
-    .med-1 { background: linear-gradient(135deg, #ffd700, #b89700); color: #000; box-shadow: 0 0 10px #ffd700; }
+    .med-1 { background: linear-gradient(135deg, #ffd700, #b89700); color: #000; box-shadow: 0 0 15px #ffd700; }
     .med-2 { background: linear-gradient(135deg, #e0e0e0, #7a7a7a); color: #000; }
     .med-3 { background: linear-gradient(135deg, #c97d34, #663600); color: #000; }
-    .med-other { color: #888; background: rgba(255,255,255,0.05); font-size: 0.9rem; }
+    .med-other { color: #888; background: rgba(255,255,255,0.05); font-size: 1rem; }
 
     /* メーター連動型の名前表示（配信映え） */
-    .rank-bar-wrap { flex: 1; position: relative; height: 32px; display: flex; align-items: center; padding-left: 10px; overflow: hidden; border-radius: 4px; background: rgba(0,0,0,0.3); }
+    .rank-bar-wrap { flex: 1; position: relative; height: 36px; display: flex; align-items: center; padding-left: 10px; overflow: hidden; border-radius: 4px; background: rgba(0,0,0,0.3); }
     .rank-bar { position: absolute; top: 0; left: 0; height: 100%; opacity: 0.25; transition: width 0.6s cubic-bezier(0.1, 0.8, 0.2, 1); }
-    .rank-name { position: relative; z-index: 2; font-weight: 700; font-size: 1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.8); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .rank-name { position: relative; z-index: 2; font-weight: 700; font-size: 1.15rem; text-shadow: 0 2px 4px rgba(0,0,0,0.8); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 320px; }
     
-    .rank-score { font-family: 'Cinzel', serif; font-size: 1.15rem; font-weight: 700; color: var(--gold-light); text-shadow: 0 0 8px rgba(240,208,96,0.3); text-align: right; min-width: 90px; }
-
-    /* ── 特大メインフィーチャー専用装飾 ── */
-    .right-main-container .rank-item { padding: 14px 20px; background: rgba(255,255,255,0.03); }
-    .right-main-container .rank-name { font-size: 1.3rem; }
-    .right-main-container .rank-score { font-size: 1.5rem; color: #fff; text-shadow: 0 0 15px var(--color-blackjack); }
-    .right-main-container .rank-num { width: 38px; height: 38px; font-size: 1.3rem; }
-    .right-main-container .rank-rows-container { gap: 15px; }
-
-    /* ── 横長競馬専用装飾 ── */
-    .keiba-bar { position: absolute; bottom: 0; left: 0; height: 4px; transition: width 0.6s ease; }
-    .kh-meta { flex: 1; min-width: 0; }
-    .kh-name { font-size: 1.2rem; font-weight: 900; color: #fff; margin-bottom: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .kh-score { font-family: 'Cinzel', serif; font-size: 1.4rem; font-weight: 700; color: var(--color-keiba); text-shadow: 0 0 10px rgba(0,255,102,0.4); }
+    .rank-score { font-family: 'Cinzel', serif; font-size: 1.35rem; font-weight: 700; color: var(--gold-light); text-shadow: 0 0 10px rgba(240,208,96,0.3); text-align: right; min-width: 100px; }
 
     .empty-msg { text-align: center; color: rgba(255,255,255,0.2); font-size: 0.9rem; padding: 20px 0; font-style: italic; }
   </style>
 </head>
 <body>
 
-  <div class="obs-screen">
+  <div class="obs-dashboard">
     
-    <div class="left-side-container">
-      <div class="game-panel panel-poker">
-        <div class="panel-head">
-          <div class="ph-left"><span class="ph-icon">♠</span><span class="ph-title">POKER</span></div>
-          <div id="count-poker" class="ph-count">0 Players</div>
-        </div>
-        <div id="rows-poker" class="rank-rows-container">
-          <div class="empty-msg">Loading...</div>
-        </div>
+    <div class="game-panel panel-poker">
+      <div class="panel-head">
+        <div class="ph-left"><span class="ph-icon">♠</span><span class="ph-title">POKER</span></div>
+        <div id="count-poker" class="ph-count">0 Players</div>
       </div>
-      
-      <div class="game-panel panel-chinchiro">
-        <div class="panel-head">
-          <div class="ph-left"><span class="ph-icon">🎲</span><span class="ph-title">CHINCHIRO</span></div>
-          <div id="count-chinchiro" class="ph-count">0 Players</div>
-        </div>
-        <div id="rows-chinchiro" class="rank-rows-container">
-          <div class="empty-msg">Loading...</div>
-        </div>
+      <div id="rows-poker" class="rank-rows-wrap">
+        <div class="empty-msg">Loading...</div>
       </div>
     </div>
-
-    <div class="right-main-container">
-      <div class="panel-head" style="border-bottom-color: rgba(0, 162, 255, 0.4); margin-bottom: 25px;">
-        <div class="ph-left">
-          <span class="ph-icon" style="color:var(--color-blackjack); font-size: 2rem;">♥</span>
-          <span class="ph-title" style="font-size: 1.7rem; letter-spacing: 0.1em;">BLACKJACK LEADERBOARD</span>
-        </div>
-        <div id="count-blackjack" class="ph-count" style="font-size: 1rem;">0 Entries</div>
+    
+    <div class="game-panel panel-blackjack">
+      <div class="panel-head">
+        <div class="ph-left"><span class="ph-icon">♥</span><span class="ph-title">BLACKJACK</span></div>
+        <div id="count-blackjack" class="ph-count">0 Players</div>
       </div>
-      <div id="rows-blackjack" class="rank-rows-container">
+      <div id="rows-blackjack" class="rank-rows-wrap">
         <div class="empty-msg">Loading...</div>
       </div>
     </div>
 
-    <div class="bottom-full-container panel-keiba">
-      <div class="panel-head" style="margin-bottom: 0; padding-bottom: 5px;">
-        <div class="ph-left"><span class="ph-icon">🏇</span><span class="ph-title">HYPER KEIBA CHAMPIONSHIP</span></div>
+    <div class="game-panel panel-chinchiro">
+      <div class="panel-head">
+        <div class="ph-left"><span class="ph-icon">🎲</span><span class="ph-title">CHINCHIRO</span></div>
+        <div id="count-chinchiro" class="ph-count">0 Players</div>
+      </div>
+      <div id="rows-chinchiro" class="rank-rows-wrap">
+        <div class="empty-msg">Loading...</div>
+      </div>
+    </div>
+
+    <div class="game-panel panel-keiba">
+      <div class="panel-head">
+        <div class="ph-left"><span class="ph-icon">🏇</span><span class="ph-title">DERBY</span></div>
         <div id="count-keiba" class="ph-count">0 Players</div>
       </div>
-      <div id="rows-keiba" class="keiba-horizontal-wrap">
-        <div class="empty-msg" style="width:100%;">Loading...</div>
+      <div id="rows-keiba" class="rank-rows-wrap">
+        <div class="empty-msg">Loading...</div>
       </div>
     </div>
 
@@ -243,7 +164,7 @@
   <script>
     // メダルマッピング
     const medals = ['med-1', 'med-2', 'med-3', 'med-other', 'med-other'];
-    const medalLabels = ['1', '2', '3', '4', '5'];
+    const medalLabels = ['Ⅰ', 'Ⅱ', 'Ⅲ', 'Ⅳ', 'Ⅴ']; // メダル風なのでローマ数字
 
     // ゲームごとの色定義
     const colorMap = {
@@ -253,7 +174,7 @@
       keiba: 'var(--color-keiba)'
     };
 
-    // ── リアルタイム監視設定（OBSは連動必須のため get ではなく onSnapshot を採用） ──
+    // ── 全ゲームリアルタイム監視 ──
     const targetGames = ['poker', 'blackjack', 'chinchiro', 'keiba'];
 
     targetGames.forEach(gameId => {
@@ -265,26 +186,17 @@
           
           // 参加人数の更新
           const countEl = document.getElementById(`count-${gameId}`);
-          if (countEl) countEl.textContent = `${docs.length} Players`;
+          if (countEl) countEl.textContent = `${docs.length} 人参加`;
 
-          // 表示用に上位5名（競馬は横長なので4名）を切り出し
-          const limit = (gameId === 'keiba') ? 4 : 5;
-          const topList = docs.slice(0, limit);
-
-          if (gameId === 'keiba') {
-            // 🏇 競馬専用の横並びレンダリング
-            renderKeibaHorizontal(topList);
-          } else {
-            // 通常の縦並びレンダリング
-            renderVerticalList(gameId, topList);
-          }
+          // トップ5を切り出し
+          const top5 = docs.slice(0, 5);
+          renderList(gameId, top5);
         }, err => {
           console.error(`OBS Firebase Error (${gameId}):`, err);
         });
     });
 
-    // 通常の縦長リストレンダリング
-    function renderVerticalList(gameId, items) {
+    function renderList(gameId, items) {
       const container = document.getElementById(`rows-${gameId}`);
       if (!container) return;
 
@@ -293,10 +205,11 @@
         return;
       }
 
-      const maxScore = items[0]?.score || 1;
+      const maxScore = items[0]?.score || 1; // プログレスバー用
       const themeColor = colorMap[gameId];
 
       container.innerHTML = items.map((it, i) => {
+        // スコアメーターの幅計算（最低でも5%確保）
         const pct = Math.min(100, Math.max(5, (it.score / maxScore) * 100));
         return `
           <div class="rank-item">
@@ -306,33 +219,6 @@
               <div class="rank-name">${it.name || '—'}</div>
             </div>
             <div class="rank-score">${it.score.toLocaleString()}</div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    // 🏇 競馬専用の横長カードレイアウトレンダリング
-    function renderKeibaHorizontal(items) {
-      const container = document.getElementById('rows-keiba');
-      if (!container) return;
-
-      if (items.length === 0) {
-        container.innerHTML = '<div class="empty-msg">— No Score —</div>';
-        return;
-      }
-
-      const maxScore = items[0]?.score || 1;
-
-      container.innerHTML = items.map((it, i) => {
-        const pct = Math.min(100, Math.max(5, (it.score / maxScore) * 100));
-        return `
-          <div class="keiba-horizontal-card">
-            <div class="rank-num ${medals[i]}" style="width:34px; height:34px; font-size:1.1rem;">${medalLabels[i]}</div>
-            <div class="kh-meta">
-              <div class="kh-name">${it.name || '—'}</div>
-              <div class="kh-score">${it.score.toLocaleString()}<span style="font-size:0.75rem; margin-left:3px; color:rgba(255,255,255,0.4)">pt</span></div>
-            </div>
-            <div class="keiba-bar" style="width: ${pct}%; background: var(--color-keiba);"></div>
           </div>
         `;
       }).join('');
