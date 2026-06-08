@@ -3,156 +3,252 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OBS Overaly — 不賭死 ♠ ALL TOP 5</title>
+  <title>OBS Master Overlay ♠ 不賭死 PREMIUM</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@700&family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@700;900&family=Noto+Serif+JP:wght@900&family=Noto+Sans+JP:wght@500;700;900&display=swap" rel="stylesheet">
   <style>
-    /* ── 配信専用ベース（1920x1080 固定） ── */
+    /* ── カジノナイト・コア・スタイリング ── */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     
     :root {
-      --gold:       #d4af37;
-      --gold-light: #f0d060;
-      --bg-panel:   rgba(10, 4, 5, 0.85);
+      --gold-gradient: linear-gradient(135deg, #ffe082 0%, #d4af37 40%, #b89700 70%, #f5d77f 100%);
+      --gold-glow: 0 0 20px rgba(212, 175, 55, 0.45);
+      --panel-shadow: 0 30px 70px rgba(0, 0, 0, 0.95), inset 0 0 40px rgba(0, 0, 0, 0.85);
       
-      /* 各ゲームのテーマカラー（ネオン発光用） */
-      --color-poker:      #ff003c; /* 鮮烈な赤 */
-      --color-blackjack:  #00a2ff; /* 鮮やかな青 */
-      --color-chinchiro:  #ff8800; /* 深いオレンジ */
-      --color-keiba:      #00ff66; /* 鮮明な緑 */
+      /* 画像リファレンス準拠の極彩色ネオンカラー */
+      --neon-poker:      #ff003c;
+      --neon-blackjack:  #00b0ff;
+      --neon-chinchiro:  #ff7700;
+      --neon-keiba:      #00ff66;
     }
 
     html, body {
       width: 1920px; height: 1080px;
       overflow: hidden;
-      background: transparent; /* OBS透過用 */
+      background: transparent; /* OBS透過 */
       font-family: 'Noto Sans JP', sans-serif;
-      color: #f5ead8;
+      color: #fff;
     }
 
-    /* 全体コンテナ：正確な4分割（2x2グリッド）を構築 */
-    .obs-dashboard {
+    /* ── 背景ギミック：空間に舞うコイン・トランプ・ダイスの概念化 ── */
+    .casino-ambient {
+      position: absolute; inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(15, 5, 8, 0.4) 0%, rgba(0, 0, 0, 0.9) 100%);
+      z-index: 1;
+      pointer-events: none;
+    }
+    /* 宙に浮くゴールドコインやカジノパーツのエフェクト光 */
+    .casino-ambient::before {
+      content: ''; position: absolute; inset: 0;
+      background-image: 
+        radial-gradient(circle at 15% 20%, rgba(214, 175, 55, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 85% 15%, rgba(0, 176, 255, 0.06) 0%, transparent 45%),
+        radial-gradient(circle at 20% 80%, rgba(255, 0, 60, 0.06) 0%, transparent 40%),
+        radial-gradient(circle at 80% 85%, rgba(0, 255, 102, 0.07) 0%, transparent 45%);
+    }
+
+    /* ── 2×2 完璧均等4画面レイアウト ── */
+    .obs-wrapper {
+      position: relative; z-index: 2;
       width: 1920px; height: 1080px;
-      padding: 30px;
+      padding: 35px;
       display: grid;
       grid-template-columns: 1fr 1fr;
       grid-template-rows: 1fr 1fr;
-      gap: 30px;
-      position: relative;
+      gap: 35px;
     }
 
-    /* ── 各ゲームパネルのゴリゴリUIデザイン ── */
+    /* ── ゴリゴリのカジノボードフレーム（金枠＋ネオン重合） ── */
     .game-panel {
-      background: var(--bg-panel);
-      border-radius: 12px;
-      padding: 25px;
+      background: linear-gradient(145deg, #160a0d 0%, #070304 100%);
+      border-radius: 16px;
+      padding: 30px;
       display: flex;
       flex-direction: column;
       position: relative;
-      overflow: hidden;
-      /* パネル共通の影 */
-      box-shadow: 0 15px 45px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,0,0,0.6);
-      transition: all 0.3s ease;
-      animation: popIn 0.4s ease both;
+      box-shadow: var(--panel-shadow);
+      animation: panelEntrance 0.6s cubic-bezier(0.15, 0.85, 0.35, 1) both;
     }
-    @keyframes popIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
+    @keyframes panelEntrance { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: none; } }
 
-    /* 各ゲームごとのネオンエフェクトと枠線 */
-    .panel-poker { border: 2px solid rgba(255, 0, 60, 0.3); box-shadow: 0 0 25px rgba(255, 0, 60, 0.1), inset 0 0 10px rgba(255,0,60,0.05); }
-    .panel-blackjack { border: 2px solid rgba(0, 162, 255, 0.3); box-shadow: 0 0 25px rgba(0, 162, 255, 0.1), inset 0 0 10px rgba(0,162,255,0.05); }
-    .panel-chinchiro { border: 2px solid rgba(255, 136, 0, 0.3); box-shadow: 0 0 25px rgba(255, 136, 0, 0.1), inset 0 0 10px rgba(255,136,0,0.05); }
-    .panel-keiba { border: 2px solid rgba(0, 255, 102, 0.3); box-shadow: 0 0 25px rgba(0, 255, 102, 0.1), inset 0 0 10px rgba(0,255,102,0.05); }
+    /* 外周を包み込む「圧倒的重厚金枠」の多重レイヤー構造 */
+    .game-panel::before {
+      content: ''; position: absolute; inset: 0;
+      border-radius: 16px; padding: 3px; /* 線の太さ */
+      background: var(--gold-gradient);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      box-shadow: var(--gold-glow);
+      z-index: 5;
+    }
 
-    /* パネルヘッダー */
+    /* 各ゲーム専用のネオン背後発光と下部グラデーション */
+    .panel-poker {      border-bottom: 3px solid var(--neon-poker); }
+    .panel-blackjack {  border-bottom: 3px solid var(--neon-blackjack); }
+    .panel-chinchiro {  border-bottom: 3px solid var(--neon-chinchiro); }
+    .panel-keiba {      border-bottom: 3px solid var(--neon-keiba); }
+
+    .panel-poker::after     { content: ''; position: absolute; inset: 0; border-radius: 16px; box-shadow: 0 0 30px rgba(255, 0, 60, 0.15); pointer-events: none; }
+    .panel-blackjack::after { content: ''; position: absolute; inset: 0; border-radius: 16px; box-shadow: 0 0 30px rgba(0, 176, 255, 0.15); pointer-events: none; }
+    .panel-chinchiro::after { content: ''; position: absolute; inset: 0; border-radius: 16px; box-shadow: 0 0 30px rgba(255, 119, 0, 0.15); pointer-events: none; }
+    .panel-keiba::after     { content: ''; position: absolute; inset: 0; border-radius: 16px; box-shadow: 0 0 30px rgba(0, 255, 102, 0.15); pointer-events: none; }
+
+    /* ── ボードヘッダー：威厳あるリッチゴールドリボン ── */
     .panel-head {
       display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 20px; border-bottom: 2px solid rgba(255,255,255,0.08); padding-bottom: 12px;
+      margin-bottom: 25px; padding-bottom: 15px;
+      border-bottom: 2px solid rgba(212, 175, 55, 0.2);
+      position: relative;
     }
-    .ph-left { display: flex; align-items: center; gap: 10px; }
-    .ph-icon { font-size: 1.8rem; text-shadow: 0 0 15px currentColor; }
-    .ph-title { font-family: 'Noto Serif JP', serif; font-weight: 900; font-size: 1.4rem; letter-spacing: 0.1em; }
-    .panel-poker .ph-icon { color: var(--color-poker); }
-    .panel-blackjack .ph-icon { color: var(--color-blackjack); }
-    .panel-chinchiro .ph-icon { color: var(--color-chinchiro); }
-    .panel-keiba .ph-icon { color: var(--color-keiba); }
+    .ph-left { display: flex; align-items: center; gap: 15px; }
+    
+    /* トランプ・ダイスなどのネオンアイコン */
+    .ph-icon {
+      font-size: 2.2rem;
+      font-weight: 900;
+      filter: drop-shadow(0 0 12px currentColor);
+    }
+    .panel-poker .ph-icon { color: var(--neon-poker); }
+    .panel-blackjack .ph-icon { color: var(--neon-blackjack); }
+    .panel-chinchiro .ph-icon { color: var(--neon-chinchiro); }
+    .panel-keiba .ph-icon { color: var(--neon-keiba); }
 
-    .ph-count { font-family: 'Cinzel', serif; font-size: 0.8rem; color: var(--gold-light); opacity: 0.8; }
+    /* タイトルテキストは映画のような重厚フォント */
+    .ph-title {
+      font-family: 'Cinzel', 'Noto Serif JP', serif;
+      font-weight: 900; font-size: 1.6rem; letter-spacing: 0.1em;
+      background: var(--gold-gradient);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    }
+    .ph-count {
+      font-family: 'Cinzel', serif; font-size: 0.85rem; font-weight: 700;
+      color: #ffd54f; background: rgba(212, 175, 55, 0.12);
+      padding: 4px 12px; border-radius: 20px;
+      border: 1px solid rgba(212,175,55,0.3);
+      box-shadow: inset 0 0 8px rgba(212,175,55,0.2);
+    }
 
-    /* ── ランキング行（通常） ── */
+    /* ── スコア行：一画面に凝縮された最高級デザイン ── */
     .rank-rows-wrap {
-      display: flex; flex-direction: column; gap: 10px; flex: 1; justify-content: center;
+      display: flex; flex-direction: column; gap: 12px; flex: 1; justify-content: center;
     }
     .rank-item {
-      display: flex; align-items: center; gap: 15px;
-      background: rgba(255,255,255,0.02);
-      padding: 10px 15px; border-radius: 6px;
-      animation: slideIn 0.3s ease both;
+      display: flex; align-items: center; gap: 18px;
+      background: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+      padding: 10px 20px; border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.04);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      position: relative;
+      animation: rowSlideIn 0.4s ease both;
     }
-    @keyframes slideIn { from { opacity: 0; transform: translateX(-15px); } to { opacity: 1; transform: none; } }
+    @keyframes rowSlideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: none; } }
 
+    /* 立体メタルバッジ（1位〜5位） */
     .rank-num {
-      font-family: 'Cinzel Decorative', serif; font-size: 1.3rem; font-weight: 900;
-      width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
-      border-radius: 50%; flex-shrink: 0;
+      font-family: 'Cinzel Decorative', serif; font-size: 1.25rem; font-weight: 900;
+      width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+      border-radius: 50%; flex-shrink: 0; position: relative;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     }
-    /* 金銀銅ゴリゴリメダル */
-    .med-1 { background: linear-gradient(135deg, #ffd700, #b89700); color: #000; box-shadow: 0 0 15px #ffd700; }
-    .med-2 { background: linear-gradient(135deg, #e0e0e0, #7a7a7a); color: #000; }
-    .med-3 { background: linear-gradient(135deg, #c97d34, #663600); color: #000; }
-    .med-other { color: #888; background: rgba(255,255,255,0.05); font-size: 1rem; }
+    /* リファレンス画像準拠の圧倒的立体メダル */
+    .med-1 { background: linear-gradient(135deg, #fff3a1 0%, #ffd700 45%, #ccaa00 75%, #ffa600 100%); color: #1a0f00; box-shadow: 0 0 15px #ffd700; text-shadow: 0 1px 2px rgba(255,255,255,0.6); }
+    .med-2 { background: linear-gradient(135deg, #ffffff 0%, #dcdcdc 50%, #aaaaaa 80%, #777777 100%); color: #111; }
+    .med-3 { background: linear-gradient(135deg, #ffcc99 0%, #ca8042 45%, #8c4600 80%, #592d00 100%); color: #fff; }
+    .med-other { background: linear-gradient(135deg, #332225 0%, #1a0b0d 100%); color: #cca84c; border: 1px solid rgba(212,175,55,0.4); font-size: 1.1rem; }
 
-    /* メーター連動型の名前表示（配信映え） */
-    .rank-bar-wrap { flex: 1; position: relative; height: 36px; display: flex; align-items: center; padding-left: 10px; overflow: hidden; border-radius: 4px; background: rgba(0,0,0,0.3); }
-    .rank-bar { position: absolute; top: 0; left: 0; height: 100%; opacity: 0.25; transition: width 0.6s cubic-bezier(0.1, 0.8, 0.2, 1); }
-    .rank-name { position: relative; z-index: 2; font-weight: 700; font-size: 1.15rem; text-shadow: 0 2px 4px rgba(0,0,0,0.8); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 320px; }
+    /* メーター連動背景コンテナ */
+    .rank-bar-wrap {
+      flex: 1; position: relative; height: 42px;
+      display: flex; align-items: center; padding-left: 15px;
+      overflow: hidden; border-radius: 6px;
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255,255,255,0.02);
+    }
+    /* ネオンカラーが背後を滑らかに染めるメーター */
+    .rank-bar {
+      position: absolute; top: 0; left: 0; height: 100%;
+      opacity: 0.28;
+      transition: width 0.8s cubic-bezier(0.075, 0.82, 0.165, 1);
+    }
+    .rank-name {
+      position: relative; z-index: 2;
+      font-weight: 700; font-size: 1.25rem;
+      color: #fff; text-shadow: 0 2px 6px rgba(0,0,0,0.95);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      max-width: 300px;
+    }
     
-    .rank-score { font-family: 'Cinzel', serif; font-size: 1.35rem; font-weight: 700; color: var(--gold-light); text-shadow: 0 0 10px rgba(240,208,96,0.3); text-align: right; min-width: 100px; }
+    /* スコア表示（リファレンス通りのゴリゴリフォント） */
+    .rank-score {
+      font-family: 'Cinzel', serif; font-size: 1.5rem; font-weight: 900;
+      background: linear-gradient(180deg, #ffffff 0%, #f0cc70 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+      text-align: right; min-width: 140px;
+    }
+    .score-unit { font-size: 0.85rem; color: #ffd54f; -webkit-text-fill-color: initial; margin-left: 4px; font-weight: 700; }
 
-    .empty-msg { text-align: center; color: rgba(255,255,255,0.2); font-size: 0.9rem; padding: 20px 0; font-style: italic; }
+    .empty-msg { text-align: center; color: rgba(212,175,55,0.3); font-size: 1rem; padding: 30px 0; font-style: italic; font-family: 'Cinzel', serif; }
   </style>
 </head>
 <body>
 
-  <div class="obs-dashboard">
+  <div class="casino-ambient"></div>
+
+  <div class="obs-wrapper">
     
     <div class="game-panel panel-poker">
       <div class="panel-head">
-        <div class="ph-left"><span class="ph-icon">♠</span><span class="ph-title">POKER</span></div>
-        <div id="count-poker" class="ph-count">0 Players</div>
+        <div class="ph-left">
+          <span class="ph-icon">♠</span>
+          <span class="ph-title">POKER LEADERBOARD</span>
+        </div>
+        <div id="count-poker" class="ph-count">0 PLAYERS</div>
       </div>
       <div id="rows-poker" class="rank-rows-wrap">
-        <div class="empty-msg">Loading...</div>
+        <div class="empty-msg">Loading Casino Data...</div>
       </div>
     </div>
     
     <div class="game-panel panel-blackjack">
       <div class="panel-head">
-        <div class="ph-left"><span class="ph-icon">♥</span><span class="ph-title">BLACKJACK</span></div>
-        <div id="count-blackjack" class="ph-count">0 Players</div>
+        <div class="ph-left">
+          <span class="ph-icon">♥</span>
+          <span class="ph-title">BLACKJACK LEADERBOARD</span>
+        </div>
+        <div id="count-blackjack" class="ph-count">0 PLAYERS</div>
       </div>
       <div id="rows-blackjack" class="rank-rows-wrap">
-        <div class="empty-msg">Loading...</div>
+        <div class="empty-msg">Loading Casino Data...</div>
       </div>
     </div>
 
     <div class="game-panel panel-chinchiro">
       <div class="panel-head">
-        <div class="ph-left"><span class="ph-icon">🎲</span><span class="ph-title">CHINCHIRO</span></div>
-        <div id="count-chinchiro" class="ph-count">0 Players</div>
+        <div class="ph-left">
+          <span class="ph-icon">🎲</span>
+          <span class="ph-title">CHINCHIRO LEADERBOARD</span>
+        </div>
+        <div id="count-chinchiro" class="ph-count">0 PLAYERS</div>
       </div>
       <div id="rows-chinchiro" class="rank-rows-wrap">
-        <div class="empty-msg">Loading...</div>
+        <div class="empty-msg">Loading Casino Data...</div>
       </div>
     </div>
 
     <div class="game-panel panel-keiba">
       <div class="panel-head">
-        <div class="ph-left"><span class="ph-icon">🏇</span><span class="ph-title">DERBY</span></div>
-        <div id="count-keiba" class="ph-count">0 Players</div>
+        <div class="ph-left">
+          <span class="ph-icon">🏇</span>
+          <span class="ph-title">DERBY LEADERBOARD</span>
+        </div>
+        <div id="count-keiba" class="ph-count">0 PLAYERS</div>
       </div>
       <div id="rows-keiba" class="rank-rows-wrap">
-        <div class="empty-msg">Loading...</div>
+        <div class="empty-msg">Loading Casino Data...</div>
       </div>
     </div>
 
@@ -162,21 +258,19 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="firebase-config.js"></script>
   <script>
-    // メダルマッピング
     const medals = ['med-1', 'med-2', 'med-3', 'med-other', 'med-other'];
-    const medalLabels = ['Ⅰ', 'Ⅱ', 'Ⅲ', 'Ⅳ', 'Ⅴ']; // メダル風なのでローマ数字
+    const medalLabels = ['1', '2', '3', '4', '5'];
 
-    // ゲームごとの色定義
-    const colorMap = {
-      poker: 'var(--color-poker)',
-      blackjack: 'var(--color-blackjack)',
-      chinchiro: 'var(--color-chinchiro)',
-      keiba: 'var(--color-keiba)'
+    const neonColors = {
+      poker: 'var(--neon-poker)',
+      blackjack: 'var(--neon-blackjack)',
+      chinchiro: 'var(--neon-chinchiro)',
+      keiba: 'var(--neon-keiba)'
     };
 
-    // ── 全ゲームリアルタイム監視 ──
     const targetGames = ['poker', 'blackjack', 'chinchiro', 'keiba'];
 
+    // 全ゲームを完全独立リアルタイム監視（超ハイスピード自動スワップ）
     targetGames.forEach(gameId => {
       db.collection('rankings')
         .where('gameId', '==', gameId)
@@ -184,41 +278,41 @@
         .onSnapshot(snap => {
           const docs = snap.docs.map(d => d.data());
           
-          // 参加人数の更新
+          // 参加人数のリアルタイム更新
           const countEl = document.getElementById(`count-${gameId}`);
-          if (countEl) countEl.textContent = `${docs.length} 人参加`;
+          if (countEl) countEl.textContent = `${docs.length} PLAYERS`;
 
-          // トップ5を切り出し
+          // 確実にトップ5を抽出
           const top5 = docs.slice(0, 5);
-          renderList(gameId, top5);
+          renderPremiumList(gameId, top5);
         }, err => {
-          console.error(`OBS Firebase Error (${gameId}):`, err);
+          console.error(`Firebase Connection Error [${gameId}]:`, err);
         });
     });
 
-    function renderList(gameId, items) {
+    function renderPremiumList(gameId, items) {
       const container = document.getElementById(`rows-${gameId}`);
       if (!container) return;
 
       if (items.length === 0) {
-        container.innerHTML = '<div class="empty-msg">— No Score —</div>';
+        container.innerHTML = '<div class="empty-msg">No Chips Dealt Yet</div>';
         return;
       }
 
-      const maxScore = items[0]?.score || 1; // プログレスバー用
-      const themeColor = colorMap[gameId];
+      const maxScore = items[0]?.score || 1;
+      const themeNeon = neonColors[gameId];
 
       container.innerHTML = items.map((it, i) => {
-        // スコアメーターの幅計算（最低でも5%確保）
-        const pct = Math.min(100, Math.max(5, (it.score / maxScore) * 100));
+        // スコアに基づき背後のネオンメーターの幅を計算（最小値確保）
+        const pct = Math.min(100, Math.max(4, (it.score / maxScore) * 100));
         return `
-          <div class="rank-item">
+          <div class="rank-item" style="animation-delay: ${i * 0.05}s">
             <div class="rank-num ${medals[i]}">${medalLabels[i]}</div>
             <div class="rank-bar-wrap">
-              <div class="rank-bar" style="width: ${pct}%; background: ${themeColor};"></div>
-              <div class="rank-name">${it.name || '—'}</div>
+              <div class="rank-bar" style="width: ${pct}%; background: ${themeNeon}; box-shadow: 0 0 15px ${themeNeon};"></div>
+              <div class="rank-name">${it.name || 'ANONYMOUS'}</div>
             </div>
-            <div class="rank-score">${it.score.toLocaleString()}</div>
+            <div class="rank-score">${it.score.toLocaleString()}<span class="score-unit">pt</span></div>
           </div>
         `;
       }).join('');
