@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>予約 ♠ 不賭死</title>
+  <title>予約 ♠ 不死賭</title>
   <!-- Google Fonts: preconnect for speed -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -175,7 +175,7 @@
 
 <div class="reserve-wrap">
   <div class="top-logo">
-    <div class="top-logo-title">♠ 不賭死</div>
+    <div class="top-logo-title">♠ Casino Night</div>
     <div class="top-logo-sub">セルフ予約</div>
   </div>
 
@@ -326,14 +326,10 @@ document.addEventListener('click', e => {
   }
 });
 
-// 予約実行（競合・重複対策版）
+// 予約実行
 async function doReserve() {
   if (!selectedGame) return showToast('ゲームを選択してください', 'error');
   const nickname = document.getElementById('nick-input').value.trim();
-  
-  // エラー表示を一度クリア
-  document.getElementById('nick-error').textContent = '';
-
   if (!nickname) {
     document.getElementById('nick-error').textContent = 'ニックネームを入力してください';
     return;
@@ -343,74 +339,43 @@ async function doReserve() {
     return;
   }
 
-  // ボタン連打による二重送信を防止
-  const submitBtn = document.querySelector('.reserve-wrap .btn-gold') || document.activeElement;
-  let originalBtnText = '';
-  if (submitBtn) {
-    originalBtnText = submitBtn.textContent;
-    submitBtn.disabled = true;
-    submitBtn.textContent = '運命を処理中...';
-  }
-
-  const gameId = selectedGame;
+  const gameId   = selectedGame;
+  const current  = globalNext;
+  const numStr   = String(current).padStart(3, '0');
+  const ticketId = numStr;
   const g = GAMES_SR.find(x => x.id === gameId);
 
   try {
-    // 🔥【改善】トランザクションを使い、サーバー側で番号の競合を完全にロックして+1する
-    const finalTicketId = await db.runTransaction(async (transaction) => {
-      const globalRef = db.collection('reserves').doc('global');
-      const globalSnap = await transaction.get(globalRef);
-      
-      // 誰かが同時にボタンを押していても、必ず最新の「next」を待って取得する
-      const current = globalSnap.data()?.next ?? 1;
-      const numStr = String(current).padStart(3, '0');
+    const batch = db.batch();
+    batch.set(db.collection('reserves').doc('global'), { next: current + 1 }, { merge: true });
+    batch.set(db.collection('reserveHistory').doc(), {
+      gameId, ticketId, nickname, done: false,
+      source: 'self',
+      issuedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    await batch.commit();
 
-      // 1. globalの「next」を安全に次の番号へインクリメント
-      transaction.set(globalRef, { next: current + 1 }, { merge: true });
-
-      // 2. 予約データを予約履歴コレクションに追加
-      const newReserveRef = db.collection('reserveHistory').doc();
-      transaction.set(newReserveRef, {
-        gameId,
-        ticketId: numStr,
-        nickname,
-        done: false,
-        source: 'self',
-        issuedAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-
-      return numStr; // 次の処理（UI更新）に確定したチケット番号を渡す
+    // 来場者数もカウントアップ
+    const visSnap = await db.collection('visitors').doc('total').get();
+    const cur = visSnap.data()?.count ?? 0;
+    await db.collection('visitors').doc('total').set({
+      count: cur + 1,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    // 🔥【改善】来場者数のカウントアップも get を挟まずに直接安全に +1 する
-    await db.collection('visitors').doc('total').set({
-      count: firebase.firestore.FieldValue.increment(1),
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-
-    // チケット表示（元のUI更新処理を維持）
+    // チケット表示
     document.getElementById('tr-game').textContent = `${g.icon} ${g.label}`;
-    document.getElementById('tr-num').textContent  = finalTicketId; // 確定した重複のない番号
+    document.getElementById('tr-num').textContent  = ticketId;
     document.getElementById('tr-name').textContent = `👤 ${nickname}`;
     document.getElementById('ticket-result').classList.add('show');
     document.getElementById('nick-form').style.display = 'none';
     document.querySelectorAll('.game-sel-btn').forEach(b => b.disabled = true);
 
-    // スクロール（元の演出を維持）
+    // スクロール
     document.getElementById('ticket-result').scrollIntoView({ behavior: 'smooth' });
 
-    showToast('予約が完了しました！');
-
-  } catch(e) { 
-    console.error(e);
-    showToast('混雑しています。もう一度お試しください', 'error');
-    
-    // エラー時はボタンを元に戻して再試行できるようにする
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.textContent = originalBtnText || '運命を決める（予約）';
-    }
-  }
-}</script>
+  } catch(e) { showToast('エラー: ' + e.message, 'error'); }
+}
+</script>
 </body>
 </html>

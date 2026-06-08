@@ -3,140 +3,163 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>Admin Login ♠ 不賭死</title>
+  <title>Admin Login ♠ Casino Night</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap">
   <link rel="stylesheet" href="style.css">
   <style>
     body { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; }
+
     .login-wrap { width:min(420px, 92vw); animation:fadeUp 0.4s ease; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
+
     .login-logo { text-align:center; margin-bottom:2rem; }
-    .login-logo-icon { font-size:3rem; display:block; margin-bottom:0.5rem; text-shadow:0 0 30px rgba(212,175,55,0.3); }
-    .login-logo-text { font-family:'Cinzel Decorative', serif; font-size:1.4rem; color:var(--gold); letter-spacing:0.06em; }
-    .dest-selector { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:1.5rem; }
-    .dest-btn {
-      background: var(--obsidian-3); border:1px solid var(--border); border-radius:4px;
-      padding:0.75rem; color:var(--text-muted); font-size:0.82rem; cursor:pointer; transition:all 0.2s;
-      text-align:center; font-family:'Noto Sans JP', sans-serif;
+    .login-logo-icon { font-size:3rem; display:block; margin-bottom:0.5rem; text-shadow:0 0 30px rgba(212,175,55,0.5); }
+    .login-logo-title { font-family:'Cinzel Decorative',serif; font-size:1.5rem; color:var(--gold); letter-spacing:0.1em; text-shadow:0 0 20px rgba(212,175,55,0.4); }
+    .login-logo-sub { font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:0.3em; color:var(--text-muted); margin-top:0.3rem; }
+
+    .login-card { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:2rem; box-shadow:var(--shadow-card); }
+    .login-section-title { font-family:'Cinzel',serif; font-size:0.72rem; letter-spacing:0.25em; color:var(--text-muted); text-align:center; margin-bottom:1.5rem; }
+
+    .login-input {
+      width:100%; background:rgba(255,255,255,0.05); border:1px solid var(--border);
+      border-radius:8px; color:var(--text); font-family:'Noto Sans JP',sans-serif;
+      font-size:1rem; padding:0.85rem 1rem; outline:none; margin-bottom:0.8rem;
+      transition:border-color 0.2s, box-shadow 0.2s;
     }
-    .dest-btn:hover { border-color:var(--gold); color:var(--text); }
-    .dest-btn.selected { background:var(--gold-dim); border-color:var(--gold); color:var(--gold-light); font-weight:500; box-shadow:0 0 15px rgba(201,168,76,0.1); }
-    .dest-btn-icon { display:block; font-size:1.1rem; margin-bottom:0.2rem; }
-    .form-group input { text-align:center; letter-spacing:0.05em; }
-    #err-msg { color:var(--red-bright); font-size:0.8rem; text-align:center; margin-top:0.8rem; min-height:1.2rem; }
+    .login-input:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(212,175,55,0.1); }
+    .login-input.error { border-color:var(--red-bright); animation:shake 0.35s ease; }
+    @keyframes shake { 0%,100%{transform:none} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
+
+    .err-msg { color:var(--red-bright); font-size:0.8rem; text-align:center; margin-bottom:0.8rem; min-height:1.2em; }
+
+    .login-btn {
+      width:100%; font-family:'Cinzel',serif; font-size:0.9rem; font-weight:700;
+      letter-spacing:0.15em; padding:0.9rem; border-radius:8px;
+      border:1px solid var(--gold);
+      background:linear-gradient(135deg, #8b6914, #d4af37, #f5d060);
+      color:#0a0806; cursor:pointer; transition:all 0.2s; margin-bottom:1rem;
+    }
+    .login-btn:hover { box-shadow:var(--shadow-gold); transform:translateY(-1px); }
+    .login-btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+
+    /* 移動先選択 */
+    .dest-label { font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:0.15em; color:var(--text-muted); margin-bottom:0.5rem; display:block; }
+    .dest-btns { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:1.2rem; }
+    .dest-btn {
+      padding:0.6rem 0.5rem; border:1px solid var(--border); border-radius:6px;
+      background:transparent; color:var(--text-muted); font-family:'Cinzel',serif;
+      font-size:0.72rem; letter-spacing:0.05em; cursor:pointer; transition:all 0.2s; text-align:center;
+    }
+    .dest-btn.selected { border-color:var(--gold); color:var(--gold); background:var(--gold-dim); }
+    .dest-btn:hover:not(.selected) { border-color:var(--border); color:var(--text); }
+
+    .back-link { display:block; text-align:center; margin-top:1.2rem; font-family:'Cinzel',serif; font-size:0.72rem; letter-spacing:0.1em; color:var(--text-muted); text-decoration:none; transition:color 0.2s; }
+    .back-link:hover { color:var(--gold); }
   </style>
 </head>
 <body>
+<div class="suit-deco tl">♠</div>
+<div class="suit-deco br">♦</div>
 
-  <div class="login-wrap">
-    <div class="login-logo">
-      <span class="login-logo-icon">♠</span>
-      <span class="login-logo-text">不賭死</span>
-    </div>
-
-    <div class="card" style="padding:2rem;">
-      <div style="font-size:0.75rem; color:var(--text-muted); font-family:'Cinzel',serif; letter-spacing:0.1em; text-align:center; margin-bottom:1rem;">SELECT DESTINATION</div>
-      
-      <div class="dest-selector">
-        <button class="dest-btn selected" data-dest="admin-reserve.html" onclick="selectDest(this)">
-          <span class="dest-btn-icon">🎟</span>受付・待機列管理
-        </button>
-        <button class="dest-btn" data-dest="admin-ranking.html" onclick="selectDest(this)">
-          <span class="dest-btn-icon">🏆</span>スコア・順位入力
-        </button>
-      </div>
-
-      <div class="form-group">
-        <label>EMAIL ADDRESS</label>
-        <input type="email" id="email-input" placeholder="staff@example.com" onkeydown="if(event.key==='Enter') doLogin()">
-      </div>
-      <div class="form-group" style="margin-bottom:1.5rem;">
-        <label>PASSWORD</label>
-        <input type="password" id="pw-input" placeholder="••••••••" onkeydown="if(event.key==='Enter') doLogin()">
-      </div>
-
-      <button id="login-btn" class="btn btn-gold" style="width:100%; letter-spacing:0.1em;" onclick="doLogin()">ENTER ▶</button>
-      <div id="err-msg"></div>
-    </div>
+<div class="login-wrap">
+  <div class="login-logo">
+    <span class="login-logo-icon">🃏</span>
+    <div class="login-logo-title">Casino Night</div>
+    <div class="login-logo-sub">Staff Admin Panel</div>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-  
-  <script src="firebase-config.js"></script>
-  <script src="common.js"></script>
-  <script src="auth.js"></script> <script>
-    const STORAGE_KEY = 'casino_admin_auth';
-    let selectedDest = 'admin-reserve.html';
+  <div class="login-card">
+    <div class="login-section-title">— Staff Only —</div>
 
-    // ページ読み込み時にログイン済みかチェック
-    window.addEventListener('DOMContentLoaded', () => {
-      firebase.auth().onAuthStateChanged((user) => {
-        if (user) {
-          // 既にログインしている場合はセッションをセットして自動遷移
-          sessionStorage.setItem(STORAGE_KEY, 'ok');
-          location.replace(selectedDest);
-        }
-      });
-    });
+    <!-- 移動先選択 -->
+    <span class="dest-label">移動先ページ</span>
+    <div class="dest-btns">
+      <button class="dest-btn selected" data-dest="admin-ranking.html" onclick="selectDest(this)">♠ Ranking 管理</button>
+      <button class="dest-btn" data-dest="admin-reserve.html" onclick="selectDest(this)">🎟 整理番号 / 待ち時間</button>
+      <button class="dest-btn" data-dest="obs.html" onclick="selectDest(this)" style="grid-column:span 2">📺 OBS 表示</button>
+    </div>
 
-    function selectDest(btn) {
-      document.querySelectorAll('.dest-btn').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      selectedDest = btn.dataset.dest;
+    <!-- ログインフォーム -->
+    <input class="login-input" type="email" id="email-input" placeholder="メールアドレス" autocomplete="email" onkeydown="if(event.key==='Enter') document.getElementById('pw-input').focus()">
+    <input class="login-input" type="password" id="pw-input" placeholder="パスワード" autocomplete="current-password" onkeydown="if(event.key==='Enter') doLogin()">
+    <div class="err-msg" id="err-msg"></div>
+    <button class="login-btn" id="login-btn" onclick="doLogin()">ENTER ▶</button>
+  </div>
+
+  <a class="back-link" href="index.html">← TOPに戻る</a>
+</div>
+
+<div id="toast-container"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="common.js"></script>
+<script>
+const STORAGE_KEY = 'casino_admin_auth';
+let selectedDest = 'admin-ranking.html';
+
+// 既にログイン済みなら転送
+firebase.auth().onAuthStateChanged(async user => {
+  if (!user) return;
+  try {
+    const snap = await db.collection('roles').doc(user.uid).get();
+    const role = snap.data()?.role;
+    if (role === 'staff' || role === 'superadmin') {
+      sessionStorage.setItem(STORAGE_KEY, 'ok');
+      siteLog('login', { dest: selectedDest });
+      location.replace(selectedDest);
     }
+  } catch(e) {}
+});
 
-    async function doLogin() {
-      const email = document.getElementById('email-input').value.trim();
-      const pw    = document.getElementById('pw-input').value;
-      const errEl = document.getElementById('err-msg');
-      const btn   = document.getElementById('login-btn');
+function selectDest(btn) {
+  document.querySelectorAll('.dest-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedDest = btn.dataset.dest;
+}
 
-      if (!email || !pw) {
-        errEl.textContent = 'メールアドレスとパスワードを入力してください';
-        return;
-      }
+async function doLogin() {
+  const email = document.getElementById('email-input').value.trim();
+  const pw    = document.getElementById('pw-input').value;
+  const errEl = document.getElementById('err-msg');
+  const btn   = document.getElementById('login-btn');
 
-      if (btn.disabled) return; // 二重クリック防止
+  if (!email || !pw) {
+    errEl.textContent = 'メールアドレスとパスワードを入力してください';
+    return;
+  }
 
-      btn.disabled = true;
-      btn.textContent = 'ログイン中...';
-      errEl.textContent = '';
+  btn.disabled = true;
+  btn.textContent = 'ログイン中...';
+  errEl.textContent = '';
 
-      try {
-        // 選択された遷移先に応じて必要な権限を判断
-        const requiredRole = (selectedDest === 'super-admin.html') ? 'super' : 'staff';
-        
-        // auth.js の共通認証関数を呼び出す
-        await signInWithRole(email, pw, requiredRole);
-
-        sessionStorage.setItem(STORAGE_KEY, 'ok');
-        
-        btn.textContent = '✓ ログイン成功';
-        setTimeout(() => location.replace(selectedDest), 400);
-
-      } catch(e) {
-        console.error(e);
-        let msg = 'ログインに失敗しました';
-        if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found') {
-          msg = 'メールアドレスまたはパスワードが違います';
-        } else if (e.message) {
-          msg = e.message;
-        }
-        errEl.textContent = msg;
-        
-        // パスワード入力欄をガタガタ揺らす演出
-        const pwInput = document.getElementById('pw-input');
-        pwInput.classList.add('error');
-        setTimeout(() => pwInput.classList.remove('error'), 400);
-        
-        btn.disabled = false;
-        btn.textContent = 'ENTER ▶';
-      }
+  try {
+    const cred = await firebase.auth().signInWithEmailAndPassword(email, pw);
+    const snap = await db.collection('roles').doc(cred.user.uid).get();
+    const role = snap.data()?.role;
+    if (role !== 'staff' && role !== 'superadmin') {
+      await firebase.auth().signOut();
+      throw new Error('スタッフ権限がありません');
     }
-  </script>
+    sessionStorage.setItem(STORAGE_KEY, 'ok');
+    siteLog('login', { dest: selectedDest });
+    btn.textContent = '✓ ログイン成功';
+    setTimeout(() => location.replace(selectedDest), 400);
+  } catch(e) {
+    const msg = e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password'
+      ? 'メールアドレスまたはパスワードが違います'
+      : e.message;
+    errEl.textContent = msg;
+    document.getElementById('pw-input').classList.add('error');
+    setTimeout(() => document.getElementById('pw-input').classList.remove('error'), 400);
+    btn.disabled = false;
+    btn.textContent = 'ENTER ▶';
+  }
+}
+</script>
 </body>
 </html>
