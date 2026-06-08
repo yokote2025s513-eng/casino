@@ -1,3 +1,7 @@
+// ========================================
+// 権限・認証管理 (auth.js)
+// ========================================
+
 const STAFF_EMAILS = [
   "staff@example.com",
   "super@example.com"
@@ -17,9 +21,11 @@ async function hasRole(role) {
 
   await user.getIdToken(true);
 
-  if (!user.emailVerified) return false;
+  // 【修正】当日のトラブルを防ぐため、メール認証(Link)の強制チェックを解除
+  // if (!user.emailVerified) return false;
 
-//  const email = getCurrentEmail();
+  // 【修正】コメントアウトを解除し、emailを正しく取得
+  const email = getCurrentEmail();
 
   if (role === "super") {
     return SUPER_EMAILS.includes(email);
@@ -33,7 +39,7 @@ async function signInWithRole(email, password, role) {
 
   if (!ok) {
     await firebase.auth().signOut();
-    throw new Error("権限のないアカウントです");
+    throw new Error("この画面へのアクセス権限がないアカウントです");
   }
 
   return cred.user;
@@ -49,7 +55,7 @@ function requireRole(role) {
     const ok = await hasRole(role);
     if (!ok) {
       await firebase.auth().signOut();
-      alert("権限がありません");
+      alert("アクセス権限がありません。ログインし直してください。");
       location.replace("admin.html");
     }
   });
@@ -58,7 +64,9 @@ function requireRole(role) {
 async function signOutAdmin() {
   try {
     await firebase.auth().signOut();
-  } finally {
+    location.replace("admin.html");
+  } catch (e) {
+    console.error("Signout Error", e);
     location.replace("admin.html");
   }
 }
