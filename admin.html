@@ -138,28 +138,33 @@ async function doLogin() {
   errEl.textContent = '';
 
   try {
-    const cred = await firebase.auth().signInWithEmailAndPassword(email, pw);
-    const snap = await db.collection('roles').doc(cred.user.uid).get();
-    const role = snap.data()?.role;
-    if (role !== 'staff' && role !== 'superadmin') {
-      await firebase.auth().signOut();
-      throw new Error('スタッフ権限がありません');
-    }
+    // 選択された遷移先に応じて、必要な権限(role)を自動判定
+    const requiredRole = (selectedDest === 'super-admin.html') ? 'super' : 'staff';
+    
+    // auth.js の一元化された認証関数を呼び出す
+    await signInWithRole(email, pw, requiredRole);
+
     sessionStorage.setItem(STORAGE_KEY, 'ok');
-    siteLog('login', { dest: selectedDest });
+    
+    // siteLog関数が存在する場合のみ実行（エラー防止）
+    if (typeof siteLog === 'function') {
+      siteLog('login', { dest: selectedDest });
+    }
+    
     btn.textContent = '✓ ログイン成功';
     setTimeout(() => location.replace(selectedDest), 400);
   } catch(e) {
-    const msg = e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password'
-      ? 'メールアドレスまたはパスワードが違います'
-      : e.message;
+    console.error(e);
+    let msg = 'ログインに失敗しました';
+    if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found') {
+      msg = 'メールアドレスまたはパスワードが違います';
+    } else if (e.message) {
+      msg = e.message;
+    }
     errEl.textContent = msg;
-    document.getElementById('pw-input').classList.add('error');
-    setTimeout(() => document.getElementById('pw-input').classList.remove('error'), 400);
     btn.disabled = false;
-    btn.textContent = 'ENTER ▶';
+    btn.textContent = 'ログイン';
   }
-}
-</script>
+}</script>
 </body>
 </html>
