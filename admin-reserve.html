@@ -541,16 +541,20 @@ db.collection('reserves').doc('global').onSnapshot(snap => {
   renderReserveGrid();
 });
 
-// ゲームごとの待ち人数（reserveHistoryのdoneフラグで管理）
+// ゲームごとの待ち人数 ＆ 登録済みニックネーム（統合リスナー）
 const waitingCounts = {};
+let existingNicknames = new Set();
 db.collection('reserveHistory').onSnapshot(snap => {
   const counts = {};
   GAMES.forEach(g => { counts[g.id] = 0; });
+  const nicknames = [];
   snap.forEach(d => {
     const data = d.data();
     if (!data.done && data.gameId) counts[data.gameId] = (counts[data.gameId]||0) + 1;
+    if (data.nickname) nicknames.push(data.nickname);
   });
   Object.assign(waitingCounts, counts);
+  existingNicknames = new Set(nicknames);
   renderReserveGrid();
 });
 
@@ -590,12 +594,6 @@ async function issueTicket(gameId) {
 }
 
 let pendingGameId = null;
-let existingNicknames = new Set();
-
-// 登録済みニックネームをリアルタイム取得
-db.collection('reserveHistory').onSnapshot(snap => {
-  existingNicknames = new Set(snap.docs.map(d => d.data().nickname).filter(Boolean));
-});
 
 // ニックネーム入力時のサジェスト＆重複チェック
 function onNickInput() {
