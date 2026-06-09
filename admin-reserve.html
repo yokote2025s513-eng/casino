@@ -390,6 +390,16 @@ async function resetVisitor() {
   showToast('リセットしました');
 }
 
+// ── XSSエスケープ ──
+function esc(str) {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // ── 整理番号（全ゲーム通し） ──
 const reserveGrid = document.getElementById('reserve-grid');
 
@@ -494,6 +504,7 @@ async function confirmIssue() {
     setTimeout(() => { document.getElementById('nick-input').style.borderColor = ''; }, 1000);
     return;
   }
+  // クライアント側の事前チェック（UX用）
   if (existingNicknames.has(nickname)) {
     document.getElementById('nick-error').textContent = '⚠ このニックネームは既に使用されています';
     document.getElementById('nick-input').style.borderColor = 'var(--red-bright)';
@@ -501,32 +512,53 @@ async function confirmIssue() {
   }
   closeNickModal();
 
-  const current  = globalNext;
-  const numStr   = String(current).padStart(3, '0');
-  const ticketId = numStr; // 通し番号のみ
-
   try {
-    const batch = db.batch();
-    // 通し番号カウンターを進める
-    batch.set(db.collection('reserves').doc('global'), { next: current + 1 }, { merge: true });
-    // 履歴に記録
-    batch.set(db.collection('reserveHistory').doc(), {
-      gameId, ticketId, nickname, done: false,
-      issuedAt: firebase.firestore.FieldValue.serverTimestamp()
+    let ticketId;
+
+    // トランザクションで整理番号の重複・ニックネーム重複を防止
+    await db.runTransaction(async (tx) => {
+      // 整理番号カウンター取得
+      const counterRef = db.collection('reserves').doc('global');
+      const counterSnap = await tx.get(counterRef);
+      const current = counterSnap.data()?.next ?? 1;
+      ticketId = String(current).padStart(3, '0');
+
+      // ニックネーム重複チェック（Firestore側で確認）
+      const dupSnap = await db.collection('reserveHistory')
+        .where('nickname', '==', nickname)
+        .limit(1)
+        .get();
+      if (!dupSnap.empty) {
+        throw new Error('このニックネームは既に使用されています');
+      }
+
+      // カウンターを進める
+      tx.set(counterRef, { next: current + 1 }, { merge: true });
+
+      // 予約履歴に追記
+      tx.set(db.collection('reserveHistory').doc(), {
+        gameId, ticketId, nickname, done: false,
+        issuedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
     });
-    // 来場者数をインクリメント
-    const visSnap = await db.collection('visitors').doc('total').get();
-    const curVis = visSnap.data()?.count ?? 0;
-    batch.set(db.collection('visitors').doc('total'), {
-      count: curVis + 1,
+
+    // 来場者数は別途インクリメント（失敗しても整理番号発行には影響させない）
+    db.collection('visitors').doc('total').update({
+      count: firebase.firestore.FieldValue.increment(1),
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    await batch.commit();
+    }).catch(() => {});
 
     siteLog('ticket_issue', { gameId, ticketId, nickname });
     showTicket(gameId, ticketId, nickname);
     showToast(`発行: No.${ticketId} — ${nickname}`);
-  } catch(e) { showToast('エラー: ' + e.message, 'error'); }
+  } catch(e) {
+    showToast('エラー: ' + e.message, 'error');
+    // ニックネームエラーの場合はモーダルを再表示
+    if (e.message.includes('ニックネーム')) {
+      document.getElementById('nick-modal').classList.add('open');
+      document.getElementById('nick-error').textContent = '⚠ ' + e.message;
+    }
+  }
 }
 
 function closeNickModal() {
@@ -586,8 +618,8 @@ async function loadHistory() {
                 : groups[g.id].slice(0, 30).map(it =>
                   `<div style="display:flex;align-items:center;gap:0.4rem;margin-bottom:0.35rem;">
                     <span class="ticket-badge game-${it.gameId}" style="margin:0;min-width:2.5rem;text-align:center">${it.ticketId}</span>
-                    <span style="font-size:0.82rem;flex:1;color:var(--text)">${it.nickname || '—'}</span>
-                    <button onclick="deleteHistoryItem('${it.id}')"
+                    <span style="font-size:0.82rem;flex:1;color:var(--text)">${esc(it.nickname) || '—'}</span>
+                    <button onclick="deleteHistoryItem('${esc(it.id)}')"
                       style="font-size:0.65rem;padding:0.15rem 0.45rem;border:1px solid rgba(231,76,60,0.4);border-radius:3px;background:transparent;color:var(--red-bright);cursor:pointer;"
                       onmouseover="this.style.background='rgba(231,76,60,0.15)'"
                       onmouseout="this.style.background='transparent'">削除</button>

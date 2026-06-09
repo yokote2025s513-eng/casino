@@ -173,6 +173,16 @@
   // 管理者権限チェック
   requireRole('staff');
 
+  // XSSエスケープ
+  function esc(str) {
+    return String(str ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   let allDocs = [];
   let currentTab = 'all';
   let delId = null;
@@ -239,11 +249,11 @@
       return `<tr>
         <td class="rank-cell">${rankDisplay(displayRank)}</td>
         <td style="font-size:0.85rem;">${g ? g.icon + ' ' + g.label : it.gameId}</td>
-        <td style="font-weight:500;">${it.name || '—'}</td>
+        <td style="font-weight:500;">${esc(it.name) || '—'}</td>
         <td class="score-cell">${(it.score || 0).toLocaleString()} pt</td>
         <td class="action-cell">
-          <button onclick="editForm('${it.id}')" class="btn-gold" style="font-size:0.7rem; padding:0.2rem 0.5rem; background:transparent;">編集</button>
-          <button onclick="openDelModal('${it.id}', '${it.name}', ${it.score})" class="btn-gold" style="font-size:0.7rem; padding:0.2rem 0.5rem; background:transparent; border-color:rgba(231,76,60,0.4); color:var(--red-bright);">削除</button>
+          <button onclick="editForm('${esc(it.id)}')" class="btn-gold" style="font-size:0.7rem; padding:0.2rem 0.5rem; background:transparent;">編集</button>
+          <button onclick="openDelModal('${esc(it.id)}', '${esc(it.name)}', ${it.score})" class="btn-gold" style="font-size:0.7rem; padding:0.2rem 0.5rem; background:transparent; border-color:rgba(231,76,60,0.4); color:var(--red-bright);">削除</button>
         </td>
       </tr>`;
     }).join('');

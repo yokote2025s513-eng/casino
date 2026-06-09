@@ -45,10 +45,9 @@ service cloud.firestore {
       allow write: if isStaff();
     }
 
-    // サイトログ（読みはスタッフのみ、作成は認証済みユーザー）
+    // サイトログ（読み・作成はログイン済みのみ、更新・削除禁止）
     match /siteLogs/{document} {
-      allow read: if isStaff();
-      allow create: if request.auth != null;
+      allow read, create: if request.auth != null;
       allow update, delete: if false;
     }
   }

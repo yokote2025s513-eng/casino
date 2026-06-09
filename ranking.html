@@ -130,6 +130,16 @@ let currentGame = GAMES[0].id;
 let unsubscribe = null;
 let allDocs = []; // 全ゲーム全データキャッシュ
 
+// XSSエスケープ
+function esc(str) {
+  return String(str ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 // 全データをリアルタイム取得（検索用）
 db.collection('rankings').orderBy('score','desc').onSnapshot(snap => {
   allDocs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -178,7 +188,7 @@ function renderRanking(gameId, items) {
     const it = top3[i];
     return `<div class="top3-card rank-${i+1}">
       <div class="top3-medal">${medals[i]}</div>
-      ${it ? `<div class="top3-name">${it.name}</div><div class="top3-score">${it.score.toLocaleString()}</div>`
+      ${it ? `<div class="top3-name">${esc(it.name)}</div><div class="top3-score">${it.score.toLocaleString()}</div>`
            : `<div class="top3-empty">—</div>`}
     </div>`;
   }).join('')}</div>`;
@@ -186,7 +196,7 @@ function renderRanking(gameId, items) {
     <div class="rank-row other-rank">
       <div class="rank-num-big other-rank">${it.rank}</div>
       <div class="rank-info">
-        <div class="rank-name-big">${it.name}</div>
+        <div class="rank-name-big">${esc(it.name)}</div>
         <div class="rank-time">${fmtTime(it.createdAt)}</div>
       </div>
       <div><div class="rank-score-big">${it.score.toLocaleString()}</div><div class="rank-score-unit">pt</div></div>
@@ -242,8 +252,8 @@ function renderSearch(q) {
 
   document.getElementById('search-results').innerHTML = hits.map(it => {
     const g = GAMES.find(x => x.id === it.gameId);
-    const highlighted = (it.name||'').replace(
-      new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'),
+    const highlighted = esc(it.name||'').replace(
+      new RegExp(esc(q).replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'),
       m => `<span class="highlight">${m}</span>`
     );
     return `<div class="rank-row">
