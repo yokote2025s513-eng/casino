@@ -117,49 +117,6 @@
       margin-bottom: 0.3rem; text-transform: uppercase;
     }
 
-    /* ── 待ち時間 ── */
-    .wait-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:2.5rem; }
-    @media(max-width:700px) { .wait-grid { grid-template-columns:repeat(2,1fr); } }
-    .wait-card {
-      background: var(--obsidian-3);
-      border: 1px solid var(--border-dim);
-      border-radius: 6px;
-      padding: 1.5rem 1rem;
-      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
-      transition: all 0.3s; box-shadow: var(--shadow-card);
-      position: relative; overflow: hidden; cursor: default;
-    }
-    /* ゲームカラーの底部アクセント */
-    .wait-card::before {
-      content: ''; position: absolute;
-      bottom: 0; left: 0; right: 0; height: 3px;
-      background: var(--game-color, var(--crimson-hot));
-      opacity: 0.7;
-    }
-    /* カード模様の透かし */
-    .wait-card::after {
-      content: attr(data-suit);
-      position: absolute; top: 0.4rem; right: 0.6rem;
-      font-size: 1rem; opacity: 0.08;
-      color: var(--game-color, var(--crimson-hot));
-    }
-    .wait-card:hover {
-      border-color: var(--game-color, var(--crimson-hot));
-      transform: translateY(-3px);
-      box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 20px rgba(184,0,0,0.15);
-    }
-    .wait-label {
-      font-size: 0.75rem; font-weight: 700;
-      letter-spacing: 0.08em;
-      color: var(--game-color, var(--crimson-hot));
-    }
-    .wait-mins {
-      font-family: 'Libre Baskerville', serif;
-      font-size: 3rem; font-weight: 700;
-      color: var(--text); line-height: 1;
-    }
-    .wait-unit-small { font-size: 0.62rem; color: var(--text-muted); letter-spacing: 0.12em; }
-
     /* ── ランキング ── */
     .ranking-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:1.5rem; margin-bottom:2rem; }
     @media(max-width:700px) { .ranking-grid { grid-template-columns:1fr; } }
@@ -256,12 +213,6 @@
     </div>
   </div>
 
-  <!-- 待ち時間 -->
-  <div class="section-head">
-    <h2>待ち時間</h2><div class="section-line"></div>
-  </div>
-  <div class="wait-grid" id="wait-grid"></div>
-
   <!-- ランキング Top5 -->
   <div class="section-head">
     <h2>ランキング TOP 5</h2>
@@ -282,30 +233,6 @@
 <script src="common.js"></script>
 <script>
 const SUIT_MAP = { poker:'♠', blackjack:'♥', chinchiro:'🎲', keiba:'♦' };
-
-// 待ち時間
-const waitGridEl = document.getElementById('wait-grid');
-function renderWaitGrid(data) {
-  waitGridEl.innerHTML = GAMES.map(g => {
-    const d = data[g.id] ?? { minutes:0, status:'open' };
-    const statusMap = { open:['空いてます','status-open'], busy:['混雑中','status-busy'], full:['満員','status-full'] };
-    const [stLabel, stClass] = statusMap[d.status] ?? statusMap.open;
-    return `
-      <div class="wait-card game-${g.id}" data-suit="${SUIT_MAP[g.id]||'♠'}">
-        <div class="wait-label">${g.icon} ${g.label}</div>
-        <div class="wait-mins">${d.minutes??0}</div>
-        <div class="wait-unit-small">分待ち</div>
-        <div class="wait-status ${stClass}">${stLabel}</div>
-      </div>`;
-  }).join('');
-}
-renderWaitGrid({});
-db.collection('waitTimes').get().then(snap => {
-  const data={};snap.forEach(doc=>{data[doc.id]=doc.data();});renderWaitGrid(data);
-});
-db.collection('waitTimes').onSnapshot(snap => {
-  const data={};snap.forEach(doc=>{data[doc.id]=doc.data();});renderWaitGrid(data);
-});
 
 // 来場者数
 db.collection('visitors').doc('total').onSnapshot(snap => {

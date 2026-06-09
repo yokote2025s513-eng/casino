@@ -59,78 +59,6 @@
     .vc-btn.minus:hover { background: rgba(231,76,60,0.2); }
     .vc-btn.reset { background: transparent; border-color: var(--border); color: var(--text-muted); font-size: 0.7rem; }
 
-    /* 待ち時間管理 */
-    .wait-mgr-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1.5rem;
-    }
-    .wait-mgr-title {
-      font-family: 'Cinzel', serif;
-      font-size: 0.85rem;
-      letter-spacing: 0.12em;
-      color: var(--gold);
-      margin-bottom: 1.2rem;
-      padding-bottom: 0.8rem;
-      border-bottom: 1px solid var(--border);
-    }
-    .wait-row {
-      display: flex; align-items: center; gap: 0.8rem;
-      padding: 0.8rem 0;
-      border-bottom: 1px solid rgba(212,175,55,0.07);
-    }
-    .wait-row:last-child { border-bottom: none; }
-    .wait-game-name {
-      font-family: 'Cinzel', serif;
-      font-size: 0.78rem;
-      letter-spacing: 0.08em;
-      color: var(--game-color, var(--gold));
-      width: 100px;
-      flex-shrink: 0;
-    }
-    .wait-input-wrap { display: flex; align-items: center; gap: 0.5rem; flex: 1; }
-    .wait-input {
-      width: 70px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      color: var(--text);
-      font-family: 'Cinzel', serif;
-      font-size: 1.1rem;
-      font-weight: 700;
-      padding: 0.4rem 0.5rem;
-      text-align: center;
-      transition: border-color 0.2s;
-      outline: none;
-    }
-    .wait-input:focus { border-color: var(--gold); }
-    .wait-mins-label { font-size: 0.75rem; color: var(--text-muted); }
-    .status-sel {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      color: var(--text);
-      font-size: 0.78rem;
-      padding: 0.35rem 0.5rem;
-      outline: none;
-      cursor: pointer;
-    }
-    .status-sel:focus { border-color: var(--gold); }
-    .wait-save-btn {
-      font-family: 'Cinzel', serif;
-      font-size: 0.72rem;
-      padding: 0.35rem 0.8rem;
-      border: 1px solid var(--gold-dark);
-      border-radius: 4px;
-      background: rgba(212,175,55,0.1);
-      color: var(--gold);
-      cursor: pointer;
-      transition: all 0.2s;
-      flex-shrink: 0;
-    }
-    .wait-save-btn:hover { background: rgba(212,175,55,0.2); border-color: var(--gold); }
-
     /* 整理番号 */
     .reserve-section { margin-top: 2rem; }
     .reserve-title {
@@ -354,7 +282,7 @@
 
 <div class="container">
   <h1 class="page-title">受付管理</h1>
-  <p class="page-subtitle">来場者管理・整理番号・待ち時間</p>
+  <p class="page-subtitle">来場者管理・整理番号</p>
   <div class="divider"></div>
 
   <div class="ops-grid">
@@ -365,12 +293,6 @@
       <div class="vc-num" id="vc-num">—</div>
       <div class="vc-unit">人来場</div>
 
-    </div>
-
-    <!-- 待ち時間管理 -->
-    <div class="wait-mgr-card">
-      <div class="wait-mgr-title">⏱ 待ち時間管理</div>
-      <div id="wait-mgr-rows"></div>
     </div>
 
   </div>
@@ -468,69 +390,6 @@ async function resetVisitor() {
   showToast('リセットしました');
 }
 
-// ── 待ち時間管理 ──
-const waitState = {}; // gameId -> {minutes, status}
-
-const waitMgrEl = document.getElementById('wait-mgr-rows');
-waitMgrEl.innerHTML = GAMES.map(g => `
-  <div class="wait-row game-${g.id}">
-    <div class="wait-game-name">${g.icon} ${g.label}</div>
-    <div class="wait-input-wrap" style="flex-wrap:wrap;gap:0.4rem;">
-      <select class="status-sel" id="ws-${g.id}">
-        <option value="open">空き</option>
-        <option value="busy">混雑</option>
-        <option value="full">満員</option>
-      </select>
-      <input class="wait-input" type="number" id="wpp-${g.id}" min="1" max="60" value="5" title="1人あたりの目安時間（分）" style="width:50px">
-      <span class="wait-mins-label">分/人</span>
-      <span id="auto-wait-${g.id}" style="font-family:'Cinzel',serif;font-size:0.85rem;color:var(--gold);min-width:50px">—</span>
-      <span class="wait-mins-label">分待ち（自動）</span>
-      <button class="wait-save-btn" onclick="saveWait('${g.id}')">保存</button>
-    </div>
-  </div>`).join('');
-
-// 現在値をロード
-db.collection('waitTimes').onSnapshot(snap => {
-  snap.forEach(doc => {
-    const d = doc.data();
-    const sel  = document.getElementById('ws-' + doc.id);
-    const wpp  = document.getElementById('wpp-' + doc.id);
-    const auto = document.getElementById('auto-wait-' + doc.id);
-    if (sel)  sel.value  = d.status ?? 'open';
-    if (wpp)  wpp.value  = d.minPerPerson ?? 5;
-    if (auto) auto.textContent = d.minutes ?? 0;
-    waitState[doc.id] = d;
-  });
-});
-
-// 待ち人数が変わったとき自動表示を更新
-function renderWaitGrid() {
-  GAMES.forEach(g => {
-    const wt = waitState[g.id] ?? {};
-    const minPer = wt.minPerPerson ?? 5;
-    const waiting = waitingCounts[g.id] ?? 0;
-    const autoEl = document.getElementById('auto-wait-' + g.id);
-    if (autoEl) autoEl.textContent = waiting * minPer;
-  });
-}
-
-async function saveWait(gameId) {
-  const status    = document.getElementById('ws-' + gameId).value;
-  const minPer    = parseInt(document.getElementById('wpp-' + gameId).value) || 5;
-  const waiting   = waitingCounts[gameId] ?? 0;
-  const autoMins  = waiting * minPer;
-  try {
-    await db.collection('waitTimes').doc(gameId).set({
-      minutes: autoMins,
-      minPerPerson: minPer,
-      status: status,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    siteLog('wait_update', { gameId, minutes: autoMins, status, minPerPerson: minPer });
-    showToast(`${gameLabel(gameId)} 待ち時間 ${autoMins}分 を更新 ✓`);
-  } catch(e) { showToast('エラー: ' + e.message, 'error'); }
-}
-
 // ── 整理番号（全ゲーム通し） ──
 const reserveGrid = document.getElementById('reserve-grid');
 
@@ -562,9 +421,6 @@ function renderReserveGrid() {
   const numStr = String(globalNext).padStart(3, '0');
   reserveGrid.innerHTML = GAMES.map(g => {
     const waiting = waitingCounts[g.id] ?? 0;
-    const wt = waitState[g.id] ?? {};
-    const minPer = wt.minPerPerson ?? 5;
-    const autoMins = waiting * minPer;
     return `
       <div class="reserve-game-card game-${g.id}">
         <div class="rg-icon">${g.icon}</div>
@@ -573,7 +429,6 @@ function renderReserveGrid() {
         <div class="rg-prefix">次の番号（通し）</div>
         <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:0.6rem;">
           待ち: <strong style="color:var(--game-color,var(--gold))">${waiting}人</strong>
-          &nbsp;≈ <strong style="color:var(--game-color,var(--gold))">${autoMins}分</strong>
         </div>
         <button class="rg-issue-btn" onclick="issueTicket('${g.id}')">発行する</button>
       </div>`;
