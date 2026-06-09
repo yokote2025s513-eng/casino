@@ -210,8 +210,8 @@ firebase.auth().onAuthStateChanged(async user => {
   if (!user) return;
   try {
     const snap = await db.collection('roles').doc(user.uid).get();
-    const role = snap.data()?.role;
-    if (role === 'superadmin') showPanel();
+    const role = snap.data()?.roles;
+    if (role === 'super') showPanel();
   } catch(e) {}
 });
 
@@ -225,8 +225,8 @@ async function doLogin() {
   try {
     const cred = await firebase.auth().signInWithEmailAndPassword(email, pw);
     const snap = await db.collection('roles').doc(cred.user.uid).get();
-    const role = snap.data()?.role;
-    if (role !== 'superadmin') {
+    const role = snap.data()?.roles;
+    if (role !== 'super') {
       await firebase.auth().signOut();
       throw new Error('管理者権限がありません');
     }

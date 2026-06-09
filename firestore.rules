@@ -2,54 +2,51 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // 管理者（スタッフまたはスーパー管理者）かどうかを判定
-    function isStaff() {
-      return request.auth != null &&
-        get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.roles in ['staff', 'super'];
-    }
+    // ── 公開コレクション（誰でも読める） ──
 
-    // 予約履歴（誰でも読み書き可、削除・更新はスタッフのみ）
-    match /reserveHistory/{document} {
+    // ランキング（読みは誰でも、書き込みはログイン済みのみ）
+    match /rankings/{doc} {
       allow read: if true;
-      allow create: if true;
-      allow update, delete: if isStaff();
+      allow write, delete: if request.auth != null;
     }
 
-    // ランキング（誰でも読める、書き込みはスタッフのみ）
-    match /rankings/{document} {
+    // 待ち時間（読みは誰でも、書き込みはログイン済みのみ）
+    match /waitTimes/{doc} {
       allow read: if true;
-      allow write, delete: if isStaff();
+      allow write: if request.auth != null;
     }
 
-    // 整理番号カウンター（誰でも読み・更新可、削除禁止）
+    // 来場者数（読みは誰でも、更新はログイン済みのみ、削除禁止）
+    match /visitors/total {
+      allow read: if true;
+      allow update: if request.auth != null;
+      allow delete: if false;
+    }
+
+    // 整理番号カウンター（読み・更新は誰でも、削除禁止）
     match /reserves/global {
       allow read, update: if true;
       allow delete: if false;
     }
 
-    // 来場者数カウンター（誰でも読み・更新可、削除禁止）
-    match /visitors/total {
-      allow read, update: if true;
-      allow delete: if false;
+    // 予約履歴（読み・作成は誰でも、削除はログイン済みのみ）
+    match /reserveHistory/{doc} {
+      allow read, create: if true;
+      allow update, delete: if request.auth != null;
     }
 
-    // rolesコレクション（認証済みなら誰でも読める、書き込み禁止）
+    // ── スタッフ限定コレクション ──
+
+    // rolesコレクション（ログイン済みなら自分のドキュメントだけ読める、書き込み禁止）
     match /roles/{userId} {
-      allow read: if request.auth != null;
+      allow read: if request.auth != null && request.auth.uid == userId;
       allow write: if false;
     }
 
-    // 待ち時間（誰でも読める、書き込みはスタッフのみ）
-    match /waitTimes/{document} {
-      allow read: if true;
-      allow write: if isStaff();
-    }
-
-    // サイトログ（読みはスタッフのみ、作成は認証済みユーザー）
-    match /siteLogs/{document} {
-      allow read: if isStaff();
+    // サイトログ（作成はログイン済みのみ、読み・削除は禁止）
+    match /siteLogs/{doc} {
       allow create: if request.auth != null;
-      allow update, delete: if false;
+      allow read, update, delete: if false;
     }
   }
 }
