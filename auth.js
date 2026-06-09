@@ -15,7 +15,7 @@ async function getRole() {
 
   if (!doc.exists) return null;
 
-  return doc.data().role || null;
+  return doc.data().roles || null;
 }
 
 async function hasRole(role) {
