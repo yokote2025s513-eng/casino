@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin: ランキング ♠ 不死賭</title>
+  <title>Admin: ランキング ♠ 不賭死</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* フォームを上、一覧を下に縦並び */
     .admin-layout { display: flex; flex-direction: column; gap: 2rem; }
 
     /* 入力フォームカード */
@@ -27,49 +26,92 @@
       padding-bottom: 0.8rem;
       border-bottom: 1px solid var(--border);
     }
-    /* フォーム内を横並びグリッド */
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap: 1rem;
+      align-items: end;
     }
     @media (max-width: 768px) {
       .form-grid { grid-template-columns: 1fr; }
     }
 
-    /* 整理番号検索の横並び */
+    /* 整理番号検索 */
     .lookup-group { display: flex; gap: 0.5rem; }
-    #ticket-lookup-result { font-size: 0.75rem; margin-top: 0.4rem; min-height: 1.2rem; }
+    #ticket-lookup-result { font-size: 0.75rem; margin-top: 0.4rem; min-height: 1.2rem; color: var(--text-muted); }
 
-    /* タブ切り替え */
-    .admin-tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; overflow-x: auto; }
+    /* タブ */
+    .admin-tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+      overflow-x: auto;
+    }
     .admin-tab-btn {
-      background: transparent; border: 1px solid transparent; color: var(--text-muted);
-      padding: 0.5rem 1.2rem; border-radius: 4px; cursor: pointer; font-size: 0.88rem; white-space: nowrap;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 0.5rem 1.2rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.88rem;
+      white-space: nowrap;
+      transition: all 0.15s;
     }
     .admin-tab-btn:hover { color: var(--text); background: var(--obsidian-3); }
     .admin-tab-btn.active { border-color: var(--border-gold); color: var(--gold-light); background: var(--gold-dim); }
 
-    /* データテーブル */
-    .admin-table-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+    /* テーブル */
+    .admin-table-wrap {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
     .admin-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
-    .admin-table th { background: var(--obsidian-3); color: var(--gold); font-weight: 600; padding: 0.85rem 1rem; border-bottom: 1px solid var(--border); font-size: 0.8rem; letter-spacing: 0.05em; }
-    .admin-table td { padding: 0.85rem 1rem; border-bottom: 1px solid rgba(212,175,55,0.05); color: var(--text); }
+    .admin-table th {
+      background: var(--obsidian-3);
+      color: var(--gold);
+      font-weight: 600;
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+    }
+    .admin-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid rgba(212,175,55,0.05);
+      color: var(--text);
+      vertical-align: middle;
+    }
     .admin-table tr:last-child td { border-bottom: none; }
-    .admin-table tr:hover td { background: rgba(255,255,255,0.01); }
+    .admin-table tr:hover td { background: rgba(255,255,255,0.015); }
 
-    .rank-cell { font-family: 'Cinzel', serif; font-weight: 700; width: 3.5rem; }
-    .score-cell { font-family: 'Cinzel', serif; font-weight: 600; color: var(--gold-light); text-align: right; }
-    .action-cell { text-align: right; width: 8rem; }
-    .action-cell button { margin-left: 0.4rem; }
+    .rank-cell { font-family: 'Cinzel', serif; font-weight: 700; width: 3rem; text-align: center; }
+    .game-cell { font-size: 0.82rem; width: 8rem; }
+    .name-cell { font-weight: 500; }
+    .score-cell { font-family: 'Cinzel', serif; font-weight: 600; color: var(--gold-light); text-align: right; width: 8rem; }
+    .action-cell { text-align: right; width: 9rem; white-space: nowrap; }
+    .action-cell button { margin-left: 0.4rem; cursor: pointer; }
+
+    /* フォームボタン行 */
+    .form-actions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+      margin-top: 1.5rem;
+    }
   </style>
 </head>
 <body>
 
+<!-- ヘッダー -->
 <div style="width:100%; background:var(--obsidian-2); border-bottom:1px solid var(--border); padding:0.75rem 1.5rem; display:flex; justify-content:space-between; align-items:center; box-sizing:border-box;">
   <div style="display:flex; align-items:center; gap:1rem;">
-    <span style="font-family:'Cinzel Decorative',serif; color:var(--gold); font-weight:700; font-size:1.1rem;">不死賭 STAFF</span>
-    <span style="background:rgba(212,175,55,0.1); border:1px solid var(--border-gold); color:var(--gold); font-size:0.68rem; padding:0.15rem 0.5rem; border-radius:3px;">RANKING MANAGER</span>
+    <span style="font-family:'Cinzel Decorative',serif; color:var(--gold); font-weight:700; font-size:1.1rem;">不賭死 STAFF</span>
+    <span style="background:rgba(212,175,55,0.1); border:1px solid var(--border-gold); color:var(--gold); font-size:0.68rem; padding:0.15rem 0.5rem; border-radius:3px; letter-spacing:0.05em;">RANKING MANAGER</span>
   </div>
   <div style="display:flex; gap:0.8rem; align-items:center;">
     <a href="admin-reserve.html" class="btn-gold" style="font-size:0.75rem; padding:0.4rem 0.8rem; background:transparent; border-color:rgba(201,168,76,0.4);">➔ 受付管理へ</a>
@@ -80,16 +122,16 @@
 <div class="container" style="padding:2rem 1rem 5rem;">
   <div class="admin-layout">
 
+    <!-- スコア登録フォーム -->
     <div class="form-card">
       <div class="form-card-title" id="form-mode-label">▸ 新規スコア登録</div>
-      
       <input type="hidden" id="edit-id">
 
       <div class="form-grid">
         <div class="form-group">
-          <label class="form-label">整理番号から呼出 (任意)</label>
+          <label class="form-label">整理番号から呼出（任意）</label>
           <div class="lookup-group">
-            <input type="text" id="f-ticket" class="form-input" placeholder="例: P001" style="text-transform: uppercase;">
+            <input type="text" id="f-ticket" class="form-input" placeholder="例: 001" style="text-transform:uppercase;">
             <button type="button" onclick="lookupTicket()" class="btn-gold" style="padding:0 0.8rem; font-size:0.8rem; flex-shrink:0;">参照</button>
           </div>
           <div id="ticket-lookup-result"></div>
@@ -112,37 +154,38 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label">獲得スコア (点数) <span style="color:var(--crimson-hot)">*</span></label>
+          <label class="form-label">獲得スコア <span style="color:var(--crimson-hot)">*</span></label>
           <input type="number" id="f-score" class="form-input" placeholder="例: 1500" min="0">
         </div>
       </div>
 
-      <div style="margin-top:1.5rem; display:flex; gap:0.5rem; justify-content:flex-end;">
-        <button type="button" id="cancel-btn" onclick="resetForm()" class="btn-gold" style="background:transparent; border-color:var(--border); color:var(--text-muted); display:none; padding:0.5rem 1.5rem;">キャンセル</button>
-        <button type="button" onclick="doSubmit()" class="btn-gold" style="padding:0.5rem 2rem;"><span id="submit-label">登録する</span></button>
+      <div class="form-actions">
+        <button type="button" id="cancel-btn" onclick="resetForm()" class="btn-gold"
+          style="background:transparent; border-color:var(--border); color:var(--text-muted); display:none; padding:0.5rem 1.5rem;">
+          キャンセル
+        </button>
+        <button type="button" onclick="doSubmit()" class="btn-gold" style="padding:0.5rem 2rem;">
+          <span id="submit-label">登録する</span>
+        </button>
       </div>
     </div>
 
+    <!-- ランキング一覧 -->
     <div>
-      <div class="admin-tabs" id="tab-container">
-        <button class="admin-tab-btn active" onclick="switchTab('all')">🏆 全ゲーム総合</button>
-        </div>
-
+      <div class="admin-tabs" id="tab-container"></div>
       <div class="admin-table-wrap">
         <table class="admin-table">
           <thead>
             <tr>
               <th class="rank-cell">順位</th>
-              <th>ゲーム</th>
-              <th>プレイヤー名</th>
-              <th style="text-align:right;">スコア</th>
+              <th class="game-cell">ゲーム</th>
+              <th class="name-cell">プレイヤー名</th>
+              <th class="score-cell" style="text-align:right;">スコア</th>
               <th class="action-cell">操作</th>
             </tr>
           </thead>
           <tbody id="ranking-tbody">
-            <tr>
-              <td colspan="5" style="text-align:center; color:var(--text-muted); padding:2rem;">データを読み込み中...</td>
-            </tr>
+            <tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:2rem;">データを読み込み中...</td></tr>
           </tbody>
         </table>
       </div>
@@ -151,6 +194,7 @@
   </div>
 </div>
 
+<!-- 削除確認モーダル -->
 <div class="modal-overlay" id="del-modal">
   <div class="modal">
     <h3>⚠️ スコアデータの削除</h3>
@@ -170,86 +214,58 @@
 <script src="auth.js"></script>
 <script src="common.js"></script>
 <script>
-  // 管理者権限チェック
   requireRole('staff');
 
-  // XSSエスケープ
   function esc(str) {
     return String(str ?? '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
   let allDocs = [];
-  let currentTab = 'all';
+  let currentTab = GAMES[0].id; // 最初のゲームタブをデフォルトに（総合なし）
   let delId = null;
 
   window.addEventListener('DOMContentLoaded', () => {
-    // タブボタンの動的生成
+    // タブ生成（総合タブなし）
     const tabsWrap = document.getElementById('tab-container');
-    tabsWrap.innerHTML = `<button class="admin-tab-btn id-tab-all active" onclick="switchTab('all')">🏆 全ゲーム総合</button>` +
-      GAMES.map(g => `<button class="admin-tab-btn id-tab-${g.id}" onclick="switchTab('${g.id}')">${g.icon} ${g.label}</button>`).join('');
+    tabsWrap.innerHTML = GAMES.map((g, i) =>
+      `<button class="admin-tab-btn id-tab-${g.id} ${i === 0 ? 'active' : ''}" onclick="switchTab('${g.id}')">${g.icon} ${g.label}</button>`
+    ).join('');
 
-    // データのリアルタイム監視
+    // データ監視
     db.collection('rankings').orderBy('score', 'desc').onSnapshot(snap => {
       allDocs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       renderTable();
     }, err => {
-      console.error("Firestore read error:", err);
-      document.getElementById('ranking-tbody').innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--red-bright);">データの読み込み権限がありません</td></tr>`;
+      console.error(err);
+      document.getElementById('ranking-tbody').innerHTML =
+        `<tr><td colspan="5" style="text-align:center; color:var(--red-bright); padding:2rem;">データの読み込み権限がありません</td></tr>`;
     });
   });
 
   function switchTab(gameId) {
     currentTab = gameId;
     document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
-    
-    const activeBtn = gameId === 'all' 
-      ? document.querySelector('.id-tab-all')
-      : document.querySelector(`.id-tab-${gameId}`);
-    if (activeBtn) activeBtn.classList.add('active');
-
+    document.querySelector(`.id-tab-${gameId}`)?.classList.add('active');
     renderTable();
   }
 
   function renderTable() {
     const tbody = document.getElementById('ranking-tbody');
-    
-    // フィルタリング
-    let filtered = allDocs;
-    if (currentTab !== 'all') {
-      filtered = allDocs.filter(d => d.gameId === currentTab);
-    }
+    const filtered = allDocs.filter(d => d.gameId === currentTab);
 
     if (filtered.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:2rem;">該当するスコアデータはありません</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:2rem;">まだスコアデータはありません</td></tr>`;
       return;
     }
 
-    // ゲームごとの順位計算用のマップを作成
-    const rankCounter = {};
-    GAMES.forEach(g => { rankCounter[g.id] = 1; });
-    let globalRank = 1;
-
-    tbody.innerHTML = filtered.map(it => {
+    tbody.innerHTML = filtered.map((it, i) => {
       const g = GAMES.find(x => x.id === it.gameId);
-      
-      // タブが総合の場合は全体順位、個別タブの場合はそのゲーム内順位を表示
-      let displayRank = 0;
-      if (currentTab === 'all') {
-        displayRank = globalRank++;
-        rankCounter[it.gameId]++; // カウンタは進めておく
-      } else {
-        displayRank = rankCounter[it.gameId]++;
-      }
-
       return `<tr>
-        <td class="rank-cell">${rankDisplay(displayRank)}</td>
-        <td style="font-size:0.85rem;">${g ? g.icon + ' ' + g.label : it.gameId}</td>
-        <td style="font-weight:500;">${esc(it.name) || '—'}</td>
+        <td class="rank-cell">${rankDisplay(i + 1)}</td>
+        <td class="game-cell">${g ? g.icon + ' ' + g.label : esc(it.gameId)}</td>
+        <td class="name-cell">${esc(it.name) || '—'}</td>
         <td class="score-cell">${(it.score || 0).toLocaleString()} pt</td>
         <td class="action-cell">
           <button onclick="editForm('${esc(it.id)}')" class="btn-gold" style="font-size:0.7rem; padding:0.2rem 0.5rem; background:transparent;">編集</button>
@@ -259,74 +275,73 @@
     }).join('');
   }
 
-  // 整理番号参照
+  // 整理番号から呼出
   async function lookupTicket() {
-    const ticketInput = document.getElementById('f-ticket').value.trim().toUpperCase();
+    const val = document.getElementById('f-ticket').value.trim();
     const resultEl = document.getElementById('ticket-lookup-result');
-    if (!ticketInput) {
-      resultEl.innerHTML = '<span style="color:var(--text-muted)">番号を入力してください</span>';
-      return;
-    }
+    if (!val) { resultEl.textContent = '番号を入力してください'; return; }
 
-    resultEl.innerHTML = '<span style="color:var(--text-muted)">検索中...</span>';
-
+    resultEl.textContent = '検索中...';
     try {
       const snap = await db.collection('reserveHistory')
-        .where('ticketId', '==', ticketInput)
-        .limit(1)
-        .get();
+        .where('ticketId', '==', val.padStart(3, '0'))
+        .limit(1).get();
 
       if (snap.empty) {
-        resultEl.innerHTML = '<span style="color:var(--red-bright)">❌ 予約が見つかりません</span>';
+        resultEl.innerHTML = '<span style="color:var(--red-bright)">❌ 見つかりません</span>';
         return;
       }
-
       const data = snap.docs[0].data();
-      resultEl.innerHTML = `<span style="color:#27ae60">✓ 発見: ${data.nickname}さん</span>`;
-      
-      // フォームに自動セット
+      resultEl.innerHTML = `<span style="color:#27ae60">✓ ${esc(data.nickname)}さん</span>`;
       document.getElementById('f-game').value = data.gameId || '';
       document.getElementById('f-name').value = data.nickname || '';
-    } catch (e) {
+      document.getElementById('f-score').focus();
+    } catch(e) {
       resultEl.innerHTML = '<span style="color:var(--red-bright)">エラーが発生しました</span>';
     }
   }
 
-  // 新規登録・更新送信
+  // Enterキーで参照
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('f-ticket').addEventListener('keydown', e => {
+      if (e.key === 'Enter') lookupTicket();
+    });
+    document.getElementById('f-score').addEventListener('keydown', e => {
+      if (e.key === 'Enter') doSubmit();
+    });
+  });
+
   async function doSubmit() {
     const editId = document.getElementById('edit-id').value;
     const gameId = document.getElementById('f-game').value;
     const name   = document.getElementById('f-name').value.trim();
     const score  = parseInt(document.getElementById('f-score').value, 10);
 
-    if (!gameId || !name || isNaN(score)) {
+    if (!gameId || !name || isNaN(score) || score < 0) {
       alert('必須項目（*）を正しく入力してください');
       return;
     }
 
     const payload = {
-      gameId,
-      name,
-      score,
+      gameId, name, score,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
 
     try {
       if (editId) {
-        // 更新モード
         await db.collection('rankings').doc(editId).update(payload);
         showToast('スコアを更新しました');
       } else {
-        // 新規登録モード
         await db.collection('rankings').add({
           ...payload,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
         showToast('スコアを登録しました');
+        // 登録後、そのゲームのタブに切り替え
+        switchTab(gameId);
       }
       resetForm();
-    } catch (e) {
-      console.error(e);
+    } catch(e) {
       alert('データの保存に失敗しました: ' + e.message);
     }
   }
@@ -334,14 +349,12 @@
   function editForm(id) {
     const target = allDocs.find(d => d.id === id);
     if (!target) return;
-
     document.getElementById('edit-id').value  = target.id;
     document.getElementById('f-ticket').value = '';
     document.getElementById('f-game').value   = target.gameId || '';
     document.getElementById('f-name').value   = target.name || '';
     document.getElementById('f-score').value  = target.score || 0;
-    
-    document.getElementById('ticket-lookup-result').innerHTML = '';
+    document.getElementById('ticket-lookup-result').textContent = '';
     document.getElementById('form-mode-label').textContent = '📝 スコアデータの編集';
     document.getElementById('submit-label').textContent = '更新する';
     document.getElementById('cancel-btn').style.display = 'inline-flex';
@@ -349,23 +362,17 @@
   }
 
   function resetForm() {
-    document.getElementById('edit-id').value  = '';
-    document.getElementById('f-ticket').value = '';
-    document.getElementById('f-game').value   = '';
-    document.getElementById('f-name').value   = '';
-    document.getElementById('f-score').value  = '';
-    // ※存在しない f-note へのアクセスを削除し、クラッシュを防止
-    
-    document.getElementById('ticket-lookup-result').innerHTML = '';
+    ['edit-id','f-ticket','f-name','f-score'].forEach(id => { document.getElementById(id).value = ''; });
+    document.getElementById('f-game').value = '';
+    document.getElementById('ticket-lookup-result').textContent = '';
     document.getElementById('form-mode-label').textContent = '▸ 新規スコア登録';
     document.getElementById('submit-label').textContent = '登録する';
     document.getElementById('cancel-btn').style.display = 'none';
   }
 
-  // 削除モーダル制御
   function openDelModal(id, name, score) {
     delId = id;
-    document.getElementById('del-target-info').textContent = `「${name}」 — ${score.toLocaleString()} pt`;
+    document.getElementById('del-target-info').textContent = `「${name}」 — ${Number(score).toLocaleString()} pt`;
     document.getElementById('del-modal').classList.add('open');
   }
   function closeDelModal() {
@@ -376,9 +383,9 @@
     if (!delId) return;
     try {
       await db.collection('rankings').doc(delId).delete();
-      showToast('データを削除しました', 'success');
+      showToast('データを削除しました');
       closeDelModal();
-    } catch (e) {
+    } catch(e) {
       alert('削除に失敗しました: ' + e.message);
     }
   }
