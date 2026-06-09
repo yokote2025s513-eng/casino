@@ -23,8 +23,6 @@ async function hasRole(role) {
 
   if (!user) return false;
 
-  if (!user.emailVerified) return false;
-
   const currentRole = await getRole();
 
   if (!currentRole) return false;
