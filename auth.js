@@ -1,35 +1,46 @@
-const STAFF_EMAILS = [
-  "staff@example.com",
-  "super@example.com"
-];
+// ============================================================
+// auth.js
+// Firestore roles 管理版
+// ============================================================
 
-const SUPER_EMAILS = [
-  "super@example.com"
-];
+async function getRole() {
+  const user = firebase.auth().currentUser;
 
-function getCurrentEmail() {
-  return (firebase.auth().currentUser?.email || "").trim().toLowerCase();
+  if (!user) return null;
+
+  const doc = await firebase.firestore()
+    .collection("roles")
+    .doc(user.uid)
+    .get();
+
+  if (!doc.exists) return null;
+
+  return doc.data().role || null;
 }
 
 async function hasRole(role) {
   const user = firebase.auth().currentUser;
-  if (!user) return false;
 
-  await user.getIdToken(true);
+  if (!user) return false;
 
   if (!user.emailVerified) return false;
 
-  // コメントアウトを解除し、emailを正しく取得するように修正
-  const email = getCurrentEmail();
+  const currentRole = await getRole();
+
+  if (!currentRole) return false;
 
   if (role === "super") {
-    return SUPER_EMAILS.includes(email);
+    return currentRole === "super";
   }
-  return STAFF_EMAILS.includes(email) || SUPER_EMAILS.includes(email);
+
+  return currentRole === "staff" ||
+         currentRole === "super";
 }
 
 async function signInWithRole(email, password, role) {
-  const cred = await firebase.auth().signInWithEmailAndPassword(email, password);
+  const cred = await firebase.auth()
+    .signInWithEmailAndPassword(email, password);
+
   const ok = await hasRole(role);
 
   if (!ok) {
@@ -42,17 +53,27 @@ async function signInWithRole(email, password, role) {
 
 function requireRole(role) {
   firebase.auth().onAuthStateChanged(async (user) => {
+
     if (!user) {
       location.replace("admin.html");
       return;
     }
 
-    const ok = await hasRole(role);
-    if (!ok) {
+    try {
+      const ok = await hasRole(role);
+
+      if (!ok) {
+        await firebase.auth().signOut();
+        alert("管理者権限がありません");
+        location.replace("admin.html");
+      }
+
+    } catch (err) {
+      console.error(err);
       await firebase.auth().signOut();
-      alert("権限がありません");
       location.replace("admin.html");
     }
+
   });
 }
 
