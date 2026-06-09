@@ -33,9 +33,9 @@ service cloud.firestore {
       allow delete: if false;
     }
 
-    // rolesコレクション（読みはスタッフのみ、書き込み禁止）
-    match /roles/{document} {
-      allow read: if isStaff();
+    // rolesコレクション（自分のドキュメントのみ読める、書き込み禁止）
+    match /roles/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
       allow write: if false;
     }
 
