@@ -405,12 +405,30 @@
       `<span style="color:#27ae60">✓ ${esc(data.nickname)} さん</span>`;
 
     document.getElementById('f-game').value = data.gameId || '';
-    document.getElementById('f-name').value = data.nickname || '';
+document.getElementById('f-name').value = data.nickname || '';
 
-    const scoreInput = document.getElementById('f-score');
-    scoreInput.value = '';
-    scoreInput.focus();
-    scoreInput.select();
+// ゲームボタンを自動選択表示
+document
+  .querySelectorAll('.game-picker button')
+  .forEach(btn => btn.classList.remove('active'));
+
+const gameMap = {
+  poker: 0,
+  blackjack: 1,
+  chinchiro: 2,
+  keiba: 3
+};
+
+const buttons = document.querySelectorAll('.game-picker button');
+if (buttons[gameMap[data.gameId]]) {
+  buttons[gameMap[data.gameId]].classList.add('active');
+}
+
+// 得点入力へ移動
+const scoreInput = document.getElementById('f-score');
+scoreInput.value = '';
+scoreInput.focus();
+scoreInput.select();
 
   } catch (e) {
     resultEl.innerHTML =
