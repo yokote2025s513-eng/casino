@@ -372,55 +372,75 @@
   });
 
   let submitting = false;
-  aasync function doSubmit() {
+
+async function doSubmit() {
 
   if (submitting) return;
   submitting = true;
 
   const submitBtn = document.getElementById('submit-btn');
-  if (submitBtn) submitBtn.disabled = true;
 
-  const editId = document.getElementById('edit-id').value;
+  if (submitBtn) {
+    submitBtn.disabled = true;
+  }
+
+  try {
+
+    const editId = document.getElementById('edit-id').value;
     const gameId = document.getElementById('f-game').value;
     const name   = document.getElementById('f-name').value.trim();
     const score  = parseInt(document.getElementById('f-score').value, 10);
 
-  if (!gameId || !name || isNaN(score) || score < 0) {
-  alert('必須項目（*）を正しく入力してください');
+    if (!gameId || !name || isNaN(score) || score < 0) {
+      alert('必須項目を入力してください');
+      return;
+    }
 
-  submitting = false;
-  if (submitBtn) submitBtn.disabled = false;
-
-  return;
-}
     const payload = {
-      gameId, name, score,
+      gameId,
+      name,
+      score,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     };
 
-    try {
-      if (editId) {
-        await db.collection('rankings').doc(editId).update(payload);
-        showToast('スコアを更新しました');
-      } else {
-        await db.collection('rankings').add({
+    if (editId) {
+
+      await db.collection('rankings')
+        .doc(editId)
+        .update(payload);
+
+      showToast('スコアを更新しました');
+
+    } else {
+
+      await db.collection('rankings')
+        .add({
           ...payload,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
-        showToast('スコアを登録しました');
-        // 登録後、そのゲームのタブに切り替え
-        switchTab(gameId);
-      }
-      resetForm();
-    } catch(e) {
-      alert('データの保存に失敗しました: ' + e.message);
-    }
-    } finally {
-  submitting = false;
-  if (submitBtn) submitBtn.disabled = false;
-}
-  }
 
+      showToast('スコアを登録しました');
+
+      switchTab(gameId);
+    }
+
+    resetForm();
+
+    document.getElementById('f-ticket')?.focus();
+
+  } catch (e) {
+
+    alert('保存失敗: ' + e.message);
+
+  } finally {
+
+    submitting = false;
+
+    if (submitBtn) {
+      submitBtn.disabled = false;
+    }
+  }
+}
   function editForm(id) {
     const target = allDocs.find(d => d.id === id);
     if (!target) return;
