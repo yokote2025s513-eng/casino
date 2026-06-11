@@ -441,7 +441,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const ticket = document.getElementById('f-ticket');
   const score  = document.getElementById('f-score');
 
-  // 整理番号 Enter → 参照
+  // 初期カーソル
+  ticket.focus();
+
+  // Enterで参照
   ticket.addEventListener('keydown', e => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -449,19 +452,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // スコア入力時 Enter → 即登録
-  score.addEventListener('keydown', e => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      doSubmit();
-    }
-  });
-
-  // ページ開いたら整理番号にカーソル
-  ticket.focus();
-
-});
-  // 3桁入力で自動参照
+  // 3桁で自動参照
   ticket.addEventListener('input', () => {
     const v = ticket.value.replace(/\D/g, '');
 
@@ -470,7 +461,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // 得点 Enter → 登録
+  // Enterで登録
   score.addEventListener('keydown', e => {
     if (e.key === 'Enter') {
       e.preventDefault();
@@ -479,8 +470,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
 });
-
-  let submitting = false;
+let submitting = false;
 
 async function doSubmit() {
 
