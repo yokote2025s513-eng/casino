@@ -391,11 +391,20 @@
         resultEl.innerHTML = '<span style="color:var(--red-bright)">❌ 見つかりません</span>';
         return;
       }
-      const data = snap.docs[0].data();
-      resultEl.innerHTML = `<span style="color:#27ae60">✓ ${esc(data.nickname)}さん</span>`;
-      document.getElementById('f-game').value = data.gameId || '';
-      document.getElementById('f-name').value = data.nickname || '';
-      document.getElementById('f-score').focus();
+     const data = snap.docs[0].data();
+
+resultEl.innerHTML =
+  `<span style="color:#27ae60">
+    ✓ ${esc(data.nickname)} さん
+  </span>`;
+
+document.getElementById('f-game').value = data.gameId || '';
+document.getElementById('f-name').value = data.nickname || '';
+
+const scoreInput = document.getElementById('f-score');
+scoreInput.value = '';
+scoreInput.focus();
+scoreInput.select();
     } catch(e) {
       resultEl.innerHTML = '<span style="color:var(--red-bright)">エラーが発生しました</span>';
     }
