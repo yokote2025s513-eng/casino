@@ -535,6 +535,17 @@
 <script src="auth.js"></script>
 <script src="common.js"></script>
 <script>
+let currentUser = null;
+
+firebase.auth().onAuthStateChanged(user => {
+  currentUser = user;
+
+  if (user) {
+    console.log("ログインOK:", user.uid);
+  } else {
+    console.log("未ログイン");
+  }
+});
 let allDocs = [];
 let currentTab = GAMES[0].id;
 function renderTable() {
@@ -666,9 +677,8 @@ async function lookupTicket() {
 ========================= */
 async function doSubmit() {
 
-  const user = firebase.auth().currentUser;
-  if (!user) {
-    alert("ログインしていません");
+  if (!currentUser) {
+    alert("ログイン処理中か未ログインです");
     return;
   }
 
@@ -677,16 +687,14 @@ async function doSubmit() {
   const name   = document.getElementById('f-name').value.trim();
   const score  = parseInt(document.getElementById('f-score').value, 10);
 
-  if (!gameId || !name || isNaN(score) || score < 0) {
-    return;
-  }
+  if (!gameId || !name || isNaN(score) || score < 0) return;
 
   const payload = {
     gameId,
     name,
     score,
     updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-    uid: user.uid
+    uid: currentUser.uid
   };
 
   if (editId) {
