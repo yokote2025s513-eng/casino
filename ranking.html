@@ -321,7 +321,7 @@ function renderSearch(q) {
 
 // 初期表示
 const hash = location.hash.replace('#','');
-const initGame = TABS.find(g => g.id === hash) ? hash : GAMES[0].id;
+const initGame = TABS.find(g => g.id === hash) ? hash : '__all__';
 selectGame(initGame);
 </script>
 </body>

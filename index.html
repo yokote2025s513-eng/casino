@@ -213,9 +213,17 @@
     </div>
   </div>
 
-  <!-- ランキング Top5 -->
+  <!-- 総合ランキング Top5 -->
   <div class="section-head">
-    <h2>ランキング TOP 5</h2>
+    <h2>🏆 総合 TOP 5</h2>
+    <div class="section-line"></div>
+    <a href="ranking.html#__all__" class="btn btn-outline btn-sm">全て見る →</a>
+  </div>
+  <div class="ranking-card" id="all-ranking-card" style="margin-bottom:2rem;grid-column:1/-1;"></div>
+
+  <!-- ゲーム別ランキング Top5 -->
+  <div class="section-head">
+    <h2>ゲーム別 TOP 5</h2>
     <div class="section-line"></div>
     <a href="ranking.html" class="btn btn-outline btn-sm">全て見る →</a>
   </div>
@@ -241,15 +249,58 @@ db.collection('visitors').doc('total').onSnapshot(snap => {
   document.getElementById('last-updated').textContent=fmtTime(d.updatedAt)||'—';
 });
 
-// ランキング
+// ランキング（リアルタイム）
 const rankingGridEl = document.getElementById('ranking-grid');
-const medals=['🥇','🥈','🥉','4','5'];
-function renderRankingCards(allData) {
+const allRankingEl  = document.getElementById('all-ranking-card');
+const medals = ['🥇','🥈','🥉','4','5'];
+let allDocs = [];
+
+db.collection('rankings').orderBy('score','desc').onSnapshot(snap => {
+  allDocs = snap.docs.map(d => d.data());
+  renderAllCard();
+  renderGameCards();
+});
+
+// 総合カード（全ゲーム合計スコア TOP5）
+function renderAllCard() {
+  const totals = {};
+  allDocs.forEach(d => {
+    if (!totals[d.name]) totals[d.name] = { name: d.name, score: 0, games: new Set() };
+    totals[d.name].score += d.score ?? 0;
+    totals[d.name].games.add(d.gameId);
+  });
+  const items = Object.values(totals).sort((a,b) => b.score - a.score).slice(0, 5);
+  const rows = items.length === 0
+    ? '<div class="empty-rank">— まだデータがありません —</div>'
+    : items.map((it, i) => {
+        const dots = [...it.games].map(gid => {
+          const g = GAMES.find(x => x.id === gid);
+          const colors = { poker:'#e74c3c', blackjack:'#3498db', chinchiro:'#e67e22', keiba:'#27ae60' };
+          return `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${colors[gid]??'#888'};margin-left:3px;" title="${g?.label??gid}"></span>`;
+        }).join('');
+        return `<div class="rank-row rank-${i+1}">
+          <div class="rank-num ${i<3?'':'other'}">${medals[i]}</div>
+          <div class="rank-name">${it.name}${dots}</div>
+          <div class="rank-score">${it.score.toLocaleString()}</div>
+        </div>`;
+      }).join('');
+  const total = Object.keys(totals).length;
+  allRankingEl.innerHTML = `
+    <div class="ranking-card-head">
+      <span class="rch-icon">🏆</span>
+      <span class="rch-title" style="color:var(--gold)">総合ランキング</span>
+      <span class="rch-count">${total}人参加</span>
+    </div>
+    ${rows}`;
+}
+
+// ゲーム別カード
+function renderGameCards() {
   rankingGridEl.innerHTML = GAMES.map(g => {
-    const items=(allData[g.id]||[]).slice(0,5);
-    const rows = items.length===0
+    const items = allDocs.filter(d => d.gameId === g.id).slice(0, 5);
+    const rows = items.length === 0
       ? '<div class="empty-rank">— まだデータがありません —</div>'
-      : items.map((it,i)=>`
+      : items.map((it, i) => `
           <div class="rank-row rank-${i+1}">
             <div class="rank-num ${i<3?'':'other'}">${medals[i]}</div>
             <div class="rank-name">${it.name}</div>
@@ -260,22 +311,12 @@ function renderRankingCards(allData) {
         <div class="ranking-card-head">
           <span class="rch-icon">${g.icon}</span>
           <span class="rch-title">${g.label}</span>
-          <span class="rch-count">${(allData[g.id]||[]).length}人参加</span>
+          <span class="rch-count">${items.length}人参加</span>
         </div>
         ${rows}
       </div>`;
   }).join('');
 }
-async function loadRankings() {
-  const allData={};
-  await Promise.all(GAMES.map(async g=>{
-    const snap=await db.collection('rankings').where('gameId','==',g.id).orderBy('score','desc').limit(5).get();
-    allData[g.id]=snap.docs.map(d=>d.data());
-  }));
-  renderRankingCards(allData);
-}
-loadRankings();
-setInterval(loadRankings,60000);
 </script>
 </body>
 </html>
