@@ -120,8 +120,20 @@
 <body>
 
 <!-- ヘッダー -->
-<div style="width:100%; background:var(--obsidian-2); border-bottom:1px solid var(--border); padding:0.75rem 1.5rem; display:flex; justify-content:space-between; align-items:center; box-sizing:border-box;">
-  <div style="display:flex; align-items:center; gap:1rem;">
+<header class="site-header">
+  <div class="header-inner">
+    <a class="site-logo" href="index.html">不賭死</a>
+    <nav class="site-nav">
+      <a class="nav-link" href="index.html">TOP</a>
+      <a class="nav-link" href="ranking.html">Ranking</a>
+      <a class="nav-link active" href="admin-ranking.html">Admin:Ranking</a>
+      <a class="nav-link" href="admin-reserve.html">Admin:Reserve</a>
+      <button class="nav-link" onclick="signOutAdmin()" style="cursor:pointer;background:none;">
+        ログアウト
+      </button>
+    </nav>
+  </div>
+</header>  <div style="display:flex; align-items:center; gap:1rem;">
     <span style="font-family:'Cinzel Decorative',serif; color:var(--gold); font-weight:700; font-size:1.1rem;">不賭死 STAFF</span>
     <span style="background:rgba(212,175,55,0.1); border:1px solid var(--border-gold); color:var(--gold); font-size:0.68rem; padding:0.15rem 0.5rem; border-radius:3px; letter-spacing:0.05em;">RANKING MANAGER</span>
   </div>
