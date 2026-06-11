@@ -675,8 +675,13 @@ async function lookupTicket() {
 ========================= */
 async function doSubmit() {
 
+  if (!authReady) {
+    alert("認証確認中です");
+    return;
+  }
+
   if (!currentUser) {
-    alert("ログイン処理中か未ログインです");
+    alert("未ログインです");
     return;
   }
 
@@ -685,7 +690,7 @@ async function doSubmit() {
   const name   = document.getElementById('f-name').value.trim();
   const score  = parseInt(document.getElementById('f-score').value, 10);
 
-  if (!gameId || !name || isNaN(score) || score < 0) return;
+  if (!gameId || !name || isNaN(score)) return;
 
   const payload = {
     gameId,
