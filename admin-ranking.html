@@ -710,12 +710,10 @@ document.addEventListener('DOMContentLoaded', () => {
 let submitting = false;
 
 async function doSubmit() {
-
   if (submitting) return;
   submitting = true;
 
   try {
-
     const editId = document.getElementById('edit-id').value;
     const gameId = document.getElementById('f-game').value;
     const name   = document.getElementById('f-name').value.trim();
@@ -735,28 +733,21 @@ async function doSubmit() {
 
     if (editId) {
       await db.collection('rankings').doc(editId).update(payload);
-      showToast('スコアを更新しました');
     } else {
       await db.collection('rankings').add({
         ...payload,
         createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
-
-      showToast('スコアを登録しました');
-      switchTab(gameId);
     }
 
     resetForm();
-
-    // Enter専用UX
-    document.getElementById('f-ticket').focus();
 
   } catch (e) {
     alert('保存失敗: ' + e.message);
   } finally {
     submitting = false;
   }
-}  function editForm(id) {
+}}  function editForm(id) {
     const target = allDocs.find(d => d.id === id);
     if (!target) return;
     document.getElementById('edit-id').value  = target.id;
@@ -773,15 +764,14 @@ if (cancelBtn) cancelBtn.style.display = 'inline-flex';
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function resetForm() {
-    ['edit-id','f-ticket','f-name','f-score'].forEach(id => { document.getElementById(id).value = ''; });
-    document.getElementById('f-game').value = '';
-    document.getElementById('ticket-lookup-result').textContent = '';
-    document.getElementById('form-mode-label').textContent = '▸ 新規スコア登録';
-    document.getElementById('submit-label').textContent = '登録する';
-    document.getElementById('cancel-btn').style.display = 'none';
-  }
-
+ function resetForm() {
+  document.getElementById('edit-id').value = '';
+  document.getElementById('f-ticket').value = '';
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-score').value = '';
+  document.getElementById('f-game').value = '';
+  document.getElementById('ticket-lookup-result').textContent = '';
+}
   function openDelModal(id, name, score) {
     delId = id;
     document.getElementById('del-target-info').textContent = `「${name}」 — ${Number(score).toLocaleString()} pt`;
