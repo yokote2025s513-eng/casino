@@ -9,98 +9,51 @@
   <link rel="stylesheet" href="style.css">
   <style>
     .admin-layout { display: flex; flex-direction: column; gap: 2rem; }
+    .form-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.8rem; position: relative; overflow: hidden; }
+    .form-card::before { content:''; position:absolute; inset:0; background:radial-gradient(circle at top right,rgba(212,175,55,.08),transparent 45%); pointer-events:none; }
+    .form-card-title { font-family:'Cinzel',serif; font-size:.88rem; letter-spacing:.12em; color:var(--gold); margin-bottom:1.4rem; padding-bottom:.7rem; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
 
-    /* フォームカード */
-    .form-card {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 10px; padding: 1.8rem; position: relative; overflow: hidden;
-    }
-    .form-card::before {
-      content: ''; position: absolute; inset: 0;
-      background: radial-gradient(circle at top right, rgba(212,175,55,.08), transparent 45%);
-      pointer-events: none;
-    }
-    .form-card-title {
-      font-family: 'Cinzel', serif; font-size: .88rem; letter-spacing: .12em;
-      color: var(--gold); margin-bottom: 1.4rem; padding-bottom: .7rem;
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .form-input {
-      width: 100%; background: rgba(255,255,255,.05); border: 1px solid var(--border);
-      border-radius: 6px; color: var(--text); padding: .7rem 1rem; transition: .2s;
-    }
-    .form-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,175,55,.12); }
+    /* 整理番号検索 */
+    .ticket-lookup-row { display: flex; gap: 0.6rem; align-items: flex-start; margin-bottom: 1rem; }
+    .ticket-input { width: 130px; background: rgba(255,255,255,.05); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: 'Cinzel Decorative', serif; font-size: 1.4rem; font-weight: 900; padding: .5rem .8rem; text-align: center; outline: none; transition: .2s; letter-spacing: .1em; }
+    .ticket-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,175,55,.12); }
+    .lookup-btn { padding: .6rem 1.2rem; background: rgba(212,175,55,.1); border: 1px solid var(--gold); color: var(--gold); border-radius: 6px; font-family: 'Cinzel', serif; font-size: .82rem; cursor: pointer; white-space: nowrap; transition: .2s; }
+    .lookup-btn:hover { background: rgba(212,175,55,.22); }
+    .lookup-result { font-size: .88rem; padding: .5rem .8rem; border-radius: 6px; display: none; }
+    .lookup-result.ok { display:block; background: rgba(93,187,122,.1); border: 1px solid rgba(93,187,122,.3); color: #5dbb7a; }
+    .lookup-result.ng { display:block; background: rgba(231,76,60,.08); border: 1px solid rgba(231,76,60,.3); color: var(--red-bright); }
 
-    /* STEP レイアウト */
-    .step-row {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-items: end;
-      margin-bottom: 1.2rem;
-    }
-    @media (max-width: 600px) { .step-row { grid-template-columns: 1fr; } }
+    /* ゲーム選択 */
+    .game-select-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:.5rem; margin-bottom:1.2rem; }
+    @media (max-width:600px) { .game-select-grid { grid-template-columns:repeat(2,1fr); } }
+    .gs-btn { padding:.7rem .4rem; border:2px solid var(--border); border-radius:8px; background:transparent; color:var(--text-muted); cursor:pointer; transition:all .15s; font-size:.8rem; text-align:center; line-height:1.5; }
+    .gs-btn:hover { border-color:var(--gold); color:var(--text); }
+    .gs-btn.selected { border-color:var(--game-color,var(--gold)); color:var(--game-color,var(--gold)); background:rgba(212,175,55,.1); }
+    .gs-btn:disabled { opacity:.35; cursor:not-allowed; }
+    .gs-icon { font-size:1.4rem; display:block; margin-bottom:.15rem; }
 
-    /* ニックネーム検索 */
-    .nick-search-wrap { position: relative; }
-    .nick-suggestions {
-      position: absolute; top: 100%; left: 0; right: 0;
-      background: var(--bg-surface); border: 1px solid var(--border); border-top: none;
-      border-radius: 0 0 6px 6px; z-index: 50; max-height: 180px; overflow-y: auto;
-    }
-    .nick-sug-item {
-      padding: .55rem .9rem; font-size: .88rem; cursor: pointer;
-      color: var(--text); transition: background .12s;
-    }
-    .nick-sug-item:hover { background: rgba(212,175,55,.08); }
-
-    /* ゲーム選択ボタン */
-    .game-select-grid {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; margin-bottom: 1.2rem;
-    }
-    @media (max-width: 600px) { .game-select-grid { grid-template-columns: repeat(2, 1fr); } }
-    .gs-btn {
-      padding: .7rem .4rem; border: 2px solid var(--border); border-radius: 8px;
-      background: transparent; color: var(--text-muted); cursor: pointer;
-      transition: all .15s; font-size: .8rem; text-align: center; line-height: 1.5;
-    }
-    .gs-btn:hover { border-color: var(--gold); color: var(--text); }
-    .gs-btn.selected {
-      border-color: var(--game-color, var(--gold));
-      color: var(--game-color, var(--gold));
-      background: rgba(212,175,55,.1);
-    }
-    .gs-icon { font-size: 1.4rem; display: block; margin-bottom: .15rem; }
-
-    /* スコア入力 */
-    .score-big {
-      height: 90px; font-size: 2.8rem; font-family: 'Cinzel Decorative', serif;
-      font-weight: 900; text-align: center; color: var(--gold);
-      border: 2px solid rgba(212,175,55,.3);
-      background: linear-gradient(to bottom, rgba(212,175,55,.08), rgba(212,175,55,.02));
-      text-shadow: 0 0 20px rgba(212,175,55,.25);
-    }
-    .submit-main {
-      height: 60px; font-family: 'Cinzel', serif; font-size: 1rem; font-weight: 700;
-      letter-spacing: .08em; transition: .2s; width: 100%;
-    }
-    .submit-main:hover { transform: translateY(-1px); box-shadow: 0 0 20px rgba(212,175,55,.18); }
-    .submit-main:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+    .form-input { width:100%; background:rgba(255,255,255,.05); border:1px solid var(--border); border-radius:6px; color:var(--text); padding:.7rem 1rem; transition:.2s; }
+    .form-input:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(212,175,55,.12); }
+    .score-big { height:90px; font-size:2.8rem; font-family:'Cinzel Decorative',serif; font-weight:900; text-align:center; color:var(--gold); border:2px solid rgba(212,175,55,.3); background:linear-gradient(to bottom,rgba(212,175,55,.08),rgba(212,175,55,.02)); }
+    .submit-main { height:60px; font-family:'Cinzel',serif; font-size:1rem; font-weight:700; letter-spacing:.08em; transition:.2s; width:100%; }
+    .submit-main:hover { transform:translateY(-1px); box-shadow:0 0 20px rgba(212,175,55,.18); }
+    .submit-main:disabled { opacity:.4; cursor:not-allowed; transform:none; }
 
     /* タブ */
-    .admin-tabs { display: flex; gap: .5rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: .5rem; overflow-x: auto; }
-    .admin-tab-btn { border: 2px solid var(--border); border-radius: 8px; padding: .75rem 1rem; transition: .15s; }
-    .admin-tab-btn.active { border-color: var(--gold); background: rgba(212,175,55,.1); color: var(--gold); }
+    .admin-tabs { display:flex; gap:.5rem; margin-bottom:1rem; border-bottom:1px solid var(--border); padding-bottom:.5rem; overflow-x:auto; }
+    .admin-tab-btn { border:2px solid var(--border); border-radius:8px; padding:.75rem 1rem; transition:.15s; white-space:nowrap; }
+    .admin-tab-btn.active { border-color:var(--gold); background:rgba(212,175,55,.1); color:var(--gold); }
 
     /* テーブル */
-    .admin-table-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
-    .admin-table { width: 100%; border-collapse: collapse; text-align: left; font-size: .9rem; }
-    .admin-table th { background: var(--obsidian-3); color: var(--gold); font-weight: 600; padding: .85rem 1rem; border-bottom: 1px solid var(--border); font-size: .8rem; letter-spacing: .05em; }
-    .admin-table td { padding: .75rem 1rem; border-bottom: 1px solid rgba(212,175,55,.05); color: var(--text); vertical-align: middle; }
-    .admin-table tr:last-child td { border-bottom: none; }
-    .admin-table tr:hover td { background: rgba(212,175,55,.05); }
-    .rank-cell { font-family: 'Cinzel Decorative', serif; font-size: 1.15rem; font-weight: 900; }
-    .score-cell { font-family: 'Cinzel', serif; font-weight: 600; color: var(--gold-light); text-align: right; }
-    .action-cell button { padding: .35rem .7rem; border-radius: 5px; transition: .15s; }
-    .action-cell button:hover { transform: translateY(-1px); }
+    .admin-table-wrap { background:var(--bg-card); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    .admin-table { width:100%; border-collapse:collapse; text-align:left; font-size:.9rem; }
+    .admin-table th { background:var(--obsidian-3); color:var(--gold); font-weight:600; padding:.85rem 1rem; border-bottom:1px solid var(--border); font-size:.8rem; letter-spacing:.05em; }
+    .admin-table td { padding:.75rem 1rem; border-bottom:1px solid rgba(212,175,55,.05); color:var(--text); vertical-align:middle; }
+    .admin-table tr:last-child td { border-bottom:none; }
+    .admin-table tr:hover td { background:rgba(212,175,55,.05); }
+    .rank-cell { font-family:'Cinzel Decorative',serif; font-size:1.1rem; font-weight:900; }
+    .score-cell { font-family:'Cinzel',serif; font-weight:600; color:var(--gold-light); text-align:right; }
+    .ticket-cell { font-family:'Cinzel Decorative',serif; font-size:.95rem; color:var(--gold); opacity:.7; }
   </style>
 </head>
 <body>
@@ -131,39 +84,39 @@
         <span id="form-mode-label">🎯 スコア登録</span>
         <span id="edit-badge" style="display:none; font-size:.75rem; color:var(--gold); border:1px solid var(--gold); border-radius:4px; padding:.2rem .6rem;">編集中</span>
       </div>
-
       <input type="hidden" id="edit-id">
 
-      <!-- STEP1: ニックネーム検索 -->
-      <div class="step-row">
-        <div class="form-group">
-          <label>① プレイヤー名</label>
-          <div class="nick-search-wrap">
-            <input type="text" id="f-name" class="form-input"
-              placeholder="名前を入力して検索..." autocomplete="off"
-              oninput="onNameInput()">
-            <div class="nick-suggestions" id="nick-sug" style="display:none"></div>
-          </div>
+      <!-- STEP1: 整理番号 -->
+      <div class="form-group" style="margin-bottom:1rem;">
+        <label>① 整理番号で検索</label>
+        <div class="ticket-lookup-row">
+          <input type="text" id="f-ticket" class="ticket-input"
+            placeholder="001" maxlength="3"
+            oninput="this.value=this.value.replace(/[^0-9]/,'')"
+            onkeydown="if(event.key==='Enter') lookupTicket()">
+          <button class="lookup-btn" onclick="lookupTicket()">検索 ▶</button>
         </div>
-        <!-- STEP2: ゲーム選択（名前確定後に有効化） -->
-        <div class="form-group" id="game-select-wrap">
-          <label>② ゲーム選択</label>
-          <div class="game-select-grid" id="game-select-grid"></div>
-        </div>
+        <div class="lookup-result" id="lookup-result"></div>
       </div>
 
-      <!-- STEP3: スコア入力 -->
+      <!-- STEP2: ゲーム選択 -->
+      <div class="form-group" style="margin-bottom:1rem;" id="game-step" style="opacity:.4">
+        <label>② ゲーム選択</label>
+        <div class="game-select-grid" id="game-select-grid"></div>
+      </div>
+
+      <!-- STEP3: スコア -->
       <div class="form-group">
         <label>③ スコア（Enterで登録）</label>
         <input type="number" id="f-score" class="form-input score-big"
-          placeholder="0" min="0" onkeydown="if(event.key==='Enter') doSubmit()">
+          placeholder="0" min="0" onkeydown="if(event.key==='Enter') doSubmit()" oninput="updateSubmitBtn()">
       </div>
 
+      <input type="hidden" id="f-name">
+
       <div style="display:flex; gap:.5rem; margin-top:1rem;">
-        <button type="button" id="cancel-btn" onclick="resetForm()"
-          class="btn-gold" style="display:none; flex:0 0 auto;">キャンセル</button>
-        <button type="button" onclick="doSubmit()" id="submit-btn"
-          class="btn-gold submit-main" disabled>登録する</button>
+        <button type="button" id="cancel-btn" onclick="resetForm()" class="btn-gold" style="display:none; flex:0 0 auto;">キャンセル</button>
+        <button type="button" onclick="doSubmit()" id="submit-btn" class="btn-gold submit-main" disabled>登録する</button>
       </div>
     </div>
 
@@ -174,15 +127,16 @@
         <table class="admin-table">
           <thead>
             <tr>
-              <th class="rank-cell">順位</th>
+              <th>順位</th>
+              <th>No.</th>
               <th>ゲーム</th>
               <th>プレイヤー名</th>
-              <th class="score-cell" style="text-align:right;">スコア</th>
+              <th style="text-align:right;">スコア</th>
               <th>操作</th>
             </tr>
           </thead>
           <tbody id="ranking-tbody">
-            <tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:2rem;">データを読み込み中...</td></tr>
+            <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:2rem;">読み込み中...</td></tr>
           </tbody>
         </table>
       </div>
@@ -195,11 +149,11 @@
 <div class="modal-overlay" id="del-modal">
   <div class="modal">
     <h3>⚠️ スコアデータの削除</h3>
-    <p style="font-size:.88rem; color:var(--text); margin-bottom:.5rem;">以下のランキングデータを完全に削除しますか？</p>
-    <div id="del-target-info" style="font-size:.9rem; font-weight:600; color:var(--crimson-hot); background:rgba(0,0,0,.2); padding:.6rem; border-radius:4px; margin-bottom:1.5rem;">—</div>
+    <p style="font-size:.88rem;color:var(--text);margin-bottom:.5rem;">以下のデータを削除しますか？</p>
+    <div id="del-target-info" style="font-size:.9rem;font-weight:600;color:var(--crimson-hot);background:rgba(0,0,0,.2);padding:.6rem;border-radius:4px;margin-bottom:1.5rem;">—</div>
     <div class="modal-actions">
-      <button onclick="closeDelModal()" class="btn-gold" style="background:transparent; border-color:var(--border); color:var(--text-muted); padding:.4rem 1rem; font-size:.8rem;">やめる</button>
-      <button onclick="confirmDelete()" class="btn-gold" style="background:var(--crimson); border-color:var(--crimson-hot); color:#fff; padding:.4rem 1rem; font-size:.8rem;">削除する</button>
+      <button onclick="closeDelModal()" class="btn-gold" style="background:transparent;border-color:var(--border);color:var(--text-muted);padding:.4rem 1rem;font-size:.8rem;">やめる</button>
+      <button onclick="confirmDelete()" class="btn-gold" style="background:var(--crimson);border-color:var(--crimson-hot);color:#fff;padding:.4rem 1rem;font-size:.8rem;">削除する</button>
     </div>
   </div>
 </div>
@@ -213,35 +167,34 @@
 <script src="auth.js"></script>
 <script src="common.js"></script>
 <script>
+requireRole('staff');
+
 let currentUser = null;
-let authReady = false;
-firebase.auth().onAuthStateChanged(user => { currentUser = user; authReady = true; });
+firebase.auth().onAuthStateChanged(user => { currentUser = user; });
 
 function esc(str) {
-  return String(str ?? '')
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
 // ── データ ──
 let allDocs = [];
 let currentTab = GAMES[0].id;
-let allPlayers = []; // { nickname } から検索サジェスト用
+let allPlayers = []; // { nickname, ticketId }
 
-// rankingsリアルタイム
 db.collection('rankings').orderBy('score','desc').onSnapshot(snap => {
   allDocs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
   renderTable();
 });
 
-// players コレクションからサジェスト用ニックネーム一覧
 db.collection('players').onSnapshot(snap => {
-  allPlayers = snap.docs.map(d => d.data().nickname).filter(Boolean);
+  allPlayers = snap.docs.map(d => d.data()).filter(d => d.nickname && d.ticketId);
 });
 
-// ── タブ ──
+// ── タブ（ゲーム別 + 総合） ──
+const TABS = [...GAMES, { id: '__all__', label: '総合', icon: '🏆' }];
+
 const tabContainer = document.getElementById('tab-container');
-GAMES.forEach(g => {
+TABS.forEach(g => {
   const btn = document.createElement('button');
   btn.className = 'admin-tab-btn' + (g.id === currentTab ? ' active' : '');
   btn.textContent = `${g.icon} ${g.label}`;
@@ -258,12 +211,12 @@ GAMES.forEach(g => {
 let selectedGame = null;
 
 function renderGameGrid(disabledGames = new Set()) {
-  const grid = document.getElementById('game-select-grid');
-  grid.innerHTML = GAMES.map(g => {
+  const GAME_COLORS = { poker:'var(--poker)', blackjack:'var(--blackjack)', chinchiro:'var(--chinchiro)', keiba:'var(--keiba)' };
+  document.getElementById('game-select-grid').innerHTML = GAMES.map(g => {
     const dis = disabledGames.has(g.id);
     const sel = selectedGame === g.id ? 'selected' : '';
-    return `<button class="gs-btn ${sel} game-${g.id}"
-      style="${g.id === 'poker' ? '--game-color:var(--poker)' : g.id === 'blackjack' ? '--game-color:var(--blackjack)' : g.id === 'chinchiro' ? '--game-color:var(--chinchiro)' : '--game-color:var(--keiba)'};${dis ? 'opacity:.35;cursor:not-allowed;' : ''}"
+    return `<button class="gs-btn ${sel}"
+      style="--game-color:${GAME_COLORS[g.id] ?? 'var(--gold)'};"
       onclick="${dis ? '' : `selectGame('${g.id}')`}"
       ${dis ? 'disabled' : ''}>
       <span class="gs-icon">${g.icon}</span>
@@ -276,86 +229,104 @@ renderGameGrid();
 
 function selectGame(id) {
   selectedGame = id;
-  renderGameGrid(getRegisteredGamesForName(document.getElementById('f-name').value.trim()));
+  renderGameGrid(getRegisteredGames());
   updateSubmitBtn();
   document.getElementById('f-score').focus();
 }
 
-// 指定ニックネームが既にスコア登録済みのゲームを返す
-function getRegisteredGamesForName(name) {
+function getRegisteredGames() {
+  const name = document.getElementById('f-name').value;
   if (!name) return new Set();
-  return new Set(allDocs.filter(d => d.name === name).map(d => d.gameId));
+  const editId = document.getElementById('edit-id').value;
+  return new Set(allDocs.filter(d => d.name === name && d.id !== editId).map(d => d.gameId));
 }
 
-// ── ニックネーム入力サジェスト ──
-function onNameInput() {
-  const val = document.getElementById('f-name').value.trim();
-  const sugEl = document.getElementById('nick-sug');
+// ── 整理番号検索 ──
+async function lookupTicket() {
+  const val = document.getElementById('f-ticket').value.trim();
+  const resultEl = document.getElementById('lookup-result');
+  if (!val) { resultEl.className = 'lookup-result ng'; resultEl.textContent = '番号を入力してください'; return; }
 
-  selectedGame = null;
-  renderGameGrid();
-  updateSubmitBtn();
+  const padded = val.padStart(3, '0');
+  resultEl.className = 'lookup-result'; resultEl.textContent = '検索中...'; resultEl.style.display = 'block';
 
-  if (!val) { sugEl.style.display = 'none'; return; }
+  // まずローカルキャッシュで引く（高速）
+  let player = allPlayers.find(p => p.ticketId === padded);
 
-  const matches = allPlayers.filter(n => n.toLowerCase().includes(val.toLowerCase()) && n !== val).slice(0, 8);
-  if (matches.length > 0) {
-    sugEl.style.display = 'block';
-    sugEl.innerHTML = matches.map(n =>
-      `<div class="nick-sug-item" onclick="pickName('${esc(n).replace(/'/g,"\\'")}')">👤 ${esc(n)}</div>`
-    ).join('');
-  } else {
-    sugEl.style.display = 'none';
+  // なければFirestoreへ
+  if (!player) {
+    const snap = await db.collection('players').where('ticketId','==',padded).limit(1).get();
+    if (!snap.empty) player = snap.docs[0].data();
   }
-}
 
-function pickName(name) {
-  document.getElementById('f-name').value = name;
-  document.getElementById('nick-sug').style.display = 'none';
-  selectedGame = null;
-  const disabled = getRegisteredGamesForName(name);
+  if (!player) {
+    resultEl.className = 'lookup-result ng';
+    resultEl.textContent = `❌ No.${padded} は見つかりません`;
+    return;
+  }
+
+  resultEl.className = 'lookup-result ok';
+  resultEl.textContent = `✓ No.${padded} — 👤 ${player.nickname}`;
+
+  document.getElementById('f-name').value = player.nickname;
+  document.getElementById('f-ticket').value = padded;
+
+  // 登録済みゲームをグレーアウト
+  const disabled = getRegisteredGames();
   renderGameGrid(disabled);
-  updateSubmitBtn();
-  // 未登録ゲームが1つならそのまま選択
-  const unregistered = GAMES.filter(g => !disabled.has(g.id));
-  if (unregistered.length === 1) {
-    selectGame(unregistered[0].id);
-  }
-}
 
-document.addEventListener('click', e => {
-  if (!e.target.closest('.nick-search-wrap'))
-    document.getElementById('nick-sug').style.display = 'none';
-});
+  // 未登録ゲームが1つだけなら自動選択
+  const free = GAMES.filter(g => !disabled.has(g.id));
+  if (free.length === 1) selectGame(free[0].id);
+
+  updateSubmitBtn();
+  document.getElementById('f-score').focus();
+}
 
 function updateSubmitBtn() {
   const name  = document.getElementById('f-name').value.trim();
   const score = document.getElementById('f-score').value;
   document.getElementById('submit-btn').disabled = !name || !selectedGame || score === '';
 }
-
 document.getElementById('f-score').addEventListener('input', updateSubmitBtn);
 
 // ── テーブル描画 ──
 function renderTable() {
   const tbody = document.getElementById('ranking-tbody');
-  const filtered = allDocs
-    .filter(d => d.gameId === currentTab)
-    .sort((a, b) => b.score - a.score);
 
-  if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:2rem;">データなし</td></tr>`;
+  let rows;
+  if (currentTab === '__all__') {
+    // 総合：プレイヤーごとの合計スコアで集計
+    const totals = {};
+    allDocs.forEach(d => {
+      if (!totals[d.name]) totals[d.name] = { name: d.name, score: 0, games: 0, ticketId: d.ticketId ?? '' };
+      totals[d.name].score += d.score ?? 0;
+      totals[d.name].games += 1;
+    });
+    rows = Object.values(totals).sort((a,b) => b.score - a.score);
+  } else {
+    rows = allDocs.filter(d => d.gameId === currentTab).sort((a,b) => b.score - a.score);
+  }
+
+  if (rows.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:2rem;">データなし</td></tr>`;
     return;
   }
 
-  tbody.innerHTML = filtered.map((it, i) => {
+  tbody.innerHTML = rows.map((it, i) => {
     const g = GAMES.find(x => x.id === it.gameId);
+    const gameCell = currentTab === '__all__'
+      ? `<span style="font-size:.78rem;color:var(--text-muted);">${it.games}ゲーム</span>`
+      : `${g?.icon ?? ''} ${g?.label ?? it.gameId}`;
+    const isAll = currentTab === '__all__';
     return `<tr>
       <td class="rank-cell">${i + 1}</td>
-      <td style="font-size:.82rem;">${g?.icon ?? ''} ${g?.label ?? it.gameId}</td>
+      <td class="ticket-cell">${esc(it.ticketId ?? '—')}</td>
+      <td style="font-size:.82rem;">${gameCell}</td>
       <td style="font-weight:500;">${esc(it.name)}</td>
-      <td class="score-cell">${(it.score||0).toLocaleString()}</td>
-      <td class="action-cell">
+      <td class="score-cell">${(it.score??0).toLocaleString()}</td>
+      <td>
+        ${isAll ? '' : `
         <button onclick="startEdit('${esc(it.id)}')"
           style="font-size:.75rem;padding:.3rem .6rem;border:1px solid rgba(212,175,55,.3);border-radius:4px;background:rgba(212,175,55,.06);color:var(--gold);cursor:pointer;">
           編集
@@ -363,7 +334,7 @@ function renderTable() {
         <button onclick="openDelModal('${esc(it.id)}','${esc(it.name)}',${it.score})"
           style="font-size:.75rem;padding:.3rem .6rem;border:1px solid rgba(231,76,60,.3);border-radius:4px;background:rgba(231,76,60,.06);color:var(--red-bright);cursor:pointer;margin-left:.3rem;">
           削除
-        </button>
+        </button>`}
       </td>
     </tr>`;
   }).join('');
@@ -373,32 +344,22 @@ function renderTable() {
 let submitting = false;
 async function doSubmit() {
   if (submitting) return;
-  if (!authReady || !currentUser) { alert('未ログインです'); return; }
-
-  const editId = document.getElementById('edit-id').value;
-  const name   = document.getElementById('f-name').value.trim();
-  const gameId = selectedGame;
-  const score  = parseInt(document.getElementById('f-score').value, 10);
-
+  if (!currentUser) { alert('未ログインです'); return; }
+  const editId  = document.getElementById('edit-id').value;
+  const name    = document.getElementById('f-name').value.trim();
+  const gameId  = selectedGame;
+  const score   = parseInt(document.getElementById('f-score').value, 10);
+  const ticketId = document.getElementById('f-ticket').value.trim().padStart(3,'0');
   if (!name || !gameId || isNaN(score)) return;
-
   submitting = true;
   document.getElementById('submit-btn').disabled = true;
-
   try {
-    const payload = {
-      gameId, name, score,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-      uid: currentUser.uid
-    };
+    const payload = { gameId, name, score, ticketId, updatedAt: firebase.firestore.FieldValue.serverTimestamp(), uid: currentUser.uid };
     if (editId) {
       await db.collection('rankings').doc(editId).update(payload);
       showToast('更新しました');
     } else {
-      await db.collection('rankings').add({
-        ...payload,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
+      await db.collection('rankings').add({ ...payload, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
       showToast(`登録: ${name} — ${score.toLocaleString()}pt`);
     }
     resetForm();
@@ -416,8 +377,12 @@ function startEdit(id) {
   if (!doc) return;
   document.getElementById('edit-id').value = id;
   document.getElementById('f-name').value = doc.name;
+  document.getElementById('f-ticket').value = doc.ticketId ?? '';
+  const lr = document.getElementById('lookup-result');
+  lr.className = 'lookup-result ok';
+  lr.textContent = `✓ No.${doc.ticketId ?? '—'} — 👤 ${doc.name}`;
   selectedGame = doc.gameId;
-  renderGameGrid(getRegisteredGamesForName(doc.name));
+  renderGameGrid(getRegisteredGames());
   document.getElementById('f-score').value = doc.score;
   document.getElementById('edit-badge').style.display = 'inline';
   document.getElementById('cancel-btn').style.display = 'inline-flex';
@@ -426,12 +391,13 @@ function startEdit(id) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// ── リセット ──
 function resetForm() {
   document.getElementById('edit-id').value = '';
   document.getElementById('f-name').value = '';
+  document.getElementById('f-ticket').value = '';
   document.getElementById('f-score').value = '';
-  document.getElementById('nick-sug').style.display = 'none';
+  const lr = document.getElementById('lookup-result');
+  lr.className = 'lookup-result'; lr.style.display = 'none';
   selectedGame = null;
   renderGameGrid();
   document.getElementById('edit-badge').style.display = 'none';
@@ -443,24 +409,15 @@ function resetForm() {
 // ── 削除 ──
 let delId = null;
 function openDelModal(id, name, score) {
-  delId = id;
-  document.getElementById('del-target-info').textContent = `${name} — ${score.toLocaleString()}pt`;
+  delId = id; document.getElementById('del-target-info').textContent = `${name} — ${score.toLocaleString()}pt`;
   document.getElementById('del-modal').classList.add('open');
 }
-function closeDelModal() {
-  delId = null;
-  document.getElementById('del-modal').classList.remove('open');
-}
+function closeDelModal() { delId = null; document.getElementById('del-modal').classList.remove('open'); }
 async function confirmDelete() {
   if (!delId) return;
-  try {
-    await db.collection('rankings').doc(delId).delete();
-    showToast('削除しました');
-  } catch(e) {
-    showToast('エラー: ' + e.message, 'error');
-  } finally {
-    closeDelModal();
-  }
+  try { await db.collection('rankings').doc(delId).delete(); showToast('削除しました'); }
+  catch(e) { showToast('エラー: ' + e.message, 'error'); }
+  finally { closeDelModal(); }
 }
 </script>
 </body>
