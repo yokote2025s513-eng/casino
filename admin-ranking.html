@@ -247,6 +247,18 @@
   let allDocs = [];
   let currentTab = GAMES[0].id; // 最初のゲームタブをデフォルトに（総合なし）
   let delId = null;
+  function setGame(gameId){
+
+  document.getElementById('f-game').value = gameId;
+
+  document
+    .querySelectorAll('.game-picker button')
+    .forEach(btn => btn.classList.remove('active'));
+
+  event.target.classList.add('active');
+
+  document.getElementById('f-name').focus();
+}
 
   window.addEventListener('DOMContentLoaded', () => {
     // タブ生成（総合タブなし）
