@@ -537,6 +537,28 @@
 <script>
 let allDocs = [];
 let currentTab = GAMES[0].id;
+function renderTable() {
+  const tbody = document.getElementById('ranking-tbody');
+  if (!tbody) return;
+
+  const filtered = allDocs.filter(d => d.gameId === currentTab);
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5">データなし</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map((it, i) => {
+    return `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${it.gameId}</td>
+        <td>${it.name}</td>
+        <td>${it.score}</td>
+      </tr>
+    `;
+  }).join('');
+}
 let delId = null;
 
 let step = 0;
