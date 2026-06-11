@@ -536,15 +536,13 @@
 <script src="common.js"></script>
 <script>
 let currentUser = null;
+let authReady = false;
 
 firebase.auth().onAuthStateChanged(user => {
   currentUser = user;
+  authReady = true;
 
-  if (user) {
-    console.log("ログインOK:", user.uid);
-  } else {
-    console.log("未ログイン");
-  }
+  console.log(user ? "ログインOK" : "未ログイン");
 });
 let allDocs = [];
 let currentTab = GAMES[0].id;
