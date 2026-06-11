@@ -430,10 +430,10 @@
 
   <!-- スコア登録フォーム -->
 <div class="form-card">
-<<div class="form-card-title">
-  <span id="form-mode-label">🎯 スコア登録</span>
-  <span id="selected-game-badge">---</span>
-</div>
+  <div class="form-card-title">
+    <span id="form-mode-label">🎯 スコア登録（Enter専用）</span>
+    <span id="selected-game-badge">---</span>
+  </div>
 
   <input type="hidden" id="edit-id">
   <input type="hidden" id="f-game">
@@ -442,68 +442,42 @@
 
     <!-- 整理番号 -->
     <div class="form-group">
-      <label class="form-label">
-        整理番号
-      </label>
-
-      <div class="lookup-group">
-        <input
-          type="text"
-          id="f-ticket"
-          class="form-input"
-          placeholder="例: 001"
-          autocomplete="off"
-          inputmode="numeric">
-      </div>
-
+      <label>整理番号</label>
+      <input
+        type="text"
+        id="f-ticket"
+        class="form-input"
+        placeholder="001"
+        inputmode="numeric"
+        autocomplete="off">
       <div id="ticket-lookup-result"></div>
     </div>
 
-    <!-- ゲーム表示 -->
+    <!-- ゲーム -->
     <div class="form-group">
-      <label class="form-label">
-        ゲーム
-      </label>
-
-      <input
-        type="text"
-        id="game-display"
-        class="form-input"
-        readonly
-        placeholder="整理番号参照で自動入力">
+      <label>ゲーム</label>
+      <input type="text" id="game-display" class="form-input" readonly>
     </div>
 
     <!-- 名前 -->
     <div class="form-group">
-      <label class="form-label">
-        プレイヤー名
-      </label>
-
-      <input
-        type="text"
-        id="f-name"
-        class="form-input"
-        maxlength="12"
-        readonly>
+      <label>プレイヤー名</label>
+      <input type="text" id="f-name" class="form-input" readonly>
     </div>
 
-    <!-- 得点 -->
+    <!-- スコア -->
     <div class="form-group">
-      <label class="form-label">
-        獲得スコア
-      </label>
-
+      <label>スコア（Enterで登録）</label>
       <input
         type="number"
         id="f-score"
         class="form-input score-big"
         placeholder="0"
-        min="0"
-        inputmode="numeric">
+        min="0">
     </div>
 
   </div>
-
+</div>
   <div class="form-actions">
 
     <button
