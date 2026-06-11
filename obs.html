@@ -207,10 +207,11 @@
       bottom: 0; left: 0; right: 0;
       height: 4px;
       background: linear-gradient(90deg,
-        var(--poker) 0%, var(--poker) 25%,
-        var(--blackjack) 25%, var(--blackjack) 50%,
-        var(--chinchiro) 50%, var(--chinchiro) 75%,
-        var(--keiba) 75%, var(--keiba) 100%
+        var(--poker) 0%, var(--poker) 20%,
+        var(--blackjack) 20%, var(--blackjack) 40%,
+        var(--chinchiro) 40%, var(--chinchiro) 60%,
+        var(--keiba) 60%, var(--keiba) 80%,
+        var(--gold) 80%, var(--gold) 100%
       );
       z-index: 10;
     }
@@ -237,6 +238,17 @@
     }
     .game-panel.active .crown-deco { opacity: 1; }
     .crown-deco { opacity: 1 !important; }
+
+    /* 総合パネル */
+    .g-all { --game-color: var(--gold); }
+    .all-row {
+      display: flex; align-items: center; gap: 14px;
+      padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+      animation: fadeIn 0.4s ease both;
+    }
+    .all-row:last-child { border-bottom: none; }
+    .all-game-dots { display: flex; gap: 3px; }
+    .all-dot { width: 8px; height: 8px; border-radius: 50%; opacity: 0.8; }
   </style>
 </head>
 <body>
@@ -244,7 +256,7 @@
 <div class="bg"></div>
 <div class="header">
   <div class="header-logo">♠ 不賭死</div>
-  <div class="header-title">— RANKING TOP 5 —</div>
+  <div class="header-title" id="header-title">— GAME RANKING TOP 5 —</div>
   <div class="header-time" id="clock">00:00:00</div>
 </div>
 
@@ -256,37 +268,51 @@
 <script src="firebase-config.js"></script>
 <script>
 const GAMES_OBS = [
-  { id: 'poker',     label: 'ポーカー',       icon: '♠', cls: 'g-poker' },
-  { id: 'blackjack', label: 'ブラックジャック', icon: '♥', cls: 'g-blackjack' },
-  { id: 'chinchiro', label: 'チンチロ',         icon: '🎲', cls: 'g-chinchiro' },
-  { id: 'keiba',     label: '競馬',             icon: '🏇', cls: 'g-keiba' },
+  { id: 'poker',     label: 'ポーカー',        icon: '♠', cls: 'g-poker',     color: '#e74c3c' },
+  { id: 'blackjack', label: 'ブラックジャック', icon: '♥', cls: 'g-blackjack', color: '#3498db' },
+  { id: 'chinchiro', label: 'チンチロ',         icon: '🎲', cls: 'g-chinchiro', color: '#e67e22' },
+  { id: 'keiba',     label: '競馬',             icon: '🏇', cls: 'g-keiba',     color: '#27ae60' },
 ];
 
-const medals = ['👑','🥈','🥉','4','5'];
+const medals  = ['👑','🥈','🥉','4','5'];
 const rankCls = ['r1','r2','r3','rn','rn'];
 
-let allRankings = {};
-// パネル描画
+let allRankings = {}; // { gameId: [{name, score}, ...] }
+
+// ── パネル描画 ──
 const mainEl = document.getElementById('main-panels');
-GAMES_OBS.forEach((g, i) => {
+
+// ゲーム別パネル（4枚）
+GAMES_OBS.forEach(g => {
   mainEl.innerHTML += `
-    <div class="game-panel ${g.cls}" id="panel-${g.id}">
+    <div class="game-panel ${g.cls} active" id="panel-${g.id}">
       <div class="crown-deco">👑</div>
       <div class="panel-head">
         <span class="panel-icon">${g.icon}</span>
         <span class="panel-name">${g.label}</span>
         <span class="panel-count" id="cnt-${g.id}">0 人参加</span>
       </div>
-      <div id="rows-${g.id}" class="rank-rows" style="flex:1;display:flex;flex-direction:column;justify-content:center;"></div>
+      <div id="rows-${g.id}" style="flex:1;display:flex;flex-direction:column;justify-content:center;"></div>
     </div>`;
 });
 
-function renderRows(gameId, items) {
-  const g = GAMES_OBS.find(x => x.id === gameId);
-  const el = document.getElementById(`rows-${gameId}`);
+// 総合パネル（1枚）
+mainEl.innerHTML += `
+  <div class="game-panel g-all active" id="panel-__all__">
+    <div class="crown-deco">🏆</div>
+    <div class="panel-head">
+      <span class="panel-icon">🏆</span>
+      <span class="panel-name" style="color:var(--gold);">総合</span>
+      <span class="panel-count" id="cnt-__all__">0 人参加</span>
+    </div>
+    <div id="rows-__all__" style="flex:1;display:flex;flex-direction:column;justify-content:center;"></div>
+  </div>`;
+
+// ── ゲーム別レンダリング ──
+function renderGameRows(gameId, items) {
+  const el   = document.getElementById(`rows-${gameId}`);
   const cntEl = document.getElementById(`cnt-${gameId}`);
   if (cntEl) cntEl.textContent = items.length + ' 人参加';
-
   if (items.length === 0) {
     el.innerHTML = '<div class="empty-msg">— まだスコアがありません —</div>';
     return;
@@ -297,14 +323,54 @@ function renderRows(gameId, items) {
     <div class="rank-item" style="animation-delay:${i * 0.07}s">
       <div class="rank-num ${rankCls[i]}">${medals[i]}</div>
       <div class="rank-bar-wrap">
-        <div class="rank-bar" style="width:${(it.score/maxScore*100).toFixed(1)}%; background:var(--game-color)"></div>
+        <div class="rank-bar" style="width:${(it.score/maxScore*100).toFixed(1)}%;background:var(--game-color)"></div>
         <div class="rank-name">${it.name}</div>
       </div>
       <div class="rank-score">${it.score.toLocaleString()}</div>
     </div>`).join('');
 }
 
-// Firestoreリアルタイム
+// ── 総合レンダリング（全ゲーム合計スコア） ──
+function renderAllRows() {
+  const totals = {};
+  GAMES_OBS.forEach(g => {
+    (allRankings[g.id] || []).forEach(it => {
+      if (!totals[it.name]) totals[it.name] = { name: it.name, score: 0, games: [] };
+      totals[it.name].score += it.score ?? 0;
+      totals[it.name].games.push(g);
+    });
+  });
+  const items = Object.values(totals).sort((a,b) => b.score - a.score);
+  const el    = document.getElementById('rows-__all__');
+  const cntEl = document.getElementById('cnt-__all__');
+  if (cntEl) cntEl.textContent = items.length + ' 人参加';
+
+  if (items.length === 0) {
+    el.innerHTML = '<div class="empty-msg">— まだスコアがありません —</div>';
+    return;
+  }
+  const top = items.slice(0, 5);
+  const maxScore = top[0]?.score || 1;
+  el.innerHTML = top.map((it, i) => {
+    const dots = it.games.map(g =>
+      `<div class="all-dot" style="background:${g.color}" title="${g.label}"></div>`
+    ).join('');
+    return `
+    <div class="rank-item" style="animation-delay:${i * 0.07}s">
+      <div class="rank-num ${rankCls[i]}">${medals[i]}</div>
+      <div class="rank-bar-wrap">
+        <div class="rank-bar" style="width:${(it.score/maxScore*100).toFixed(1)}%;background:var(--gold)"></div>
+        <div class="rank-name">
+          ${it.name}
+          <span style="margin-left:6px;" class="all-game-dots">${dots}</span>
+        </div>
+      </div>
+      <div class="rank-score" style="color:var(--gold)">${it.score.toLocaleString()}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Firestoreリアルタイム ──
 GAMES_OBS.forEach(g => {
   db.collection('rankings')
     .where('gameId', '==', g.id)
@@ -312,13 +378,9 @@ GAMES_OBS.forEach(g => {
     .limit(5)
     .onSnapshot(snap => {
       allRankings[g.id] = snap.docs.map(d => d.data());
-      renderRows(g.id, allRankings[g.id]);
+      renderGameRows(g.id, allRankings[g.id]);
+      renderAllRows(); // 総合も毎回再計算
     });
-});
-
-// 全パネルを常時表示
-GAMES_OBS.forEach(g => {
-  document.getElementById(`panel-${g.id}`)?.classList.add('active');
 });
 
 // 時計
@@ -329,7 +391,7 @@ function updateClock() {
 }
 updateClock();
 setInterval(updateClock, 1000);
-// ページ非表示時はFirebase接続を節約
+
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) db.disableNetwork();
   else db.enableNetwork();

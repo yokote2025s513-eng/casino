@@ -126,30 +126,26 @@
 <script src="firebase-config.js"></script>
 <script src="common.js"></script>
 <script>
+const ALL_TAB = '__all__';
 let currentGame = GAMES[0].id;
 let unsubscribe = null;
-let allDocs = []; // 全ゲーム全データキャッシュ
+let allDocs = [];
 
-// XSSエスケープ
 function esc(str) {
-  return String(str ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
+  return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-// 全データをリアルタイム取得（検索用）
 db.collection('rankings').orderBy('score','desc').onSnapshot(snap => {
   allDocs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  if (currentGame === ALL_TAB) renderAllRanking();
   const q = document.getElementById('search-input').value.trim();
   if (q) renderSearch(q);
 });
 
-// タブ描画
+// タブ描画（ゲーム別 + 総合）
 const tabsEl = document.getElementById('game-tabs');
-GAMES.forEach(g => {
+const TABS = [...GAMES, { id: ALL_TAB, label: '総合', icon: '🏆' }];
+TABS.forEach(g => {
   const btn = document.createElement('button');
   btn.className = `game-tab game-${g.id}`;
   btn.dataset.game = g.id;
@@ -162,7 +158,12 @@ function selectGame(gameId) {
   currentGame = gameId;
   document.querySelectorAll('.game-tab').forEach(b =>
     b.classList.toggle('active', b.dataset.game === gameId));
-  loadRanking(gameId);
+  if (gameId === ALL_TAB) {
+    if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+    renderAllRanking();
+  } else {
+    loadRanking(gameId);
+  }
 }
 
 function loadRanking(gameId) {
@@ -211,7 +212,49 @@ function renderRanking(gameId, items) {
     </div>`;
 }
 
-// ── 検索 ──
+// 総合ランキング（全ゲーム合計スコア）
+function renderAllRanking() {
+  const totals = {};
+  allDocs.forEach(d => {
+    if (!totals[d.name]) totals[d.name] = { name: d.name, score: 0, games: [] };
+    totals[d.name].score += d.score ?? 0;
+    totals[d.name].games.push(d.gameId);
+  });
+  const items = Object.values(totals).sort((a,b) => b.score - a.score);
+  const medals = ['🥇','🥈','🥉'];
+  const top3 = items.slice(0,3);
+  const rest  = items.slice(3);
+  const top3HTML = `<div class="top3-grid">${[0,1,2].map(i => {
+    const it = top3[i];
+    return `<div class="top3-card rank-${i+1}">
+      <div class="top3-medal">${medals[i]}</div>
+      ${it ? `<div class="top3-name">${esc(it.name)}</div><div class="top3-score">${it.score.toLocaleString()}</div>`
+           : `<div class="top3-empty">—</div>`}
+    </div>`;
+  }).join('')}</div>`;
+  const restHTML = rest.length === 0 ? '' : `<div class="card">${rest.map((it,i) => `
+    <div class="rank-row other-rank">
+      <div class="rank-num-big other-rank">${i+4}</div>
+      <div class="rank-info">
+        <div class="rank-name-big">${esc(it.name)}</div>
+        <div class="rank-time">${it.games.map(gid => {
+          const g = GAMES.find(x => x.id === gid);
+          return `<span class="game-badge game-${gid}" style="font-size:0.65rem;">${g?.icon} ${g?.label}</span>`;
+        }).join(' ')}</div>
+      </div>
+      <div><div class="rank-score-big">${it.score.toLocaleString()}</div><div class="rank-score-unit">pt</div></div>
+    </div>`).join('')}</div>`;
+  document.getElementById('ranking-content').innerHTML = `
+    <div>
+      <div class="section-label">🏆 総合ランキング</div>
+      <div class="section-desc">${items.length} 人参加中 — 全ゲーム合計スコア</div>
+      ${items.length === 0
+        ? `<div class="empty-state"><div class="empty-icon">🏆</div>まだスコアがありません</div>`
+        : top3HTML + restHTML}
+    </div>`;
+}
+
+// 検索
 function onSearch() {
   const q = document.getElementById('search-input').value.trim();
   document.getElementById('search-clear').style.display = q ? 'inline' : 'none';
@@ -234,34 +277,27 @@ function clearSearch() {
 function renderSearch(q) {
   const ql = q.toLowerCase();
   const hits = allDocs.filter(d => (d.name||'').toLowerCase().includes(ql));
-  document.getElementById('search-label').textContent =
-    `「${q}」の検索結果: ${hits.length} 件`;
-
+  document.getElementById('search-label').textContent = `「${q}」の検索結果: ${hits.length} 件`;
   if (hits.length === 0) {
     document.getElementById('search-results').innerHTML =
       '<div class="empty-state"><div class="empty-icon">🔍</div>見つかりません</div>';
     return;
   }
-
-  // ゲーム別に順位を計算
   const rankMap = {};
   GAMES.forEach(g => {
     let r = 1;
     allDocs.filter(d => d.gameId === g.id).forEach(d => { rankMap[d.id] = r++; });
   });
-
-  // 同一人物が複数ゲームに登場する場合は名前でグループ化して表示
   const nameGroups = {};
   hits.forEach(it => {
     const name = it.name || '';
     if (!nameGroups[name]) nameGroups[name] = [];
     nameGroups[name].push(it);
   });
-
   const re = new RegExp(esc(q).replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
-
   document.getElementById('search-results').innerHTML = Object.entries(nameGroups).map(([name, items]) => {
     const highlighted = esc(name).replace(re, m => `<span class="highlight">${m}</span>`);
+    const total = items.reduce((s,it) => s + (it.score||0), 0);
     const gamesHTML = items.map(it => {
       const g = GAMES.find(x => x.id === it.gameId);
       const rankN = rankMap[it.id] || '?';
@@ -276,7 +312,7 @@ function renderSearch(q) {
     return `<div class="rank-row" style="flex-direction:column;align-items:stretch;gap:0;">
       <div style="display:flex;align-items:center;gap:0.6rem;padding-bottom:0.4rem;">
         <div class="rank-info"><div class="rank-name-big">${highlighted}</div></div>
-        <div style="font-size:0.75rem;color:var(--text-muted);">${items.length}ゲーム参加</div>
+        <div style="font-size:0.75rem;color:var(--text-muted);">${items.length}ゲーム / 合計 ${total.toLocaleString()}pt</div>
       </div>
       ${gamesHTML}
     </div>`;
@@ -285,7 +321,7 @@ function renderSearch(q) {
 
 // 初期表示
 const hash = location.hash.replace('#','');
-const initGame = GAMES.find(g => g.id === hash) ? hash : GAMES[0].id;
+const initGame = TABS.find(g => g.id === hash) ? hash : GAMES[0].id;
 selectGame(initGame);
 </script>
 </body>

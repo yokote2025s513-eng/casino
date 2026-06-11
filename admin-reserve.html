@@ -8,7 +8,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* 来場者カウンター */
     .visitor-counter-card {
       background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px;
       padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between;
@@ -16,89 +15,53 @@
     }
     .vc-left { display: flex; align-items: baseline; gap: 0.6rem; }
     .vc-label { font-family: 'Cinzel', serif; font-size: 0.72rem; letter-spacing: 0.18em; color: var(--text-muted); }
-    .vc-num {
-      font-family: 'Cinzel Decorative', serif; font-size: 2.8rem; font-weight: 900;
-      color: var(--gold); text-shadow: 0 0 20px rgba(212,175,55,0.35); line-height: 1;
-    }
+    .vc-num { font-family: 'Cinzel Decorative', serif; font-size: 2.8rem; font-weight: 900; color: var(--gold); text-shadow: 0 0 20px rgba(212,175,55,0.35); line-height: 1; }
     .vc-unit { color: var(--text-muted); font-size: 0.85rem; }
     .vc-btns { display: flex; gap: 0.5rem; align-items: center; }
-    .vc-btn {
-      font-family: 'Cinzel', serif; font-size: 1rem; font-weight: 700;
-      width: 48px; height: 48px; border-radius: 50%; border: 1px solid;
-      cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center;
-    }
+    .vc-btn { font-family: 'Cinzel', serif; font-size: 1rem; font-weight: 700; width: 48px; height: 48px; border-radius: 50%; border: 1px solid; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
     .vc-btn.plus  { background: rgba(93,187,122,0.12); border-color: #5dbb7a; color: #5dbb7a; }
-    .vc-btn.plus:hover  { background: rgba(93,187,122,0.25); box-shadow: 0 0 12px rgba(93,187,122,0.3); }
+    .vc-btn.plus:hover  { background: rgba(93,187,122,0.25); }
     .vc-btn.minus { background: rgba(231,76,60,0.1); border-color: var(--red-bright); color: var(--red-bright); }
     .vc-btn.minus:hover { background: rgba(231,76,60,0.2); }
     .vc-btn.reset { background: transparent; border-color: var(--border); color: var(--text-muted); font-size: 0.7rem; width: auto; border-radius: 4px; padding: 0 0.8rem; }
 
     /* 受付パネル */
-    .reception-panel {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 10px; padding: 1.8rem; margin-bottom: 2rem;
-    }
-    .reception-title {
-      font-family: 'Cinzel', serif; font-size: 0.88rem; letter-spacing: 0.12em;
-      color: var(--gold); margin-bottom: 1.4rem; padding-bottom: 0.7rem;
-      border-bottom: 1px solid var(--border);
-    }
+    .reception-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.8rem; margin-bottom: 2rem; }
+    .reception-title { font-family: 'Cinzel', serif; font-size: 0.88rem; letter-spacing: 0.12em; color: var(--gold); margin-bottom: 1.4rem; padding-bottom: 0.7rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+    .next-ticket-badge { font-family: 'Cinzel Decorative', serif; font-size: 1.6rem; font-weight: 900; color: var(--gold); text-shadow: 0 0 20px rgba(212,175,55,0.4); }
 
-    /* ニックネーム入力行 */
     .nick-row { display: flex; gap: 0.6rem; align-items: flex-start; }
     .nick-input-wrap { position: relative; flex: 1; }
-    .nick-input {
-      width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-      border-radius: 6px; color: var(--text); font-family: 'Noto Sans JP', sans-serif;
-      font-size: 1rem; padding: 0.65rem 1rem; outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s; box-sizing: border-box;
-    }
+    .nick-input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: 'Noto Sans JP', sans-serif; font-size: 1rem; padding: 0.65rem 1rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; box-sizing: border-box; }
     .nick-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(212,175,55,0.12); }
-    .nick-suggestions {
-      position: absolute; top: 100%; left: 0; right: 0;
-      background: var(--bg-surface); border: 1px solid var(--border); border-top: none;
-      border-radius: 0 0 6px 6px; z-index: 50; max-height: 150px; overflow-y: auto;
-    }
-    .nick-sug-item {
-      padding: 0.5rem 0.9rem; font-size: 0.82rem; cursor: pointer;
-      color: var(--text-muted); transition: background 0.12s;
-    }
+    .nick-suggestions { position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-surface); border: 1px solid var(--border); border-top: none; border-radius: 0 0 6px 6px; z-index: 50; max-height: 150px; overflow-y: auto; }
+    .nick-sug-item { padding: 0.5rem 0.9rem; font-size: 0.82rem; cursor: pointer; color: var(--text-muted); transition: background 0.12s; }
     .nick-sug-item:hover { background: rgba(212,175,55,0.08); color: var(--text); }
     .nick-sug-item.taken { color: rgba(231,76,60,0.6); cursor: not-allowed; font-size: 0.75rem; }
     .nick-error { font-size: 0.73rem; color: var(--red-bright); margin-top: 0.3rem; min-height: 1.1em; }
     .nick-hint { font-size: 0.7rem; color: var(--text-muted); margin-top: 0.3rem; }
-
-    .issue-btn {
-      font-family: 'Cinzel', serif; font-size: 0.88rem; font-weight: 700;
-      padding: 0.65rem 1.4rem; white-space: nowrap;
-      background: rgba(212,175,55,0.12); border: 1px solid var(--gold);
-      color: var(--gold); border-radius: 6px; cursor: pointer;
-      transition: all 0.2s; flex-shrink: 0;
-    }
+    .issue-btn { font-family: 'Cinzel', serif; font-size: 0.88rem; font-weight: 700; padding: 0.65rem 1.4rem; white-space: nowrap; background: rgba(212,175,55,0.12); border: 1px solid var(--gold); color: var(--gold); border-radius: 6px; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
     .issue-btn:hover { background: rgba(212,175,55,0.25); box-shadow: 0 0 15px rgba(212,175,55,0.2); }
     .issue-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
 
+    /* 整理番号モーダル */
+    .ticket-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 300; align-items: center; justify-content: center; }
+    .ticket-modal.open { display: flex; }
+    .ticket-display { background: var(--bg-card); border: 2px solid var(--gold); border-radius: 16px; padding: 3rem; text-align: center; box-shadow: 0 0 60px rgba(212,175,55,0.3); min-width: 260px; cursor: pointer; animation: fadeUp 0.2s ease; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+    .ticket-num-big { font-family: 'Cinzel Decorative', serif; font-size: 5rem; font-weight: 900; color: var(--gold); text-shadow: 0 0 40px rgba(212,175,55,0.6); line-height: 1; }
+    .ticket-nickname { font-size: 1.1rem; font-weight: 700; color: var(--text); margin-top: 0.8rem; }
+    .ticket-close { font-size: 0.72rem; color: var(--text-muted); margin-top: 1.5rem; }
+
     /* 登録済み一覧 */
     .history-section { margin-top: 2rem; }
-    .history-title {
-      font-family: 'Cinzel', serif; font-size: 0.85rem; letter-spacing: 0.12em;
-      color: var(--gold); margin-bottom: 1rem; padding-bottom: 0.6rem;
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-    }
+    .history-title { font-family: 'Cinzel', serif; font-size: 0.85rem; letter-spacing: 0.12em; color: var(--gold); margin-bottom: 1rem; padding-bottom: 0.6rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
     .player-list { display: flex; flex-direction: column; gap: 0.4rem; }
-    .player-item {
-      display: flex; align-items: center; gap: 0.6rem;
-      padding: 0.5rem 0.8rem; background: var(--bg-card);
-      border: 1px solid var(--border); border-radius: 6px; font-size: 0.88rem;
-    }
+    .player-item { display: flex; align-items: center; gap: 0.6rem; padding: 0.5rem 0.8rem; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; font-size: 0.88rem; }
+    .player-ticket { font-family: 'Cinzel Decorative', serif; font-size: 1rem; color: var(--gold); min-width: 2.8rem; text-align: center; }
     .player-name { flex: 1; font-weight: 500; }
     .player-time { font-size: 0.72rem; color: var(--text-muted); }
-    .del-btn {
-      font-size: 0.65rem; padding: 0.15rem 0.4rem;
-      border: 1px solid rgba(231,76,60,0.4); border-radius: 3px;
-      background: transparent; color: var(--red-bright); cursor: pointer;
-    }
+    .del-btn { font-size: 0.65rem; padding: 0.15rem 0.4rem; border: 1px solid rgba(231,76,60,0.4); border-radius: 3px; background: transparent; color: var(--red-bright); cursor: pointer; }
     .del-btn:hover { background: rgba(231,76,60,0.15); }
   </style>
 </head>
@@ -138,9 +101,12 @@
     </div>
   </div>
 
-  <!-- 受付パネル：ニックネームのみ -->
+  <!-- 受付パネル -->
   <div class="reception-panel">
-    <div class="reception-title">🎟 受付登録</div>
+    <div class="reception-title">
+      <span>🎟 受付登録</span>
+      <span>次の整理番号: <span class="next-ticket-badge" id="next-ticket-num">—</span></span>
+    </div>
     <div class="nick-row">
       <div class="nick-input-wrap">
         <input class="nick-input" type="text" id="nick-input"
@@ -148,21 +114,30 @@
           autocomplete="off" oninput="onNickInput()" onkeydown="if(event.key==='Enter') registerPlayer()">
         <div class="nick-suggestions" id="nick-sug" style="display:none"></div>
       </div>
-      <button class="issue-btn" id="issue-btn" onclick="registerPlayer()" disabled>登録 ▶</button>
+      <button class="issue-btn" id="issue-btn" onclick="registerPlayer()" disabled>発行 ▶</button>
     </div>
     <div class="nick-error" id="nick-error"></div>
-    <div class="nick-hint">スコア登録時にこの名前で検索します</div>
+    <div class="nick-hint">整理番号を発行してスコア登録時に使います</div>
   </div>
 
   <!-- 登録済みプレイヤー一覧 -->
   <div class="history-section">
     <div class="history-title">
       <span>登録済みプレイヤー（<span id="player-count">0</span>人）</span>
-      <button class="btn btn-outline btn-sm" onclick="loadPlayers()">更新</button>
     </div>
     <div id="player-list-wrap">
       <div class="loading"><div class="spinner"></div>Loading...</div>
     </div>
+  </div>
+</div>
+
+<!-- 整理番号モーダル -->
+<div class="ticket-modal" id="ticket-modal" onclick="closeTicket()">
+  <div class="ticket-display">
+    <div style="font-family:'Cinzel',serif; font-size:0.82rem; letter-spacing:0.18em; color:var(--text-muted); margin-bottom:0.4rem;">整理番号</div>
+    <div class="ticket-num-big" id="tk-num"></div>
+    <div class="ticket-nickname" id="tk-nickname"></div>
+    <div class="ticket-close">タップで閉じる</div>
   </div>
 </div>
 
@@ -178,9 +153,7 @@
 requireRole('staff');
 
 function esc(str) {
-  return String(str ?? '')
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
 // ── 来場者カウンター ──
@@ -189,28 +162,26 @@ db.collection('visitors').doc('total').onSnapshot(snap => {
   currentVisitors = snap.data()?.count ?? 0;
   document.getElementById('vc-num').textContent = currentVisitors.toLocaleString();
 });
-
 async function changeVisitor(delta) {
   const next = Math.max(0, currentVisitors + delta);
-  try {
-    await db.collection('visitors').doc('total').set({
-      count: next, updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-  } catch(e) { showToast('エラー: ' + e.message, 'error'); }
+  try { await db.collection('visitors').doc('total').set({ count: next, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }); }
+  catch(e) { showToast('エラー: ' + e.message, 'error'); }
 }
-
 async function resetVisitor() {
   if (!confirm('来場者数をリセットしますか？')) return;
-  await db.collection('visitors').doc('total').set({
-    count: 0, updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
+  await db.collection('visitors').doc('total').set({ count: 0, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
   showToast('リセットしました');
 }
 
-// ── プレイヤー一覧（リアルタイム） ──
-// players コレクション: { nickname, registeredAt }
-let existingNicknames = new Set();
+// ── 整理番号カウンター ──
+let globalNext = 1;
+db.collection('reserves').doc('global').onSnapshot(snap => {
+  globalNext = snap.data()?.next ?? 1;
+  document.getElementById('next-ticket-num').textContent = String(globalNext).padStart(3, '0');
+});
 
+// ── プレイヤー一覧リアルタイム ──
+let existingNicknames = new Set();
 db.collection('players').orderBy('registeredAt', 'desc').onSnapshot(snap => {
   existingNicknames = new Set(snap.docs.map(d => d.data().nickname));
   document.getElementById('player-count').textContent = snap.docs.length;
@@ -226,53 +197,43 @@ function renderPlayerList(docs) {
   wrap.innerHTML = `<div class="player-list">${docs.map(d => {
     const data = d.data();
     return `<div class="player-item">
+      <span class="player-ticket">${esc(data.ticketId ?? '—')}</span>
       <span class="player-name">👤 ${esc(data.nickname)}</span>
       <span class="player-time">${fmtTime(data.registeredAt)}</span>
-      <button class="del-btn" onclick="deletePlayer('${esc(d.id)}', '${esc(data.nickname)}')">削除</button>
+      <button class="del-btn" onclick="deletePlayer('${esc(d.id)}','${esc(data.nickname)}')">削除</button>
     </div>`;
   }).join('')}</div>`;
-}
-
-async function loadPlayers() {
-  showToast('更新しました');
 }
 
 // ── ニックネーム入力 ──
 function onNickInput() {
   const val = document.getElementById('nick-input').value.trim();
   const sugEl = document.getElementById('nick-sug');
-  const errEl = document.getElementById('nick-error');
-  errEl.textContent = '';
-
+  document.getElementById('nick-error').textContent = '';
   if (!val) { sugEl.style.display = 'none'; updateBtn(); return; }
 
   if (existingNicknames.has(val)) {
-    errEl.textContent = '⚠ このニックネームは既に登録されています';
+    document.getElementById('nick-error').textContent = '⚠ このニックネームは既に登録されています';
   }
 
   const matches = [...existingNicknames].filter(n => n.startsWith(val) && n !== val).slice(0, 5);
   if (matches.length > 0) {
     sugEl.style.display = 'block';
-    sugEl.innerHTML = matches.map(n =>
-      `<div class="nick-sug-item taken">✗ ${esc(n)}（登録済）</div>`
-    ).join('');
+    sugEl.innerHTML = matches.map(n => `<div class="nick-sug-item taken">✗ ${esc(n)}（登録済）</div>`).join('');
   } else {
     sugEl.style.display = 'none';
   }
   updateBtn();
 }
-
 function updateBtn() {
   const val = document.getElementById('nick-input').value.trim();
   document.getElementById('issue-btn').disabled = !val || existingNicknames.has(val);
 }
-
 document.addEventListener('click', e => {
-  if (!e.target.closest('.nick-input-wrap'))
-    document.getElementById('nick-sug').style.display = 'none';
+  if (!e.target.closest('.nick-input-wrap')) document.getElementById('nick-sug').style.display = 'none';
 });
 
-// ── プレイヤー登録 ──
+// ── プレイヤー登録（整理番号発行） ──
 async function registerPlayer() {
   const nickname = document.getElementById('nick-input').value.trim();
   if (!nickname) { document.getElementById('nick-error').textContent = '名前を入力してください'; return; }
@@ -280,16 +241,24 @@ async function registerPlayer() {
     document.getElementById('nick-error').textContent = '⚠ このニックネームは既に登録されています';
     return;
   }
-
   document.getElementById('issue-btn').disabled = true;
   try {
-    // Firestoreで最終確認
-    const dup = await db.collection('players').where('nickname','==',nickname).limit(1).get();
-    if (!dup.empty) throw new Error('このニックネームは既に登録されています');
+    let ticketId;
+    await db.runTransaction(async tx => {
+      const counterRef = db.collection('reserves').doc('global');
+      const counterSnap = await tx.get(counterRef);
+      const current = counterSnap.data()?.next ?? 1;
+      ticketId = String(current).padStart(3, '0');
 
-    await db.collection('players').add({
-      nickname,
-      registeredAt: firebase.firestore.FieldValue.serverTimestamp()
+      // Firestoreで最終確認
+      const dup = await db.collection('players').where('nickname','==',nickname).limit(1).get();
+      if (!dup.empty) throw new Error('このニックネームは既に登録されています');
+
+      tx.set(counterRef, { next: current + 1 }, { merge: true });
+      tx.set(db.collection('players').doc(), {
+        nickname, ticketId,
+        registeredAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
     });
 
     // 来場者数インクリメント
@@ -298,17 +267,26 @@ async function registerPlayer() {
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }).catch(() => {});
 
-    siteLog('player_register', { nickname });
+    siteLog('player_register', { nickname, ticketId });
+
+    // モーダル表示
+    document.getElementById('tk-num').textContent = ticketId;
+    document.getElementById('tk-nickname').textContent = `👤 ${nickname}`;
+    document.getElementById('ticket-modal').classList.add('open');
 
     document.getElementById('nick-input').value = '';
     document.getElementById('nick-error').textContent = '';
     document.getElementById('nick-sug').style.display = 'none';
-    showToast(`登録: ${nickname}`);
+    showToast(`発行: No.${ticketId} — ${nickname}`);
   } catch(e) {
     document.getElementById('nick-error').textContent = '⚠ ' + e.message;
   } finally {
     updateBtn();
   }
+}
+
+function closeTicket() {
+  document.getElementById('ticket-modal').classList.remove('open');
 }
 
 // ── プレイヤー削除 ──
@@ -317,9 +295,7 @@ async function deletePlayer(docId, nickname) {
   try {
     await db.collection('players').doc(docId).delete();
     showToast('削除しました');
-  } catch(e) {
-    showToast('エラー: ' + e.message, 'error');
-  }
+  } catch(e) { showToast('エラー: ' + e.message, 'error'); }
 }
 </script>
 </body>

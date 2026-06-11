@@ -2,9 +2,19 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-   function isStaff() {
-  return request.auth != null;
-}
+    // 本物のロールチェック（Firestoreのrolesドキュメントを参照）
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    function getRole() {
+      return get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.roles;
+    }
+    function isStaff() {
+      return isAuthenticated() && (getRole() == 'staff' || getRole() == 'super');
+    }
+    function isSuper() {
+      return isAuthenticated() && getRole() == 'super';
+    }
 
     // rankings（ランキング）
     match /rankings/{document} {
@@ -15,41 +25,39 @@ service cloud.firestore {
     // players（受付登録プレイヤー）
     match /players/{document} {
       allow read: if true;
-      allow create: if isStaff();
-      allow update, delete: if isStaff();
+      allow create, update, delete: if isStaff();
     }
 
-    // reserveHistory（予約）
-    match /reserveHistory/{document} {
-      allow read: if true;
-      allow create: if true;
-      allow update, delete: if isStaff();
-    }
-
-    // roles（権限管理）
+    // roles（権限管理）— 書き込みはsuperのみ、読み取りは自分のみ
     match /roles/{userId} {
-      allow read: if request.auth != null;
-      allow write: if false;
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      allow write: if isSuper();
     }
 
-    // counters系
+    // 整理番号カウンター — 読み取り自由、更新はスタッフのみ
     match /reserves/global {
-      allow read, update: if true;
+      allow read: if true;
+      allow update: if isStaff();
       allow delete: if false;
     }
 
+    // 来場者カウンター — スタッフのみ更新
     match /visitors/total {
-      allow read, update: if true;
+      allow read: if true;
+      allow update: if isStaff();
       allow delete: if false;
     }
 
+    // 待ち時間
     match /waitTimes/{document} {
       allow read: if true;
       allow write: if isStaff();
     }
 
+    // サイトログ
     match /siteLogs/{document} {
-      allow read, create: if request.auth != null;
+      allow read: if isStaff();
+      allow create: if isAuthenticated();
       allow update, delete: if false;
     }
   }
