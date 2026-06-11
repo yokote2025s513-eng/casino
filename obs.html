@@ -2,215 +2,151 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OBS — 不賭死</title>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; }
-
-    :root {
-      --gold:        #c9a84c;
-      --gold-light:  #f0cc70;
-      --obsidian:    #050203;
-      --obsidian-2:  #0c0405;
-      --obsidian-3:  #130608;
-      --crimson:     #b80000;
-      --crimson-hot: #e80000;
-      --crimson-glow:rgba(184,0,0,0.6);
-      --text:        #f5ead8;
-      --text-muted:  #6b4040;
-      --border-red:  rgba(184,0,0,0.25);
-      --poker:       #e84040;
-      --blackjack:   #4a8fd9;
-      --chinchiro:   #e89020;
-      --keiba:       #40c870;
+    *{margin:0;padding:0;box-sizing:border-box;}
+    :root{
+      --gold:#c9a84c; --gold-light:#f0cc70; --gold-pale:#e8d5a0; --gold-dim:rgba(201,168,76,0.15);
+      --obsidian:#050203; --obsidian-2:#0c0405; --obsidian-3:#130608; --obsidian-4:#1a090a;
+      --crimson:#b80000; --crimson-hot:#e80000; --crimson-glow:rgba(184,0,0,0.6);
+      --text:#f5ead8; --text-muted:#6b4040; --border-red:rgba(184,0,0,0.25);
+      --poker:#e84040; --blackjack:#4a8fd9; --chinchiro:#e89020; --keiba:#40c870;
     }
+    html,body{width:1920px;height:1080px;overflow:hidden;background:transparent;font-family:'Noto Sans JP',sans-serif;color:var(--text);}
 
-    html, body {
-      width:1920px; height:1080px;
-      overflow:hidden;
-      background:transparent;
-      font-family:'Noto Sans JP', sans-serif;
-      color:var(--text);
-    }
+    /* ══ 背景レイヤー ══ */
+    #bg-base{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(184,0,0,0.18) 0%,transparent 55%),linear-gradient(180deg,var(--obsidian-2) 0%,var(--obsidian) 100%);}
+    #bg-vignette{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,transparent 40%,rgba(0,0,0,0.7) 100%);pointer-events:none;}
+    /* スポットライト */
+    #spotlight{position:absolute;width:900px;height:900px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,0.06) 0%,transparent 70%);pointer-events:none;transform:translate(-50%,-50%);transition:left 2s ease,top 2s ease;z-index:1;}
+    /* パーティクルキャンバス */
+    #particle-canvas{position:absolute;inset:0;pointer-events:none;z-index:2;}
 
-    /* 背景 */
-    .bg {
-      position:absolute; inset:0;
-      background:
-        radial-gradient(ellipse at 20% 50%, rgba(184,0,0,0.04) 0%, transparent 50%),
-        radial-gradient(ellipse at 80% 50%, rgba(201,168,76,0.04) 0%, transparent 50%),
-        linear-gradient(180deg, var(--obsidian-2) 0%, var(--obsidian) 100%);
-    }
-    /* サイトと同じ赤いグロー */
-    .bg-glow {
-      position:absolute; inset:0; pointer-events:none;
-      background:radial-gradient(ellipse at 50% -10%, rgba(184,0,0,0.15) 0%, transparent 55%);
-    }
-
-    /* ヘッダー（サイトのsite-headerと同系統） */
-    .header {
-      position:relative; z-index:10;
-      display:flex; align-items:center; justify-content:space-between;
-      padding:0 80px;
-      height:80px;
+    /* ══ ヘッダー ══ */
+    .header{
+      position:relative;z-index:10;
+      display:flex;align-items:center;justify-content:space-between;
+      height:82px;padding:0 72px;
       border-bottom:1px solid var(--border-red);
-      background:linear-gradient(180deg, var(--obsidian-2) 0%, transparent 100%);
+      background:linear-gradient(180deg,rgba(12,4,5,0.98) 0%,rgba(12,4,5,0.80) 100%);
     }
-    .header-logo {
-      font-family:'Cinzel Decorative',serif;
-      font-size:1.8rem; font-weight:900;
-      color:var(--crimson-hot);
-      text-shadow:0 0 20px var(--crimson-glow), 0 0 60px rgba(184,0,0,0.3);
-      letter-spacing:0.08em;
-    }
-    .header-center {
-      display:flex; flex-direction:column; align-items:center; gap:2px;
-    }
-    .header-title {
-      font-family:'Cinzel',serif;
-      font-size:0.85rem; letter-spacing:0.35em;
-      color:var(--text-muted); text-transform:uppercase;
-    }
-    .header-sub {
-      font-family:'Cinzel',serif;
-      font-size:0.6rem; letter-spacing:0.2em;
-      color:rgba(107,64,64,0.6);
-    }
-    .header-time {
-      font-family:'Cinzel',serif;
-      font-size:1.4rem; letter-spacing:0.1em;
-      color:rgba(245,234,216,0.4);
-    }
+    .header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--crimson-hot),var(--gold),var(--crimson-hot),transparent);}
+    .header-logo{font-family:'Cinzel Decorative',serif;font-size:1.9rem;font-weight:900;color:var(--crimson-hot);text-shadow:0 0 20px var(--crimson-glow),0 0 60px rgba(184,0,0,0.3);letter-spacing:0.08em;}
+    .header-center{display:flex;flex-direction:column;align-items:center;gap:3px;}
+    .header-title{font-family:'Cinzel',serif;font-size:0.9rem;letter-spacing:0.38em;color:rgba(201,168,76,0.7);text-transform:uppercase;}
+    .header-sub{font-family:'Noto Sans JP',sans-serif;font-size:0.58rem;letter-spacing:0.18em;color:rgba(107,64,64,0.7);}
+    .header-right{display:flex;flex-direction:column;align-items:flex-end;gap:2px;}
+    .header-time{font-family:'Cinzel',serif;font-size:1.45rem;letter-spacing:0.12em;color:rgba(245,234,216,0.45);}
+    .header-date{font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.15em;color:rgba(107,64,64,0.6);}
 
-    /* メインエリア */
-    .main {
-      position:relative; z-index:10;
-      display:flex;
-      height:calc(1080px - 80px - 4px);
-      padding:28px 60px;
-      gap:28px;
-      align-items:stretch;
-    }
+    /* ══ メインエリア ══ */
+    .main{position:relative;z-index:10;display:flex;height:calc(1080px - 82px - 5px);padding:22px 50px 20px;gap:22px;align-items:stretch;}
 
-    /* ゲームパネル */
-    .game-panel {
-      flex:1; display:flex; flex-direction:column;
-      padding:28px 24px;
-      border-radius:8px;
-      border:1px solid var(--border-red);
-      background:linear-gradient(160deg, var(--obsidian-3) 0%, var(--obsidian-2) 100%);
-      position:relative; overflow:hidden;
+    /* ══ パネル ══ */
+    .game-panel{
+      flex:1;display:flex;flex-direction:column;
+      padding:0;border-radius:10px;overflow:hidden;
+      border:1px solid var(--game-color,var(--border-red));
+      background:linear-gradient(160deg,var(--obsidian-3) 0%,var(--obsidian-2) 100%);
+      position:relative;
+      box-shadow:0 0 40px rgba(0,0,0,0.6),inset 0 0 60px rgba(0,0,0,0.3);
+      transition:box-shadow 0.6s ease,border-color 0.6s ease;
     }
-    .game-panel::before {
-      content:''; position:absolute; inset:0;
-      background:linear-gradient(135deg, rgba(201,168,76,0.03) 0%, transparent 60%);
-      pointer-events:none;
-    }
-    .game-panel::after {
-      content:''; position:absolute;
-      bottom:0; left:0; right:0; height:2px;
-      background:var(--game-color, var(--crimson));
-    }
-    /* 総合パネルは少し広く */
-    .panel-all { flex:1.25; }
+    .panel-all{flex:1.3;}
+    /* 側面グロー */
+    .game-panel::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(var(--gc-rgb),0.08) 0%,transparent 60%);pointer-events:none;border-radius:inherit;}
+    /* ボトムバー */
+    .game-panel::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,var(--game-color,var(--gold)),transparent);}
+    /* 1位更新グロー */
+    .game-panel.rank-updated{animation:panelFlash 1.2s ease;}
+    @keyframes panelFlash{0%,100%{box-shadow:0 0 40px rgba(0,0,0,0.6)}30%{box-shadow:0 0 80px rgba(var(--gc-rgb),0.5),0 0 120px rgba(var(--gc-rgb),0.2)}}
 
-    /* パネルヘッダー */
-    .panel-head {
-      display:flex; align-items:center; gap:10px;
-      margin-bottom:20px; padding-bottom:14px;
-      border-bottom:1px solid var(--border-red);
-    }
-    .panel-icon { font-size:1.6rem; line-height:1; }
-    .panel-name {
-      font-family:'Cinzel',serif; font-size:0.85rem;
-      letter-spacing:0.15em; font-weight:700;
-      color:var(--game-color, var(--gold));
-    }
-    .panel-count {
-      margin-left:auto; font-size:0.65rem;
-      color:var(--text-muted); letter-spacing:0.1em;
-    }
+    /* ゲームカラー変数 */
+    .g-all      {--game-color:var(--gold);     --gc-rgb:201,168,76;}
+    .g-poker    {--game-color:var(--poker);    --gc-rgb:232,64,64;}
+    .g-blackjack{--game-color:var(--blackjack);--gc-rgb:74,143,217;}
+    .g-chinchiro{--game-color:var(--chinchiro);--gc-rgb:232,144,32;}
+    .g-keiba    {--game-color:var(--keiba);    --gc-rgb:64,200,112;}
 
-    /* ランキング行 */
-    .rank-item {
-      display:flex; align-items:center; gap:12px;
-      padding:9px 0;
-      border-bottom:1px solid rgba(184,0,0,0.08);
-      animation:fadeIn 0.4s ease both;
+    /* ── パネルヘッダー ── */
+    .panel-head{
+      display:flex;align-items:center;gap:10px;
+      padding:16px 20px 14px;
+      border-bottom:1px solid rgba(var(--gc-rgb,184,0,0),0.2);
+      background:linear-gradient(180deg,rgba(var(--gc-rgb,184,0,0),0.08) 0%,transparent 100%);
+      flex-shrink:0;
     }
-    .rank-item:last-child { border-bottom:none; }
-    @keyframes fadeIn { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:none} }
+    .panel-icon{font-size:1.5rem;line-height:1;filter:drop-shadow(0 0 8px rgba(var(--gc-rgb,201,168,76),0.5));}
+    .panel-name{font-family:'Cinzel',serif;font-size:0.82rem;letter-spacing:0.14em;font-weight:700;color:var(--game-color,var(--gold));text-shadow:0 0 12px rgba(var(--gc-rgb,201,168,76),0.4);}
+    .panel-count{margin-left:auto;font-size:0.62rem;color:var(--text-muted);letter-spacing:0.1em;}
 
-    .rank-num {
-      font-family:'Cinzel',serif; font-weight:700;
-      font-size:1rem; width:40px; text-align:center; flex-shrink:0;
-    }
-    .r1 { color:#ffd700; text-shadow:0 0 12px rgba(255,215,0,0.6); font-size:1.2rem; }
-    .r2 { color:#c0c0c0; }
-    .r3 { color:#cd7f32; }
-    .rn { color:var(--text-muted); font-size:0.85rem; }
+    /* ── ランキングリスト ── */
+    .rank-list{flex:1;display:flex;flex-direction:column;justify-content:center;padding:10px 18px 14px;gap:2px;}
 
-    .rank-bar-wrap {
-      flex:1; position:relative; height:34px;
-      display:flex; align-items:center;
+    .rank-item{
+      display:flex;align-items:center;gap:10px;
+      padding:8px 6px;border-radius:5px;
+      border-bottom:1px solid rgba(var(--gc-rgb,184,0,0),0.06);
+      position:relative;overflow:hidden;
+      transition:background 0.3s;
     }
-    .rank-bar {
-      position:absolute; left:0; top:0; bottom:0;
-      border-radius:3px; opacity:0.12; transition:width 1s ease;
-    }
-    .rank-name {
-      position:relative; z-index:1;
-      font-size:0.9rem; font-weight:700;
-      color:var(--text); padding-left:8px;
-      display:flex; align-items:center; gap:6px;
-    }
-    .rank-score {
-      font-family:'Cinzel',serif; font-weight:700;
-      font-size:1.1rem; color:var(--game-color, var(--gold));
-      flex-shrink:0; min-width:76px; text-align:right;
-    }
+    .rank-item:last-child{border-bottom:none;}
+    .rank-item.flash{animation:rowFlash 0.8s ease;}
+    @keyframes rowFlash{0%,100%{background:transparent}30%{background:rgba(var(--gc-rgb,201,168,76),0.18)}}
+    @keyframes slideIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
 
-    .empty-msg {
-      flex:1; display:flex; align-items:center; justify-content:center;
-      color:var(--text-muted); font-size:0.8rem; letter-spacing:0.15em;
+    .rank-num{font-family:'Cinzel',serif;font-weight:700;font-size:0.95rem;width:36px;text-align:center;flex-shrink:0;}
+    .r1{color:#ffd700;text-shadow:0 0 14px rgba(255,215,0,0.7);font-size:1.15rem;}
+    .r2{color:#c0c0c0;text-shadow:0 0 8px rgba(192,192,192,0.4);}
+    .r3{color:#cd7f32;text-shadow:0 0 8px rgba(205,127,50,0.4);}
+    .rn{color:var(--text-muted);font-size:0.82rem;}
+
+    /* バー */
+    .rank-bar-wrap{flex:1;position:relative;height:32px;display:flex;align-items:center;border-radius:4px;overflow:hidden;}
+    .rank-bar{position:absolute;left:0;top:0;bottom:0;border-radius:4px;opacity:0.16;transition:width 1.2s cubic-bezier(0.34,1.56,0.64,1);}
+    .rank-bar-shine{position:absolute;left:0;top:0;bottom:0;width:100%;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.06) 50%,transparent 100%);border-radius:4px;}
+    .rank-name{position:relative;z-index:1;font-size:0.88rem;font-weight:700;color:var(--text);padding-left:8px;display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .rank-score{font-family:'Cinzel',serif;font-weight:700;font-size:1.05rem;color:var(--game-color,var(--gold));flex-shrink:0;min-width:72px;text-align:right;text-shadow:0 0 10px rgba(var(--gc-rgb,201,168,76),0.35);}
+
+    .empty-msg{flex:1;display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:0.78rem;letter-spacing:0.2em;}
+
+    /* ── 総合専用：ゲームドット ── */
+    .all-dots{display:flex;gap:3px;flex-shrink:0;}
+    .all-dot{width:7px;height:7px;border-radius:50%;opacity:0.8;}
+
+    /* ── 王冠バースト（1位更新） ── */
+    .crown-burst{
+      position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+      pointer-events:none;z-index:50;display:none;
     }
-
-    /* ゲームカラー */
-    .g-all       { --game-color: var(--gold); }
-    .g-poker     { --game-color: var(--poker); }
-    .g-blackjack { --game-color: var(--blackjack); }
-    .g-chinchiro { --game-color: var(--chinchiro); }
-    .g-keiba     { --game-color: var(--keiba); }
-
-    /* 総合のゲームドット */
-    .all-game-dots { display:flex; gap:3px; }
-    .all-dot { width:7px; height:7px; border-radius:50%; opacity:0.75; }
-
-    /* フッター（サイトと同系統のカラーバー） */
-    .footer {
-      position:absolute; bottom:0; left:0; right:0; height:4px; z-index:10;
-      background:linear-gradient(90deg,
-        var(--gold)      0%,  var(--gold)      20%,
-        var(--poker)     20%, var(--poker)     40%,
-        var(--blackjack) 40%, var(--blackjack) 60%,
-        var(--chinchiro) 60%, var(--chinchiro) 80%,
-        var(--keiba)     80%, var(--keiba)     100%
-      );
+    .crown-burst.active{display:block;animation:crownPop 1.4s ease forwards;}
+    @keyframes crownPop{
+      0%{opacity:0;transform:translate(-50%,-50%) scale(0.3);}
+      20%{opacity:1;transform:translate(-50%,-50%) scale(1.3);}
+      50%{opacity:1;transform:translate(-50%,-50%) scale(1.0);}
+      80%{opacity:0.6;transform:translate(-50%,-50%) scale(1.1);}
+      100%{opacity:0;transform:translate(-50%,-50%) scale(1.5);}
     }
-
-    /* クラウン装飾 */
-    .crown-deco {
-      position:absolute; top:-8px; left:50%;
-      transform:translateX(-50%);
-      font-size:1.2rem; opacity:1;
+    .crown-burst-icon{font-size:5rem;text-shadow:0 0 40px rgba(255,215,0,0.9),0 0 80px rgba(255,215,0,0.5);}
+    .crown-burst-ring{
+      position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+      width:120px;height:120px;border-radius:50%;
+      border:3px solid rgba(255,215,0,0.6);
+      animation:ringExpand 1.4s ease forwards;
     }
+    @keyframes ringExpand{0%{width:60px;height:60px;opacity:1;}100%{width:220px;height:220px;opacity:0;}}
+
+    /* ── フッター ── */
+    .footer{position:absolute;bottom:0;left:0;right:0;height:5px;z-index:10;background:linear-gradient(90deg,var(--gold) 0%,var(--gold) 20%,var(--poker) 20%,var(--poker) 40%,var(--blackjack) 40%,var(--blackjack) 60%,var(--chinchiro) 60%,var(--chinchiro) 80%,var(--keiba) 80%,var(--keiba) 100%);}
+    .footer::before{content:'';position:absolute;inset:0;background:inherit;filter:blur(6px);opacity:0.6;}
   </style>
 </head>
 <body>
-
-<div class="bg"></div>
-<div class="bg-glow"></div>
+<div id="bg-base"></div>
+<div id="bg-vignette"></div>
+<div id="spotlight"></div>
+<canvas id="particle-canvas"></canvas>
 
 <div class="header">
   <div class="header-logo">♠ 不賭死</div>
@@ -218,7 +154,10 @@
     <div class="header-title">— Ranking Top 5 —</div>
     <div class="header-sub">〜君たちは生きて帰れるのか〜</div>
   </div>
-  <div class="header-time" id="clock">00:00:00</div>
+  <div class="header-right">
+    <div class="header-time" id="clock">00:00:00</div>
+    <div class="header-date" id="dateline"></div>
+  </div>
 </div>
 
 <div class="main" id="main-panels"></div>
@@ -231,76 +170,139 @@
 <script src="auth.js"></script>
 <script src="common.js"></script>
 <script>
-const db = firebase.firestore();
 requireRole('staff');
 
+// ══════════════════════════════════════
+//  データ・定数
+// ══════════════════════════════════════
 const GAMES_OBS = [
-  { id:'poker',     label:'ポーカー',        icon:'♠', cls:'g-poker',     color:'#e84040' },
-  { id:'blackjack', label:'ブラックジャック', icon:'♥', cls:'g-blackjack', color:'#4a8fd9' },
-  { id:'chinchiro', label:'チンチロ',         icon:'🎲', cls:'g-chinchiro', color:'#e89020' },
-  { id:'keiba',     label:'競馬',             icon:'🏇', cls:'g-keiba',     color:'#40c870' },
+  {id:'poker',     label:'ポーカー',        icon:'♠', cls:'g-poker',     color:'#e84040', rgb:'232,64,64'},
+  {id:'blackjack', label:'ブラックジャック', icon:'♥', cls:'g-blackjack', color:'#4a8fd9', rgb:'74,143,217'},
+  {id:'chinchiro', label:'チンチロ',         icon:'🎲', cls:'g-chinchiro', color:'#e89020', rgb:'232,144,32'},
+  {id:'keiba',     label:'競馬',             icon:'🏇', cls:'g-keiba',     color:'#40c870', rgb:'64,200,112'},
 ];
+const MEDALS   = ['👑','🥈','🥉','4','5'];
+const RANK_CLS = ['r1','r2','r3','rn','rn'];
+let allRankings = {}; // gameId → [{name,score}]
+let prevTop1    = {}; // gameId → name  (前回の1位)
 
-const medals  = ['👑','🥈','🥉','4','5'];
-const rankCls = ['r1','r2','r3','rn','rn'];
-
-let allRankings = {};
+// ══════════════════════════════════════
+//  パネル構築
+// ══════════════════════════════════════
 const mainEl = document.getElementById('main-panels');
 
-// 総合パネルを一番左に
-mainEl.innerHTML = `
-  <div class="game-panel g-all panel-all" id="panel-__all__">
-    <div class="crown-deco">🏆</div>
-    <div class="panel-head">
-      <span class="panel-icon">🏆</span>
-      <span class="panel-name" style="color:var(--gold);">総合ランキング</span>
-      <span class="panel-count" id="cnt-__all__">0 人参加</span>
+function buildPanel(id, cls, icon, label) {
+  const div = document.createElement('div');
+  div.className = `game-panel ${cls}` + (cls === 'g-all' ? ' panel-all' : '');
+  div.id = `panel-${id}`;
+  div.innerHTML = `
+    <div class="crown-burst" id="burst-${id}">
+      <div class="crown-burst-ring"></div>
+      <div class="crown-burst-icon">👑</div>
     </div>
-    <div id="rows-__all__" style="flex:1;display:flex;flex-direction:column;justify-content:center;"></div>
-  </div>`;
-
-// ゲーム別パネル（右4枚）
-GAMES_OBS.forEach(g => {
-  mainEl.innerHTML += `
-    <div class="game-panel ${g.cls}" id="panel-${g.id}">
-      <div class="crown-deco">👑</div>
-      <div class="panel-head">
-        <span class="panel-icon">${g.icon}</span>
-        <span class="panel-name">${g.label}</span>
-        <span class="panel-count" id="cnt-${g.id}">0 人参加</span>
-      </div>
-      <div id="rows-${g.id}" style="flex:1;display:flex;flex-direction:column;justify-content:center;"></div>
+    <div class="panel-head">
+      <span class="panel-icon">${icon}</span>
+      <span class="panel-name">${label}</span>
+      <span class="panel-count" id="cnt-${id}">0 人参加</span>
+    </div>
+    <div class="rank-list" id="rows-${id}">
+      <div class="empty-msg">— まだスコアがありません —</div>
     </div>`;
-});
+  mainEl.appendChild(div);
+}
 
-// ゲーム別レンダリング
+// 総合を一番左
+buildPanel('__all__', 'g-all', '🏆', '総合ランキング');
+GAMES_OBS.forEach(g => buildPanel(g.id, g.cls, g.icon, g.label));
+
+// ══════════════════════════════════════
+//  スコアカウントアップアニメ
+// ══════════════════════════════════════
+function animateCount(el, from, to, duration = 800) {
+  const start = performance.now();
+  function tick(now) {
+    const t = Math.min((now - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - t, 3); // ease-out-cubic
+    el.textContent = Math.round(from + (to - from) * ease).toLocaleString();
+    if (t < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+// ══════════════════════════════════════
+//  ゲーム別レンダリング
+// ══════════════════════════════════════
+const prevScores = {}; // `${gameId}-${name}` → score
+
 function renderGameRows(gameId, items) {
   const el    = document.getElementById(`rows-${gameId}`);
   const cntEl = document.getElementById(`cnt-${gameId}`);
+  const panel = document.getElementById(`panel-${gameId}`);
+  const g     = GAMES_OBS.find(x => x.id === gameId);
   if (cntEl) cntEl.textContent = items.length + ' 人参加';
+
   if (items.length === 0) {
     el.innerHTML = '<div class="empty-msg">— まだスコアがありません —</div>';
     return;
   }
+
   const top = items.slice(0, 5);
   const maxScore = top[0]?.score || 1;
-  el.innerHTML = top.map((it, i) => `
-    <div class="rank-item" style="animation-delay:${i * 0.07}s">
-      <div class="rank-num ${rankCls[i]}">${medals[i]}</div>
+  const newTop1  = top[0]?.name;
+  const old1     = prevTop1[gameId];
+
+  // 1位が変わった → バースト演出
+  if (old1 && old1 !== newTop1) triggerCrownBurst(gameId);
+  prevTop1[gameId] = newTop1;
+
+  el.innerHTML = top.map((it, i) => {
+    const key = `${gameId}-${it.name}`;
+    const prev = prevScores[key];
+    const changed = prev !== undefined && prev !== it.score;
+    prevScores[key] = it.score;
+    const barW = (it.score / maxScore * 100).toFixed(1);
+    return `<div class="rank-item${changed ? ' flash' : ''}" style="animation:slideIn 0.35s ${i*0.06}s ease both;">
+      <div class="rank-num ${RANK_CLS[i]}">${MEDALS[i]}</div>
       <div class="rank-bar-wrap">
-        <div class="rank-bar" style="width:${(it.score/maxScore*100).toFixed(1)}%;background:var(--game-color)"></div>
-        <div class="rank-name">${it.name}</div>
+        <div class="rank-bar" style="width:${barW}%;background:${g?.color ?? '#c9a84c'}"></div>
+        <div class="rank-bar-shine"></div>
+        <div class="rank-name">${escHtml(it.name)}</div>
       </div>
-      <div class="rank-score">${it.score.toLocaleString()}</div>
-    </div>`).join('');
+      <div class="rank-score" id="score-${gameId}-${i}">${it.score.toLocaleString()}</div>
+    </div>`;
+  }).join('');
+
+  // スコアが変わったものだけカウントアップ
+  top.forEach((it, i) => {
+    const key = `${gameId}-${it.name}`;
+    const prev = prevScores[key + '_prev'];
+    if (prev !== undefined && prev !== it.score) {
+      const el2 = document.getElementById(`score-${gameId}-${i}`);
+      if (el2) animateCount(el2, prev, it.score);
+    }
+    prevScores[key + '_prev'] = it.score;
+  });
+
+  // パネルフラッシュ
+  if (Object.values(prevScores).some((_, idx) => {
+    const k = Object.keys(prevScores)[idx];
+    return k.startsWith(gameId) && !k.endsWith('_prev');
+  })) {
+    panel.classList.remove('rank-updated');
+    void panel.offsetWidth;
+    panel.classList.add('rank-updated');
+    setTimeout(() => panel.classList.remove('rank-updated'), 1200);
+  }
 }
 
-// 総合レンダリング
+// ══════════════════════════════════════
+//  総合レンダリング
+// ══════════════════════════════════════
 function renderAllRows() {
   const totals = {};
   GAMES_OBS.forEach(g => {
     (allRankings[g.id] || []).forEach(it => {
-      if (!totals[it.name]) totals[it.name] = { name:it.name, score:0, games:[] };
+      if (!totals[it.name]) totals[it.name] = {name: it.name, score: 0, games: []};
       totals[it.name].score += it.score ?? 0;
       totals[it.name].games.push(g);
     });
@@ -309,6 +311,11 @@ function renderAllRows() {
   const el    = document.getElementById('rows-__all__');
   const cntEl = document.getElementById('cnt-__all__');
   if (cntEl) cntEl.textContent = items.length + ' 人参加';
+
+  const newTop1 = items[0]?.name;
+  if (prevTop1['__all__'] && prevTop1['__all__'] !== newTop1) triggerCrownBurst('__all__');
+  prevTop1['__all__'] = newTop1;
+
   if (items.length === 0) {
     el.innerHTML = '<div class="empty-msg">— まだスコアがありません —</div>';
     return;
@@ -317,16 +324,17 @@ function renderAllRows() {
   const maxScore = top[0]?.score || 1;
   el.innerHTML = top.map((it, i) => {
     const dots = it.games.map(g =>
-      `<div class="all-dot" style="background:${g.color}" title="${g.label}"></div>`
+      `<div class="all-dot" style="background:${g.color};box-shadow:0 0 4px ${g.color};" title="${g.label}"></div>`
     ).join('');
-    return `
-    <div class="rank-item" style="animation-delay:${i * 0.07}s">
-      <div class="rank-num ${rankCls[i]}">${medals[i]}</div>
+    const barW = (it.score / maxScore * 100).toFixed(1);
+    return `<div class="rank-item" style="animation:slideIn 0.35s ${i*0.06}s ease both;">
+      <div class="rank-num ${RANK_CLS[i]}">${MEDALS[i]}</div>
       <div class="rank-bar-wrap">
-        <div class="rank-bar" style="width:${(it.score/maxScore*100).toFixed(1)}%;background:var(--gold)"></div>
+        <div class="rank-bar" style="width:${barW}%;background:var(--gold)"></div>
+        <div class="rank-bar-shine"></div>
         <div class="rank-name">
-          ${it.name}
-          <span class="all-game-dots">${dots}</span>
+          ${escHtml(it.name)}
+          <span class="all-dots">${dots}</span>
         </div>
       </div>
       <div class="rank-score" style="color:var(--gold)">${it.score.toLocaleString()}</div>
@@ -334,11 +342,131 @@ function renderAllRows() {
   }).join('');
 }
 
-// Firestoreリアルタイム
+// ══════════════════════════════════════
+//  王冠バースト
+// ══════════════════════════════════════
+function triggerCrownBurst(panelId) {
+  const burst = document.getElementById(`burst-${panelId}`);
+  if (!burst) return;
+  burst.classList.remove('active');
+  void burst.offsetWidth;
+  burst.classList.add('active');
+  setTimeout(() => burst.classList.remove('active'), 1400);
+  // パーティクルも噴出
+  const panel = document.getElementById(`panel-${panelId}`);
+  if (panel) {
+    const rect = panel.getBoundingClientRect();
+    spawnBurst(rect.left + rect.width / 2, rect.top + rect.height / 2);
+  }
+}
+
+// ══════════════════════════════════════
+//  パーティクルシステム
+// ══════════════════════════════════════
+const canvas  = document.getElementById('particle-canvas');
+const ctx     = canvas.getContext('2d');
+canvas.width  = 1920;
+canvas.height = 1080;
+
+const COLORS = ['#ffd700','#c9a84c','#f0cc70','#e80000','#fff8e0','#4a8fd9','#e84040','#40c870'];
+
+class Particle {
+  constructor(x, y, burst = false) {
+    this.x  = x; this.y = y;
+    this.burst = burst;
+    const speed = burst ? (Math.random() * 14 + 6) : (Math.random() * 2 + 0.5);
+    const angle = burst ? (Math.random() * Math.PI * 2) : (Math.random() * Math.PI * 2);
+    this.vx = Math.cos(angle) * speed;
+    this.vy = burst ? (Math.sin(angle) * speed) : (-(Math.random() * 1.5 + 0.5));
+    this.life  = 1;
+    this.decay = burst ? (Math.random() * 0.02 + 0.012) : (Math.random() * 0.006 + 0.003);
+    this.size  = burst ? (Math.random() * 6 + 3) : (Math.random() * 2 + 1);
+    this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
+    this.rot   = Math.random() * Math.PI * 2;
+    this.rotV  = (Math.random() - 0.5) * 0.2;
+    this.shape = Math.random() < 0.5 ? 'circle' : 'rect';
+  }
+  update() {
+    this.x  += this.vx;
+    this.y  += this.vy;
+    this.vy += this.burst ? 0.35 : 0.02; // 重力
+    this.vx *= 0.98;
+    this.rot += this.rotV;
+    this.life -= this.decay;
+  }
+  draw(ctx) {
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, this.life);
+    ctx.fillStyle   = this.color;
+    ctx.shadowColor = this.color;
+    ctx.shadowBlur  = this.burst ? 6 : 3;
+    ctx.translate(this.x, this.y);
+    ctx.rotate(this.rot);
+    if (this.shape === 'circle') {
+      ctx.beginPath();
+      ctx.arc(0, 0, this.size, 0, Math.PI * 2);
+      ctx.fill();
+    } else {
+      ctx.fillRect(-this.size, -this.size / 2, this.size * 2, this.size);
+    }
+    ctx.restore();
+  }
+}
+
+let particles = [];
+
+// 常時浮遊パーティクル（ランダム追加）
+function spawnAmbient() {
+  if (particles.length < 80) {
+    particles.push(new Particle(
+      Math.random() * 1920,
+      1080 + 10,
+      false
+    ));
+  }
+}
+
+// バースト（1位更新時）
+function spawnBurst(x, y) {
+  for (let i = 0; i < 60; i++) {
+    particles.push(new Particle(x, y, true));
+  }
+}
+
+function animateParticles() {
+  ctx.clearRect(0, 0, 1920, 1080);
+  particles = particles.filter(p => p.life > 0);
+  particles.forEach(p => { p.update(); p.draw(ctx); });
+  requestAnimationFrame(animateParticles);
+}
+animateParticles();
+setInterval(spawnAmbient, 180);
+
+// ══════════════════════════════════════
+//  スポットライト移動
+// ══════════════════════════════════════
+const spotlight = document.getElementById('spotlight');
+let slIdx = 0;
+const slPositions = [
+  {left:'20%', top:'50%'}, {left:'50%', top:'30%'},
+  {left:'80%', top:'60%'}, {left:'35%', top:'70%'},
+  {left:'65%', top:'40%'},
+];
+function moveSpotlight() {
+  slIdx = (slIdx + 1) % slPositions.length;
+  spotlight.style.left = slPositions[slIdx].left;
+  spotlight.style.top  = slPositions[slIdx].top;
+}
+spotlight.style.left = '50%'; spotlight.style.top = '50%';
+setInterval(moveSpotlight, 4000);
+
+// ══════════════════════════════════════
+//  Firestore リアルタイム
+// ══════════════════════════════════════
 GAMES_OBS.forEach(g => {
   db.collection('rankings')
-    .where('gameId','==',g.id)
-    .orderBy('score','desc')
+    .where('gameId', '==', g.id)
+    .orderBy('score', 'desc')
     .limit(5)
     .onSnapshot(snap => {
       allRankings[g.id] = snap.docs.map(d => d.data());
@@ -347,10 +475,15 @@ GAMES_OBS.forEach(g => {
     });
 });
 
-// 時計
+// ══════════════════════════════════════
+//  時計
+// ══════════════════════════════════════
 function updateClock() {
+  const now = new Date();
   document.getElementById('clock').textContent =
-    new Date().toLocaleTimeString('ja-JP', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+    now.toLocaleTimeString('ja-JP', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+  document.getElementById('dateline').textContent =
+    now.toLocaleDateString('ja-JP', {year:'numeric', month:'long', day:'numeric', weekday:'short'});
 }
 updateClock();
 setInterval(updateClock, 1000);
@@ -359,6 +492,13 @@ document.addEventListener('visibilitychange', () => {
   if (document.hidden) db.disableNetwork();
   else db.enableNetwork();
 });
+
+// ══════════════════════════════════════
+//  ユーティリティ
+// ══════════════════════════════════════
+function escHtml(str) {
+  return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
 </script>
 </body>
 </html>

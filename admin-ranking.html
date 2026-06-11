@@ -92,9 +92,7 @@
         <div class="ticket-lookup-row">
           <input type="text" id="f-ticket" class="ticket-input"
             placeholder="001" maxlength="3"
-            oninput="this.value=this.value.replace(/[^0-9]/,'')"
-            onkeydown="if(event.key==='Enter') lookupTicket()">
-          <button class="lookup-btn" onclick="lookupTicket()">検索 ▶</button>
+            oninput="onTicketInput(this.value)">
         </div>
         <div class="lookup-result" id="lookup-result"></div>
       </div>
@@ -241,19 +239,36 @@ function getRegisteredGames() {
   return new Set(allDocs.filter(d => d.name === name && d.id !== editId).map(d => d.gameId));
 }
 
-// ── 整理番号検索 ──
-async function lookupTicket() {
-  const val = document.getElementById('f-ticket').value.trim();
+// ── F: 前回選択ゲームを記憶 ──
+let lastGameId = null;
+
+// ── C: 整理番号リアルタイム検索（3桁入力で即検索）──
+let lookupTimer = null;
+function onTicketInput(raw) {
+  // 数字以外除去
+  const val = raw.replace(/[^0-9]/g, '');
+  document.getElementById('f-ticket').value = val;
   const resultEl = document.getElementById('lookup-result');
-  if (!val) { resultEl.className = 'lookup-result ng'; resultEl.textContent = '番号を入力してください'; return; }
 
-  const padded = val.padStart(3, '0');
-  resultEl.className = 'lookup-result'; resultEl.textContent = '検索中...'; resultEl.style.display = 'block';
+  if (!val) {
+    resultEl.className = 'lookup-result'; resultEl.style.display = 'none';
+    document.getElementById('f-name').value = '';
+    selectedGame = null; renderGameGrid(); updateSubmitBtn();
+    return;
+  }
 
-  // まずローカルキャッシュで引く（高速）
+  // 3桁揃ったら即検索、途中は100ms debounce
+  clearTimeout(lookupTimer);
+  const delay = val.length >= 3 ? 0 : 100;
+  lookupTimer = setTimeout(() => doLookup(val.padStart(3, '0')), delay);
+}
+
+async function doLookup(padded) {
+  const resultEl = document.getElementById('lookup-result');
+  resultEl.className = 'lookup-result'; resultEl.textContent = '…'; resultEl.style.display = 'block';
+
+  // ローカルキャッシュで高速検索
   let player = allPlayers.find(p => p.ticketId === padded);
-
-  // なければFirestoreへ
   if (!player) {
     const snap = await db.collection('players').where('ticketId','==',padded).limit(1).get();
     if (!snap.empty) player = snap.docs[0].data();
@@ -262,25 +277,29 @@ async function lookupTicket() {
   if (!player) {
     resultEl.className = 'lookup-result ng';
     resultEl.textContent = `❌ No.${padded} は見つかりません`;
+    document.getElementById('f-name').value = '';
+    selectedGame = null; renderGameGrid(); updateSubmitBtn();
     return;
   }
 
   resultEl.className = 'lookup-result ok';
   resultEl.textContent = `✓ No.${padded} — 👤 ${player.nickname}`;
-
   document.getElementById('f-name').value = player.nickname;
-  document.getElementById('f-ticket').value = padded;
 
   // 登録済みゲームをグレーアウト
   const disabled = getRegisteredGames();
   renderGameGrid(disabled);
-
-  // 未登録ゲームが1つだけなら自動選択
   const free = GAMES.filter(g => !disabled.has(g.id));
-  if (free.length === 1) selectGame(free[0].id);
+
+  // D: 未登録が1つ → 自動選択
+  if (free.length === 1) {
+    selectGame(free[0].id);
+  // F: 前回ゲームが未登録なら自動選択
+  } else if (lastGameId && !disabled.has(lastGameId)) {
+    selectGame(lastGameId);
+  }
 
   updateSubmitBtn();
-  document.getElementById('f-score').focus();
 }
 
 function updateSubmitBtn() {
@@ -361,6 +380,7 @@ async function doSubmit() {
     } else {
       await db.collection('rankings').add({ ...payload, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
       showToast(`登録: ${name} — ${score.toLocaleString()}pt`);
+      lastGameId = gameId; // F: 次回のデフォルトゲームとして記憶
     }
     resetForm();
   } catch(e) {
