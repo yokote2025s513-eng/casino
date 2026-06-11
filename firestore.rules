@@ -12,6 +12,13 @@ service cloud.firestore {
       allow create, update, delete: if isStaff();
     }
 
+    // players（受付登録プレイヤー）
+    match /players/{document} {
+      allow read: if true;
+      allow create: if isStaff();
+      allow update, delete: if isStaff();
+    }
+
     // reserveHistory（予約）
     match /reserveHistory/{document} {
       allow read: if true;

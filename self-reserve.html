@@ -4,54 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>予約 ♠ 不賭死</title>
-  <!-- Google Fonts: preconnect for speed -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-      <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css">
   <style>
     body { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; }
-
-    .reserve-wrap {
-      width: min(500px, 94vw);
-      padding: 2rem 0 4rem;
-    }
-
-    .top-logo {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-    .top-logo-title {
-      font-family: 'Cinzel Decorative', serif;
-      font-size: 1.6rem;
-      color: var(--gold);
-      text-shadow: 0 0 20px rgba(212,175,55,0.4);
-      letter-spacing: 0.08em;
-    }
-    .top-logo-sub {
-      font-family: 'Cinzel', serif;
-      font-size: 0.7rem;
-      letter-spacing: 0.25em;
-      color: var(--text-muted);
-      margin-top: 0.3rem;
-    }
+    .reserve-wrap { width: min(500px, 94vw); padding: 2rem 0 4rem; }
+    .top-logo { text-align: center; margin-bottom: 2rem; }
+    .top-logo-title { font-family: 'Cinzel Decorative', serif; font-size: 1.6rem; color: var(--gold); text-shadow: 0 0 20px rgba(212,175,55,0.4); letter-spacing: 0.08em; }
+    .top-logo-sub { font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 0.25em; color: var(--text-muted); margin-top: 0.3rem; }
 
     /* ゲーム選択 */
-    .game-select-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.8rem;
-      margin-bottom: 1.5rem;
-    }
+    .game-select-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1.5rem; }
     .game-sel-btn {
       display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
-      padding: 1.2rem 0.5rem;
-      border-radius: 8px;
-      border: 2px solid var(--border);
-      background: var(--bg-card);
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all 0.2s;
-      font-family: 'Cinzel', serif;
+      padding: 1.2rem 0.5rem; border-radius: 8px; border: 2px solid var(--border);
+      background: var(--bg-card); color: var(--text-muted); cursor: pointer;
+      transition: all 0.2s; font-family: 'Cinzel', serif; position: relative;
     }
     .game-sel-btn .g-icon { font-size: 2rem; line-height: 1; }
     .game-sel-btn .g-name { font-size: 0.78rem; letter-spacing: 0.08em; }
@@ -60,112 +29,57 @@
     .game-sel-btn.selected.g-chinchiro { border-color: var(--chinchiro); color: var(--chinchiro); background: rgba(230,126,34,0.08); }
     .game-sel-btn.selected.g-keiba     { border-color: var(--keiba);     color: var(--keiba);     background: rgba(39,174,96,0.08); }
     .game-sel-btn:not(.selected):hover { border-color: rgba(212,175,55,0.4); color: var(--text); }
+    /* 既予約バッジ */
+    .already-badge {
+      position: absolute; top: 6px; right: 6px;
+      font-size: 0.6rem; letter-spacing: 0.05em;
+      background: rgba(212,175,55,0.15); border: 1px solid rgba(212,175,55,0.4);
+      color: var(--gold); border-radius: 4px; padding: 1px 5px;
+      font-family: 'Noto Sans JP', sans-serif;
+    }
 
-    /* 待ち時間表示 */
-    .wait-info {
-      display: none;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1rem 1.2rem;
-      margin-bottom: 1.2rem;
-      display: flex; align-items: center; gap: 1rem;
-    }
+    /* 待ち時間 */
+    .wait-info { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1rem 1.2rem; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 1rem; }
     .wait-info.hidden { display: none; }
-    .wait-mins-big {
-      font-family: 'Cinzel Decorative', serif;
-      font-size: 2.4rem;
-      font-weight: 700;
-      color: var(--gold);
-      line-height: 1;
-    }
+    .wait-mins-big { font-family: 'Cinzel Decorative', serif; font-size: 2.4rem; font-weight: 700; color: var(--gold); line-height: 1; }
     .wait-detail { font-size: 0.8rem; color: var(--text-muted); }
-    .wait-status-badge {
-      margin-left: auto;
-      font-size: 0.75rem;
-      padding: 0.2rem 0.7rem;
-      border-radius: 20px;
-      border: 1px solid;
-    }
+    .wait-status-badge { margin-left: auto; font-size: 0.75rem; padding: 0.2rem 0.7rem; border-radius: 20px; border: 1px solid; }
 
     /* フォームカード */
-    .form-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1.5rem;
-      margin-bottom: 1rem;
+    .form-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; margin-bottom: 1rem; }
+    .form-card-title { font-family: 'Cinzel', serif; font-size: 0.78rem; letter-spacing: 0.15em; color: var(--gold); margin-bottom: 1.2rem; padding-bottom: 0.8rem; border-bottom: 1px solid var(--border); }
+
+    /* ニックネーム入力済みバナー */
+    .nick-locked-banner {
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.3);
+      border-radius: 8px; padding: 0.7rem 1rem; margin-bottom: 1rem;
     }
-    .form-card-title {
-      font-family: 'Cinzel', serif;
-      font-size: 0.78rem;
-      letter-spacing: 0.15em;
-      color: var(--gold);
-      margin-bottom: 1.2rem;
-      padding-bottom: 0.8rem;
-      border-bottom: 1px solid var(--border);
-    }
+    .nick-locked-name { font-weight: 700; font-size: 1rem; color: var(--gold); }
+    .nick-locked-change { font-size: 0.72rem; color: var(--text-muted); background: none; border: 1px solid var(--border); border-radius: 4px; padding: 0.3rem 0.6rem; cursor: pointer; }
+    .nick-locked-change:hover { color: var(--text); border-color: var(--gold); }
 
     /* 発行チケット表示 */
-    .ticket-result {
-      display: none;
-      text-align: center;
-      background: var(--bg-card);
-      border: 2px solid var(--gold);
-      border-radius: 12px;
-      padding: 2.5rem 1.5rem;
-      margin-top: 1rem;
-      animation: fadeUp 0.4s ease;
-    }
+    .ticket-result { display: none; text-align: center; background: var(--bg-card); border: 2px solid var(--gold); border-radius: 12px; padding: 2.5rem 1.5rem; margin-top: 1rem; animation: fadeUp 0.4s ease; }
     @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
     .ticket-result.show { display: block; }
     .tr-game { font-family: 'Cinzel', serif; font-size: 0.8rem; letter-spacing: 0.15em; color: var(--text-muted); margin-bottom: 0.4rem; }
-    .tr-num {
-      font-family: 'Cinzel Decorative', serif;
-      font-size: 4rem;
-      font-weight: 900;
-      color: var(--gold);
-      text-shadow: 0 0 30px rgba(212,175,55,0.5);
-      line-height: 1;
-      margin-bottom: 0.4rem;
-    }
+    .tr-num { font-family: 'Cinzel Decorative', serif; font-size: 4rem; font-weight: 900; color: var(--gold); text-shadow: 0 0 30px rgba(212,175,55,0.5); line-height: 1; margin-bottom: 0.4rem; }
     .tr-name { font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem; }
     .tr-note { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 1.5rem; }
-    .tr-warning {
-      font-size: 0.75rem;
-      color: var(--red-bright);
-      border: 1px solid rgba(231,76,60,0.3);
-      border-radius: 6px;
-      padding: 0.6rem 0.8rem;
-      background: rgba(231,76,60,0.06);
-    }
+    .tr-warning { font-size: 0.75rem; color: var(--red-bright); border: 1px solid rgba(231,76,60,0.3); border-radius: 6px; padding: 0.6rem 0.8rem; background: rgba(231,76,60,0.06); }
+    /* 追加予約ボタン */
+    .tr-another-btn { margin-top: 1.2rem; font-size: 0.82rem; background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.3); color: var(--gold); border-radius: 6px; padding: 0.6rem 1.2rem; cursor: pointer; }
+    .tr-another-btn:hover { background: rgba(212,175,55,0.18); }
 
     /* 入力済みニックネーム候補 */
-    .nick-suggestions {
-      position: absolute;
-      top: 100%; left: 0; right: 0;
-      background: var(--bg-surface);
-      border: 1px solid var(--border);
-      border-top: none;
-      border-radius: 0 0 6px 6px;
-      z-index: 50;
-      max-height: 180px;
-      overflow-y: auto;
-    }
-    .nick-sug-item {
-      padding: 0.6rem 0.9rem;
-      font-size: 0.9rem;
-      cursor: pointer;
-      color: var(--text-muted);
-      transition: background 0.15s;
-    }
+    .nick-suggestions { position: absolute; top: 100%; left: 0; right: 0; background: var(--bg-surface); border: 1px solid var(--border); border-top: none; border-radius: 0 0 6px 6px; z-index: 50; max-height: 180px; overflow-y: auto; }
+    .nick-sug-item { padding: 0.6rem 0.9rem; font-size: 0.9rem; cursor: pointer; color: var(--text-muted); transition: background 0.15s; }
     .nick-sug-item:hover { background: rgba(212,175,55,0.08); color: var(--text); }
-    .nick-sug-item.taken { color: rgba(231,76,60,0.6); cursor: not-allowed; font-size: 0.8rem; }
+    .nick-sug-item.selectable { color: var(--text); }
     .input-wrap { position: relative; }
 
-    @media (max-width: 480px) {
-      .tr-num { font-size: 3rem; }
-    }
+    @media (max-width: 480px) { .tr-num { font-size: 3rem; } }
   </style>
 </head>
 <body>
@@ -177,6 +91,15 @@
   <div class="top-logo">
     <div class="top-logo-title">♠ 不賭死</div>
     <div class="top-logo-sub">セルフ予約</div>
+  </div>
+
+  <!-- ニックネームロック済み表示 -->
+  <div class="nick-locked-banner" id="nick-locked-banner" style="display:none">
+    <div>
+      <div style="font-size:0.7rem; color:var(--text-muted); margin-bottom:0.2rem;">プレイヤー名</div>
+      <div class="nick-locked-name" id="nick-locked-name"></div>
+    </div>
+    <button class="nick-locked-change" onclick="unlockNick()">変更</button>
   </div>
 
   <!-- ゲーム選択 -->
@@ -195,7 +118,7 @@
     <div class="wait-status-badge" id="wi-badge">—</div>
   </div>
 
-  <!-- ニックネーム入力 -->
+  <!-- ニックネーム入力（未ロック時） -->
   <div class="form-card" id="nick-form" style="display:none">
     <div class="form-card-title">▸ ニックネームを入力</div>
     <div class="form-group">
@@ -210,6 +133,12 @@
     <button class="btn btn-gold" style="width:100%" onclick="doReserve()">予約する ▶</button>
   </div>
 
+  <!-- ニックネームロック済み時の予約ボタン -->
+  <div id="locked-reserve-btn-wrap" style="display:none; margin-bottom:1rem;">
+    <button class="btn btn-gold" style="width:100%" onclick="doReserve()">このゲームを予約する ▶</button>
+    <div id="locked-nick-error" style="font-size:0.75rem; color:var(--red-bright); margin-top:0.4rem; min-height:1.2em;"></div>
+  </div>
+
   <!-- 結果チケット -->
   <div class="ticket-result" id="ticket-result">
     <div class="tr-game" id="tr-game"></div>
@@ -217,6 +146,7 @@
     <div class="tr-name" id="tr-name"></div>
     <div class="tr-note">整理番号をスタッフに見せてください</div>
     <div class="tr-warning">⚠ スクリーンショットを保存してください<br>このページを閉じると番号は表示されません</div>
+    <button class="tr-another-btn" onclick="reserveAnother()">別のゲームも予約する ▶</button>
   </div>
 
   <div id="toast-container"></div>
@@ -228,47 +158,118 @@
 <script src="common.js"></script>
 <script>
 const GAMES_SR = [
-  { id:'poker',     label:'ポーカー',       icon:'♠', cls:'g-poker' },
-  { id:'blackjack', label:'ブラックジャック', icon:'♥', cls:'g-blackjack' },
-  { id:'chinchiro', label:'チンチロ',         icon:'🎲', cls:'g-chinchiro' },
-  { id:'keiba',     label:'競馬',             icon:'🏇', cls:'g-keiba' },
+  { id:'poker',     label:'ポーカー',        icon:'♠', cls:'g-poker' },
+  { id:'blackjack', label:'ブラックジャック',  icon:'♥', cls:'g-blackjack' },
+  { id:'chinchiro', label:'チンチロ',          icon:'🎲', cls:'g-chinchiro' },
+  { id:'keiba',     label:'競馬',              icon:'🏇', cls:'g-keiba' },
 ];
-const prefixMap = { poker:'P', blackjack:'B', chinchiro:'C', keiba:'K' };
 
 let selectedGame = null;
 let waitData = {};
-let existingNicknames = new Set();
-let nextNums = {};
+// ニックネームロック（同セッション内で固定）
+let lockedNickname = sessionStorage.getItem('sr_nickname') || null;
+// ゲーム別の既予約状況（同ニックネームが既に予約済みか）
+let reservedGames = new Set(); // このセッションのニックネームが予約済みのゲームID
+let globalNext = 1;
 
-// ゲーム選択ボタン
-const grid = document.getElementById('game-select-grid');
-GAMES_SR.forEach(g => {
-  const btn = document.createElement('button');
-  btn.className = `game-sel-btn ${g.cls}`;
-  btn.dataset.id = g.id;
-  btn.innerHTML = `<span class="g-icon">${g.icon}</span><span class="g-name">${g.label}</span>`;
-  btn.onclick = () => selectGame(g.id);
-  grid.appendChild(btn);
-});
-
-function selectGame(gameId) {
-  selectedGame = gameId;
-  document.querySelectorAll('.game-sel-btn').forEach(b => {
-    b.classList.toggle('selected', b.dataset.id === gameId);
-  });
-  updateWaitInfo(gameId);
-  document.getElementById('nick-form').style.display = 'block';
-  document.getElementById('ticket-result').classList.remove('show');
-  document.getElementById('nick-input').value = '';
-  document.getElementById('nick-error').textContent = '';
-  document.getElementById('nick-sug').style.display = 'none';
+// ── ゲームボタン描画 ──
+function renderGameGrid() {
+  const grid = document.getElementById('game-select-grid');
+  grid.innerHTML = GAMES_SR.map(g => {
+    const sel = selectedGame === g.id ? 'selected' : '';
+    const alreadyBadge = reservedGames.has(g.id)
+      ? `<span class="already-badge">予約済</span>` : '';
+    return `<button class="game-sel-btn ${g.cls} ${sel}" data-id="${g.id}" onclick="selectGame('${g.id}')">
+      ${alreadyBadge}
+      <span class="g-icon">${g.icon}</span>
+      <span class="g-name">${g.label}</span>
+    </button>`;
+  }).join('');
 }
+renderGameGrid();
 
-// 待ち時間
+// ── 待ち時間リアルタイム ──
 db.collection('waitTimes').onSnapshot(snap => {
   snap.forEach(doc => { waitData[doc.id] = doc.data(); });
   if (selectedGame) updateWaitInfo(selectedGame);
 });
+
+// ── 整理番号カウンター ──
+db.collection('reserves').doc('global').onSnapshot(snap => {
+  globalNext = snap.data()?.next ?? 1;
+});
+
+// ── ロック済みニックネームの予約済みゲームを監視 ──
+function watchReservedGames(nickname) {
+  if (!nickname) return;
+  db.collection('reserveHistory')
+    .where('nickname', '==', nickname)
+    .onSnapshot(snap => {
+      reservedGames = new Set(snap.docs.map(d => d.data().gameId).filter(Boolean));
+      renderGameGrid();
+      updateLockedBannerBtnVisibility();
+    });
+}
+if (lockedNickname) {
+  watchReservedGames(lockedNickname);
+  showLockedBanner(lockedNickname);
+}
+
+// ── ゲーム選択 ──
+function selectGame(gameId) {
+  selectedGame = gameId;
+  renderGameGrid();
+  updateWaitInfo(gameId);
+
+  document.getElementById('ticket-result').classList.remove('show');
+
+  if (lockedNickname) {
+    document.getElementById('nick-form').style.display = 'none';
+    updateLockedBannerBtnVisibility();
+  } else {
+    document.getElementById('nick-form').style.display = 'block';
+    document.getElementById('locked-reserve-btn-wrap').style.display = 'none';
+    document.getElementById('nick-input').value = '';
+    document.getElementById('nick-error').textContent = '';
+    document.getElementById('nick-sug').style.display = 'none';
+  }
+}
+
+function updateLockedBannerBtnVisibility() {
+  const wrap = document.getElementById('locked-reserve-btn-wrap');
+  const errEl = document.getElementById('locked-nick-error');
+  if (!lockedNickname || !selectedGame) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  if (reservedGames.has(selectedGame)) {
+    errEl.textContent = '⚠ このゲームは既に予約済みです';
+    wrap.querySelector('button').disabled = true;
+  } else {
+    errEl.textContent = '';
+    wrap.querySelector('button').disabled = false;
+  }
+}
+
+// ── ニックネームロック表示 ──
+function showLockedBanner(nickname) {
+  document.getElementById('nick-locked-banner').style.display = 'flex';
+  document.getElementById('nick-locked-name').textContent = `👤 ${nickname}`;
+  document.getElementById('nick-form').style.display = 'none';
+  updateLockedBannerBtnVisibility();
+}
+
+function unlockNick() {
+  lockedNickname = null;
+  reservedGames = new Set();
+  sessionStorage.removeItem('sr_nickname');
+  document.getElementById('nick-locked-banner').style.display = 'none';
+  document.getElementById('locked-reserve-btn-wrap').style.display = 'none';
+  if (selectedGame) {
+    document.getElementById('nick-form').style.display = 'block';
+  }
+  renderGameGrid();
+}
+
+// ── 待ち時間更新 ──
 function updateWaitInfo(gameId) {
   const d = waitData[gameId] ?? { minutes: 0, status: 'open' };
   const el = document.getElementById('wait-info');
@@ -282,67 +283,84 @@ function updateWaitInfo(gameId) {
   badge.className = `wait-status-badge ${cls}`;
 }
 
-// 登録済みニックネーム取得
+// ── ニックネーム入力（未ロック時のサジェスト） ──
+let allNicknames = new Set();
 db.collection('reserveHistory').onSnapshot(snap => {
-  existingNicknames = new Set(snap.docs.map(d => d.data().nickname).filter(Boolean));
+  // 同一ゲームに限らず全ニックネームをサジェスト候補に（参考用）
+  allNicknames = new Set(snap.docs.map(d => d.data().nickname).filter(Boolean));
 });
 
-// 通し番号取得
-let globalNext = 1;
-db.collection('reserves').doc('global').onSnapshot(snap => {
-  globalNext = snap.data()?.next ?? 1;
-});
-
-// ニックネーム入力
 function onNickInput() {
   const val = document.getElementById('nick-input').value.trim();
   const sugEl = document.getElementById('nick-sug');
-  const errEl = document.getElementById('nick-error');
-  errEl.textContent = '';
+  document.getElementById('nick-error').textContent = '';
 
   if (!val) { sugEl.style.display = 'none'; return; }
 
-  // 重複チェック
-  if (existingNicknames.has(val)) {
-    errEl.textContent = '⚠ このニックネームは既に使用されています';
-  }
+  // 同一ゲーム内の重複チェック
+  checkGameDup(val, selectedGame).then(taken => {
+    if (taken) {
+      document.getElementById('nick-error').textContent = '⚠ このゲームでこの名前は既に予約済みです';
+    }
+  });
 
-  // サジェスト（前方一致）
-  const matches = [...existingNicknames].filter(n => n.startsWith(val) && n !== val);
+  // 過去に使ったニックネームをサジェスト（自分の可能性あり → タップで入力）
+  const matches = [...allNicknames].filter(n => n.startsWith(val) && n !== val).slice(0, 6);
   if (matches.length > 0) {
     sugEl.style.display = 'block';
-    sugEl.innerHTML = matches.slice(0, 6).map(n =>
-      `<div class="nick-sug-item taken" title="使用中">✗ ${n}（使用中）</div>`
+    sugEl.innerHTML = matches.map(n =>
+      `<div class="nick-sug-item selectable" onclick="pickNick('${n.replace(/'/g,"\\'")}')">👤 ${n}</div>`
     ).join('');
   } else {
     sugEl.style.display = 'none';
   }
 }
 
-// クリックでサジェストを閉じる
+function pickNick(name) {
+  document.getElementById('nick-input').value = name;
+  document.getElementById('nick-sug').style.display = 'none';
+  document.getElementById('nick-error').textContent = '';
+}
+
+// 同一ゲーム内でニックネーム重複チェック
+async function checkGameDup(nickname, gameId) {
+  if (!gameId) return false;
+  const snap = await db.collection('reserveHistory')
+    .where('nickname', '==', nickname)
+    .where('gameId', '==', gameId)
+    .limit(1).get();
+  return !snap.empty;
+}
+
 document.addEventListener('click', e => {
   if (!e.target.closest('.input-wrap')) {
     document.getElementById('nick-sug').style.display = 'none';
   }
 });
 
-// 予約実行
+// ── 予約実行 ──
 async function doReserve() {
   if (!selectedGame) return showToast('ゲームを選択してください', 'error');
-  const nickname = document.getElementById('nick-input').value.trim();
+
+  const nickname = lockedNickname || document.getElementById('nick-input').value.trim();
   if (!nickname) {
     document.getElementById('nick-error').textContent = 'ニックネームを入力してください';
     return;
   }
-  if (existingNicknames.has(nickname)) {
-    document.getElementById('nick-error').textContent = '⚠ このニックネームは既に使用されています';
+
+  // 同一ゲーム重複チェック
+  const taken = await checkGameDup(nickname, selectedGame);
+  if (taken) {
+    const errEl = lockedNickname
+      ? document.getElementById('locked-nick-error')
+      : document.getElementById('nick-error');
+    errEl.textContent = '⚠ このゲームではこの名前は既に予約済みです';
     return;
   }
 
-  const gameId   = selectedGame;
-  const current  = globalNext;
-  const numStr   = String(current).padStart(3, '0');
-  const ticketId = numStr;
+  const gameId  = selectedGame;
+  const current = globalNext;
+  const ticketId = String(current).padStart(3, '0');
   const g = GAMES_SR.find(x => x.id === gameId);
 
   try {
@@ -355,13 +373,21 @@ async function doReserve() {
     });
     await batch.commit();
 
-    // 来場者数もカウントアップ
-    const visSnap = await db.collection('visitors').doc('total').get();
-    const cur = visSnap.data()?.count ?? 0;
-    await db.collection('visitors').doc('total').set({
-      count: cur + 1,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    // 来場者数：初回予約時のみカウントアップ
+    if (!lockedNickname) {
+      const visSnap = await db.collection('visitors').doc('total').get();
+      const cur = visSnap.data()?.count ?? 0;
+      await db.collection('visitors').doc('total').set({
+        count: cur + 1,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    }
+
+    // ニックネームをセッションにロック
+    lockedNickname = nickname;
+    sessionStorage.setItem('sr_nickname', nickname);
+    showLockedBanner(nickname);
+    watchReservedGames(nickname);
 
     // チケット表示
     document.getElementById('tr-game').textContent = `${g.icon} ${g.label}`;
@@ -369,12 +395,20 @@ async function doReserve() {
     document.getElementById('tr-name').textContent = `👤 ${nickname}`;
     document.getElementById('ticket-result').classList.add('show');
     document.getElementById('nick-form').style.display = 'none';
-    document.querySelectorAll('.game-sel-btn').forEach(b => b.disabled = true);
-
-    // スクロール
+    document.getElementById('locked-reserve-btn-wrap').style.display = 'none';
     document.getElementById('ticket-result').scrollIntoView({ behavior: 'smooth' });
 
   } catch(e) { showToast('エラー: ' + e.message, 'error'); }
+}
+
+// ── 別のゲームを予約する ──
+function reserveAnother() {
+  document.getElementById('ticket-result').classList.remove('show');
+  selectedGame = null;
+  renderGameGrid();
+  document.getElementById('wait-info').classList.add('hidden');
+  document.getElementById('locked-reserve-btn-wrap').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 </script>
 </body>

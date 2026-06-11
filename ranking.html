@@ -250,22 +250,35 @@ function renderSearch(q) {
     allDocs.filter(d => d.gameId === g.id).forEach(d => { rankMap[d.id] = r++; });
   });
 
-  document.getElementById('search-results').innerHTML = hits.map(it => {
-    const g = GAMES.find(x => x.id === it.gameId);
-    const highlighted = esc(it.name||'').replace(
-      new RegExp(esc(q).replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'),
-      m => `<span class="highlight">${m}</span>`
-    );
-    return `<div class="rank-row">
-      <div class="rank-num-big ${rankMap[it.id]<=3?`rank-${rankMap[it.id]}`:'other-rank'}">${rankMap[it.id]}</div>
-      <div class="rank-info">
-        <div class="rank-name-big">${highlighted}</div>
-        <div class="rank-time">
-          <span class="game-badge game-${it.gameId}">${g?.icon} ${g?.label}</span>
-          &nbsp;${fmtTime(it.createdAt)}
-        </div>
+  // 同一人物が複数ゲームに登場する場合は名前でグループ化して表示
+  const nameGroups = {};
+  hits.forEach(it => {
+    const name = it.name || '';
+    if (!nameGroups[name]) nameGroups[name] = [];
+    nameGroups[name].push(it);
+  });
+
+  const re = new RegExp(esc(q).replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
+
+  document.getElementById('search-results').innerHTML = Object.entries(nameGroups).map(([name, items]) => {
+    const highlighted = esc(name).replace(re, m => `<span class="highlight">${m}</span>`);
+    const gamesHTML = items.map(it => {
+      const g = GAMES.find(x => x.id === it.gameId);
+      const rankN = rankMap[it.id] || '?';
+      const rankCls = rankN <= 3 ? `rank-${rankN}` : 'other-rank';
+      return `<div style="display:flex;align-items:center;gap:0.6rem;padding:0.4rem 0;border-top:1px solid rgba(212,175,55,0.06);">
+        <div class="rank-num-big ${rankCls}" style="font-size:1rem;width:2rem;">${rankN}</div>
+        <span class="game-badge game-${it.gameId}" style="font-size:0.75rem;">${g?.icon} ${g?.label}</span>
+        <div style="flex:1;font-size:0.75rem;color:var(--text-muted);">${fmtTime(it.createdAt)}</div>
+        <div><span class="rank-score-big" style="font-size:1.1rem;">${(it.score||0).toLocaleString()}</span><span class="rank-score-unit">pt</span></div>
+      </div>`;
+    }).join('');
+    return `<div class="rank-row" style="flex-direction:column;align-items:stretch;gap:0;">
+      <div style="display:flex;align-items:center;gap:0.6rem;padding-bottom:0.4rem;">
+        <div class="rank-info"><div class="rank-name-big">${highlighted}</div></div>
+        <div style="font-size:0.75rem;color:var(--text-muted);">${items.length}ゲーム参加</div>
       </div>
-      <div><div class="rank-score-big">${(it.score||0).toLocaleString()}</div><div class="rank-score-unit">pt</div></div>
+      ${gamesHTML}
     </div>`;
   }).join('');
 }
