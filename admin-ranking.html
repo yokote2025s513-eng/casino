@@ -30,21 +30,19 @@
       transparent 45%);
   pointer-events:none;
 }
-    .form-input{
+   .form-input{
   width:100%;
   background:rgba(255,255,255,.05);
   border:1px solid var(--border);
   border-radius:6px;
   color:var(--text);
-  font-size:1rem;
-  padding:.65rem 1rem;
-  box-sizing:border-box;
+  padding:.7rem 1rem;
+  transition:.2s;
 }
 
 .form-input:focus{
   border-color:var(--gold);
   box-shadow:0 0 0 3px rgba(212,175,55,.12);
-  outline:none;
 }
     .form-card-title{
   font-family:'Cinzel',serif;
@@ -82,27 +80,35 @@
       padding-bottom: 0.5rem;
       overflow-x: auto;
     }
-    .admin-tab-btn {
-      background: transparent;
-      border: 1px solid transparent;
-      color: var(--text-muted);
-      padding: 0.5rem 1.2rem;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.88rem;
-      white-space: nowrap;
-      transition: all 0.15s;
-    }
-    .admin-tab-btn:hover { color: var(--text); background: var(--obsidian-3); }
-    .admin-tab-btn.active { border-color: var(--border-gold); color: var(--gold-light); background: var(--gold-dim); }
+   .admin-tab-btn{
+  border:2px solid var(--border);
+  border-radius:8px;
 
+  padding:.75rem 1rem;
+
+  transition:.15s;
+}
+
+.admin-tab-btn.active{
+  border-color:var(--gold);
+
+  background:rgba(212,175,55,.1);
+
+  color:var(--gold);
+
+  box-shadow:
+    0 0 12px rgba(212,175,55,.15);
+}
     /* テーブル */
-    .admin-table-wrap {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-    }
+    .admin-table-wrap{
+  background:var(--bg-card);
+
+  border:1px solid var(--border);
+
+  border-radius:10px;
+
+  overflow:hidden;
+}
     .admin-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
     .admin-table th {
       background: var(--obsidian-3);
@@ -120,15 +126,27 @@
       vertical-align: middle;
     }
     .admin-table tr:last-child td { border-bottom: none; }
-    .admin-table tr:hover td { background: rgba(255,255,255,0.015); }
-
-    .rank-cell { font-family: 'Cinzel', serif; font-weight: 700; width: 3rem; text-align: center; }
+    .admin-table tr:hover td{
+  background:
+    rgba(212,175,55,.05);
+}
+    .rank-cell{
+  font-family:'Cinzel Decorative',serif;
+  font-size:1.15rem;
+  font-weight:900;
+}
     .game-cell { font-size: 0.82rem; width: 8rem; }
     .name-cell { font-weight: 500; }
     .score-cell { font-family: 'Cinzel', serif; font-weight: 600; color: var(--gold-light); text-align: right; width: 8rem; }
-    .action-cell { text-align: right; width: 9rem; white-space: nowrap; }
-    .action-cell button { margin-left: 0.4rem; cursor: pointer; }
+   .action-cell button{
+  padding:.35rem .7rem;
+  border-radius:5px;
+  transition:.15s;
+}
 
+.action-cell button:hover{
+  transform:translateY(-1px);
+}
     /* フォームボタン行 */
     .form-actions {
       display: flex;
@@ -137,16 +155,44 @@
       margin-top: 1.5rem;
     }
   .score-big{
-  height:auto;
-  font-size:1.4rem;
+  height:100px;
+
+  font-size:3rem;
+  font-family:'Cinzel Decorative',serif;
+  font-weight:900;
+
   text-align:center;
+
+  color:var(--gold);
+
+  border:2px solid rgba(212,175,55,.3);
+
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(212,175,55,.08),
+      rgba(212,175,55,.02)
+    );
+
+  text-shadow:0 0 20px rgba(212,175,55,.25);
 }
-    .submit-main{
-  width:100%;
-  height:60px;
+   .submit-main{
+  height:64px;
+
   font-family:'Cinzel',serif;
   font-size:1rem;
   font-weight:700;
+
+  letter-spacing:.08em;
+
+  transition:.2s;
+}
+
+.submit-main:hover{
+  transform:translateY(-1px);
+
+  box-shadow:
+    0 0 20px rgba(212,175,55,.18);
 }
   </style>
 </head>
