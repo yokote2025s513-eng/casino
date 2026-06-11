@@ -431,6 +431,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // スコア入力時 Enter → 即登録
+  score.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      doSubmit();
+    }
+  });
+
+  // ページ開いたら整理番号にカーソル
+  ticket.focus();
+
+});
   // 3桁入力で自動参照
   ticket.addEventListener('input', () => {
     const v = ticket.value.replace(/\D/g, '');
