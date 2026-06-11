@@ -6,56 +6,64 @@
   <title>Admin Login ♠ 不賭死</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap">
   <link rel="stylesheet" href="style.css">
   <style>
     body { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; }
 
-    .login-wrap { width:min(420px, 92vw); animation:fadeUp 0.4s ease; }
+    .login-wrap { width:min(440px, 92vw); animation:fadeUp 0.4s ease; }
     @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:none} }
 
     .login-logo { text-align:center; margin-bottom:2rem; }
-    .login-logo-icon { font-size:3rem; display:block; margin-bottom:0.5rem; text-shadow:0 0 30px rgba(212,175,55,0.5); }
-    .login-logo-title { font-family:'Cinzel Decorative',serif; font-size:1.5rem; color:var(--gold); letter-spacing:0.1em; text-shadow:0 0 20px rgba(212,175,55,0.4); }
-    .login-logo-sub { font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:0.3em; color:var(--text-muted); margin-top:0.3rem; }
+    .login-logo-title {
+      font-family:'Cinzel Decorative',serif; font-size:2rem;
+      color:var(--gold); letter-spacing:0.1em;
+      text-shadow:0 0 30px rgba(201,168,76,0.5);
+    }
+    .login-logo-sub {
+      font-family:'Cinzel',serif; font-size:0.68rem;
+      letter-spacing:0.35em; color:var(--text-muted); margin-top:0.4rem;
+    }
 
-    .login-card { background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:2rem; box-shadow:var(--shadow-card); }
-    .login-section-title { font-family:'Cinzel',serif; font-size:0.72rem; letter-spacing:0.25em; color:var(--text-muted); text-align:center; margin-bottom:1.5rem; }
+    .login-card {
+      background:var(--bg-card); border:1px solid var(--border-red);
+      border-radius:12px; padding:2rem; box-shadow:var(--shadow-card);
+    }
+    .login-section-title {
+      font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:0.25em;
+      color:var(--text-muted); text-align:center; margin-bottom:1.5rem;
+    }
 
     .login-input {
-      width:100%; background:rgba(255,255,255,0.05); border:1px solid var(--border);
+      width:100%; background:rgba(255,255,255,0.05); border:1px solid var(--border-red);
       border-radius:8px; color:var(--text); font-family:'Noto Sans JP',sans-serif;
       font-size:1rem; padding:0.85rem 1rem; outline:none; margin-bottom:0.8rem;
-      transition:border-color 0.2s, box-shadow 0.2s;
+      transition:border-color 0.2s, box-shadow 0.2s; box-sizing:border-box;
     }
-    .login-input:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(212,175,55,0.1); }
+    .login-input:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(201,168,76,0.1); }
     .login-input.error { border-color:var(--red-bright); animation:shake 0.35s ease; }
     @keyframes shake { 0%,100%{transform:none} 20%{transform:translateX(-6px)} 40%{transform:translateX(6px)} 60%{transform:translateX(-4px)} 80%{transform:translateX(4px)} }
 
     .err-msg { color:var(--red-bright); font-size:0.8rem; text-align:center; margin-bottom:0.8rem; min-height:1.2em; }
 
-    .login-btn {
-      width:100%; font-family:'Cinzel',serif; font-size:0.9rem; font-weight:700;
-      letter-spacing:0.15em; padding:0.9rem; border-radius:8px;
-      border:1px solid var(--gold);
-      background:linear-gradient(135deg, #8b6914, #d4af37, #f5d060);
-      color:#0a0806; cursor:pointer; transition:all 0.2s; margin-bottom:1rem;
-    }
-    .login-btn:hover { box-shadow:var(--shadow-gold); transform:translateY(-1px); }
-    .login-btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
-
     /* 移動先選択 */
-    .dest-label { font-family:'Cinzel',serif; font-size:0.7rem; letter-spacing:0.15em; color:var(--text-muted); margin-bottom:0.5rem; display:block; }
-    .dest-btns { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:1.2rem; }
+    .dest-label {
+      font-family:'Cinzel',serif; font-size:0.68rem; letter-spacing:0.15em;
+      color:var(--text-muted); margin-bottom:0.5rem; display:block;
+    }
+    .dest-btns { display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:1.4rem; }
     .dest-btn {
-      padding:0.6rem 0.5rem; border:1px solid var(--border); border-radius:6px;
+      padding:0.65rem 0.5rem; border:1px solid var(--border-red); border-radius:6px;
       background:transparent; color:var(--text-muted); font-family:'Cinzel',serif;
       font-size:0.72rem; letter-spacing:0.05em; cursor:pointer; transition:all 0.2s; text-align:center;
     }
     .dest-btn.selected { border-color:var(--gold); color:var(--gold); background:var(--gold-dim); }
-    .dest-btn:hover:not(.selected) { border-color:var(--border); color:var(--text); }
+    .dest-btn:hover:not(.selected) { border-color:rgba(201,168,76,0.3); color:var(--text); }
 
-    .back-link { display:block; text-align:center; margin-top:1.2rem; font-family:'Cinzel',serif; font-size:0.72rem; letter-spacing:0.1em; color:var(--text-muted); text-decoration:none; transition:color 0.2s; }
+    .back-link {
+      display:block; text-align:center; margin-top:1.2rem;
+      font-family:'Cinzel',serif; font-size:0.72rem; letter-spacing:0.1em;
+      color:var(--text-muted); text-decoration:none; transition:color 0.2s;
+    }
     .back-link:hover { color:var(--gold); }
   </style>
 </head>
@@ -65,8 +73,7 @@
 
 <div class="login-wrap">
   <div class="login-logo">
-    <span class="login-logo-icon">🃏</span>
-    <div class="login-logo-title">不賭死</div>
+    <div class="login-logo-title">♠ 不賭死</div>
     <div class="login-logo-sub">Staff Admin Panel</div>
   </div>
 
@@ -76,14 +83,14 @@
     <span class="dest-label">移動先ページ</span>
     <div class="dest-btns">
       <button class="dest-btn selected" data-dest="admin-ranking.html" onclick="selectDest(this)">♠ Ranking 管理</button>
-      <button class="dest-btn" data-dest="admin-reserve.html" onclick="selectDest(this)">🎟 整理番号 / 待ち時間</button>
+      <button class="dest-btn" data-dest="admin-reserve.html" onclick="selectDest(this)">🎟 受付</button>
       <button class="dest-btn" data-dest="obs.html" onclick="selectDest(this)" style="grid-column:span 2">📺 OBS 表示</button>
     </div>
 
     <input class="login-input" type="email" id="email-input" placeholder="メールアドレス" autocomplete="email" onkeydown="if(event.key==='Enter') document.getElementById('pw-input').focus()">
     <input class="login-input" type="password" id="pw-input" placeholder="パスワード" autocomplete="current-password" onkeydown="if(event.key==='Enter') doLogin()">
     <div class="err-msg" id="err-msg"></div>
-    <button class="login-btn" id="login-btn" onclick="doLogin()">ENTER ▶</button>
+    <button class="btn btn-gold" style="width:100%; height:52px; font-size:0.9rem; letter-spacing:0.15em;" id="login-btn" onclick="doLogin()">ENTER ▶</button>
   </div>
 
   <a class="back-link" href="index.html">← TOPに戻る</a>
@@ -98,21 +105,14 @@
 <script src="auth.js"></script>
 <script src="common.js"></script>
 <script>
-const STORAGE_KEY = 'casino_admin_auth';
 let selectedDest = 'admin-ranking.html';
 
-// 既にログイン済みなら転送（auth.jsの判定を使用）
 firebase.auth().onAuthStateChanged(async user => {
   if (!user) return;
   try {
     const ok = await hasRole('staff');
-    if (ok) {
-      sessionStorage.setItem(STORAGE_KEY, 'ok');
-      siteLog('login', { dest: selectedDest });
-      location.replace(selectedDest);
-    } else {
-      await firebase.auth().signOut();
-    }
+    if (ok) { siteLog('login', { dest: selectedDest }); location.replace(selectedDest); }
+    else await firebase.auth().signOut();
   } catch(e) {}
 });
 
@@ -122,39 +122,25 @@ function selectDest(btn) {
   selectedDest = btn.dataset.dest;
 }
 
-// auth.jsのsignInWithRoleを使ったログイン処理に修正
 async function doLogin() {
   const email = document.getElementById('email-input').value.trim();
   const pw    = document.getElementById('pw-input').value;
   const errEl = document.getElementById('err-msg');
   const btn   = document.getElementById('login-btn');
-
-  if (!email || !pw) {
-    errEl.textContent = 'メールアドレスとパスワードを入力してください';
-    return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = 'ログイン中...';
-  errEl.textContent = '';
-
+  if (!email || !pw) { errEl.textContent = 'メールアドレスとパスワードを入力してください'; return; }
+  btn.disabled = true; btn.textContent = 'ログイン中...'; errEl.textContent = '';
   try {
-    // 認証処理を auth.js に任せる
     await signInWithRole(email, pw, 'staff');
-    
-    sessionStorage.setItem(STORAGE_KEY, 'ok');
     siteLog('login', { dest: selectedDest });
     btn.textContent = '✓ ログイン成功';
     setTimeout(() => location.replace(selectedDest), 400);
   } catch(e) {
-    const msg = e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password'
-      ? 'メールアドレスまたはパスワードが違います'
-      : e.message;
+    const msg = (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password')
+      ? 'メールアドレスまたはパスワードが違います' : e.message;
     errEl.textContent = msg;
     document.getElementById('pw-input').classList.add('error');
     setTimeout(() => document.getElementById('pw-input').classList.remove('error'), 400);
-    btn.disabled = false;
-    btn.textContent = 'ENTER ▶';
+    btn.disabled = false; btn.textContent = 'ENTER ▶';
   }
 }
 </script>

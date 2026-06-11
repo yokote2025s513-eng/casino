@@ -6,257 +6,218 @@
   <title>OBS — 不賭死</title>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=Noto+Sans+JP:wght@300;400;700&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin:0; padding:0; box-sizing:border-box; }
 
     :root {
-      --gold:       #d4af37;
-      --gold-light: #f0d060;
-      --bg:         #0a0a0f;
-      --poker:      #e74c3c;
-      --blackjack:  #3498db;
-      --chinchiro:  #e67e22;
-      --keiba:      #27ae60;
+      --gold:        #c9a84c;
+      --gold-light:  #f0cc70;
+      --obsidian:    #050203;
+      --obsidian-2:  #0c0405;
+      --obsidian-3:  #130608;
+      --crimson:     #b80000;
+      --crimson-hot: #e80000;
+      --crimson-glow:rgba(184,0,0,0.6);
+      --text:        #f5ead8;
+      --text-muted:  #6b4040;
+      --border-red:  rgba(184,0,0,0.25);
+      --poker:       #e84040;
+      --blackjack:   #4a8fd9;
+      --chinchiro:   #e89020;
+      --keiba:       #40c870;
     }
 
     html, body {
-      width: 1920px; height: 1080px;
-      overflow: hidden;
-      background: transparent;
-      font-family: 'Noto Sans JP', sans-serif;
+      width:1920px; height:1080px;
+      overflow:hidden;
+      background:transparent;
+      font-family:'Noto Sans JP', sans-serif;
+      color:var(--text);
     }
 
-    /* ── 背景 ── */
+    /* 背景 */
     .bg {
-      position: absolute; inset: 0;
+      position:absolute; inset:0;
       background:
-        radial-gradient(ellipse at 50% 50%, rgba(212,175,55,0.06) 0%, transparent 70%),
-        linear-gradient(180deg, rgba(10,10,15,0.95) 0%, rgba(10,10,15,0.98) 100%);
+        radial-gradient(ellipse at 20% 50%, rgba(184,0,0,0.04) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 50%, rgba(201,168,76,0.04) 0%, transparent 50%),
+        linear-gradient(180deg, var(--obsidian-2) 0%, var(--obsidian) 100%);
+    }
+    /* サイトと同じ赤いグロー */
+    .bg-glow {
+      position:absolute; inset:0; pointer-events:none;
+      background:radial-gradient(ellipse at 50% -10%, rgba(184,0,0,0.15) 0%, transparent 55%);
     }
 
-    /* ── ヘッダー ── */
+    /* ヘッダー（サイトのsite-headerと同系統） */
     .header {
-      position: relative; z-index: 10;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 28px 80px 0;
-      border-bottom: 1px solid rgba(212,175,55,0.2);
-      padding-bottom: 20px;
+      position:relative; z-index:10;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 80px;
+      height:80px;
+      border-bottom:1px solid var(--border-red);
+      background:linear-gradient(180deg, var(--obsidian-2) 0%, transparent 100%);
     }
     .header-logo {
-      font-family: 'Cinzel Decorative', serif;
-      font-size: 2rem;
-      color: var(--gold);
-      text-shadow: 0 0 30px rgba(212,175,55,0.5);
-      letter-spacing: 0.1em;
+      font-family:'Cinzel Decorative',serif;
+      font-size:1.8rem; font-weight:900;
+      color:var(--crimson-hot);
+      text-shadow:0 0 20px var(--crimson-glow), 0 0 60px rgba(184,0,0,0.3);
+      letter-spacing:0.08em;
+    }
+    .header-center {
+      display:flex; flex-direction:column; align-items:center; gap:2px;
     }
     .header-title {
-      font-family: 'Cinzel', serif;
-      font-size: 1.1rem;
-      letter-spacing: 0.3em;
-      color: rgba(212,175,55,0.6);
-      text-transform: uppercase;
+      font-family:'Cinzel',serif;
+      font-size:0.85rem; letter-spacing:0.35em;
+      color:var(--text-muted); text-transform:uppercase;
+    }
+    .header-sub {
+      font-family:'Cinzel',serif;
+      font-size:0.6rem; letter-spacing:0.2em;
+      color:rgba(107,64,64,0.6);
     }
     .header-time {
-      font-family: 'Cinzel', serif;
-      font-size: 1.3rem;
-      color: rgba(255,255,255,0.5);
-      letter-spacing: 0.1em;
+      font-family:'Cinzel',serif;
+      font-size:1.4rem; letter-spacing:0.1em;
+      color:rgba(245,234,216,0.4);
     }
 
-    /* ── メインエリア ── */
+    /* メインエリア */
     .main {
-      position: relative; z-index: 10;
-      display: flex;
-      height: calc(1080px - 110px);
-      padding: 0 60px;
-      gap: 40px;
-      align-items: stretch;
+      position:relative; z-index:10;
+      display:flex;
+      height:calc(1080px - 80px - 4px);
+      padding:28px 60px;
+      gap:28px;
+      align-items:stretch;
     }
 
-    /* ── ゲームパネル ── */
+    /* ゲームパネル */
     .game-panel {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      padding: 32px 28px;
-      border-radius: 12px;
-      border: 1px solid rgba(212,175,55,0.15);
-      background: rgba(17,17,24,0.8);
-      position: relative;
-      overflow: hidden;
-      margin-top: 30px;
-      margin-bottom: 30px;
-      transition: all 0.5s ease;
+      flex:1; display:flex; flex-direction:column;
+      padding:28px 24px;
+      border-radius:8px;
+      border:1px solid var(--border-red);
+      background:linear-gradient(160deg, var(--obsidian-3) 0%, var(--obsidian-2) 100%);
+      position:relative; overflow:hidden;
     }
     .game-panel::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: linear-gradient(135deg, rgba(212,175,55,0.04) 0%, transparent 60%);
-      pointer-events: none;
-    }
-    .game-panel.active {
-      border-color: var(--game-color);
-      box-shadow: 0 0 40px rgba(0,0,0,0.5), inset 0 0 30px rgba(0,0,0,0.3);
+      content:''; position:absolute; inset:0;
+      background:linear-gradient(135deg, rgba(201,168,76,0.03) 0%, transparent 60%);
+      pointer-events:none;
     }
     .game-panel::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 3px;
-      background: var(--game-color, var(--gold));
-      opacity: 0;
-      transition: opacity 0.5s;
+      content:''; position:absolute;
+      bottom:0; left:0; right:0; height:2px;
+      background:var(--game-color, var(--crimson));
     }
-    .game-panel.active::after { opacity: 1; }
+    /* 総合パネルは少し広く */
+    .panel-all { flex:1.25; }
 
-    /* ゲームヘッダー */
+    /* パネルヘッダー */
     .panel-head {
-      display: flex; align-items: center; gap: 12px;
-      margin-bottom: 24px;
-      padding-bottom: 16px;
-      border-bottom: 1px solid rgba(212,175,55,0.12);
+      display:flex; align-items:center; gap:10px;
+      margin-bottom:20px; padding-bottom:14px;
+      border-bottom:1px solid var(--border-red);
     }
-    .panel-icon { font-size: 2rem; line-height: 1; }
+    .panel-icon { font-size:1.6rem; line-height:1; }
     .panel-name {
-      font-family: 'Cinzel', serif;
-      font-size: 1rem;
-      letter-spacing: 0.15em;
-      color: var(--game-color, var(--gold));
-      font-weight: 700;
+      font-family:'Cinzel',serif; font-size:0.85rem;
+      letter-spacing:0.15em; font-weight:700;
+      color:var(--game-color, var(--gold));
     }
     .panel-count {
-      margin-left: auto;
-      font-size: 0.72rem;
-      color: rgba(255,255,255,0.3);
-      letter-spacing: 0.1em;
+      margin-left:auto; font-size:0.65rem;
+      color:var(--text-muted); letter-spacing:0.1em;
     }
 
     /* ランキング行 */
     .rank-item {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-      animation: fadeIn 0.4s ease both;
+      display:flex; align-items:center; gap:12px;
+      padding:9px 0;
+      border-bottom:1px solid rgba(184,0,0,0.08);
+      animation:fadeIn 0.4s ease both;
     }
-    .rank-item:last-child { border-bottom: none; }
-    @keyframes fadeIn { from { opacity:0; transform:translateX(-8px); } to { opacity:1; transform:none; } }
+    .rank-item:last-child { border-bottom:none; }
+    @keyframes fadeIn { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:none} }
 
     .rank-num {
-      font-family: 'Cinzel', serif;
-      font-weight: 700;
-      font-size: 1.1rem;
-      width: 44px;
-      text-align: center;
-      flex-shrink: 0;
+      font-family:'Cinzel',serif; font-weight:700;
+      font-size:1rem; width:40px; text-align:center; flex-shrink:0;
     }
-    .r1 { color: #ffd700; text-shadow: 0 0 12px rgba(255,215,0,0.6); font-size: 1.3rem; }
-    .r2 { color: #c0c0c0; }
-    .r3 { color: #cd7f32; }
-    .rn { color: rgba(255,255,255,0.3); font-size: 0.9rem; }
+    .r1 { color:#ffd700; text-shadow:0 0 12px rgba(255,215,0,0.6); font-size:1.2rem; }
+    .r2 { color:#c0c0c0; }
+    .r3 { color:#cd7f32; }
+    .rn { color:var(--text-muted); font-size:0.85rem; }
 
     .rank-bar-wrap {
-      flex: 1;
-      position: relative;
-      height: 36px;
-      display: flex; align-items: center;
+      flex:1; position:relative; height:34px;
+      display:flex; align-items:center;
     }
     .rank-bar {
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      border-radius: 4px;
-      opacity: 0.15;
-      transition: width 1s ease;
+      position:absolute; left:0; top:0; bottom:0;
+      border-radius:3px; opacity:0.12; transition:width 1s ease;
     }
     .rank-name {
-      position: relative; z-index: 1;
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: rgba(255,255,255,0.9);
-      padding-left: 10px;
+      position:relative; z-index:1;
+      font-size:0.9rem; font-weight:700;
+      color:var(--text); padding-left:8px;
+      display:flex; align-items:center; gap:6px;
     }
     .rank-score {
-      font-family: 'Cinzel', serif;
-      font-weight: 700;
-      font-size: 1.2rem;
-      color: var(--game-color, var(--gold));
-      flex-shrink: 0;
-      min-width: 80px;
-      text-align: right;
+      font-family:'Cinzel',serif; font-weight:700;
+      font-size:1.1rem; color:var(--game-color, var(--gold));
+      flex-shrink:0; min-width:76px; text-align:right;
     }
 
     .empty-msg {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: rgba(255,255,255,0.2);
-      font-size: 0.85rem;
-      letter-spacing: 0.15em;
+      flex:1; display:flex; align-items:center; justify-content:center;
+      color:var(--text-muted); font-size:0.8rem; letter-spacing:0.15em;
     }
 
     /* ゲームカラー */
+    .g-all       { --game-color: var(--gold); }
     .g-poker     { --game-color: var(--poker); }
     .g-blackjack { --game-color: var(--blackjack); }
     .g-chinchiro { --game-color: var(--chinchiro); }
     .g-keiba     { --game-color: var(--keiba); }
 
-    /* ── フッター ── */
+    /* 総合のゲームドット */
+    .all-game-dots { display:flex; gap:3px; }
+    .all-dot { width:7px; height:7px; border-radius:50%; opacity:0.75; }
+
+    /* フッター（サイトと同系統のカラーバー） */
     .footer {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 4px;
-      background: linear-gradient(90deg,
-        var(--poker) 0%, var(--poker) 20%,
-        var(--blackjack) 20%, var(--blackjack) 40%,
-        var(--chinchiro) 40%, var(--chinchiro) 60%,
-        var(--keiba) 60%, var(--keiba) 80%,
-        var(--gold) 80%, var(--gold) 100%
+      position:absolute; bottom:0; left:0; right:0; height:4px; z-index:10;
+      background:linear-gradient(90deg,
+        var(--gold)      0%,  var(--gold)      20%,
+        var(--poker)     20%, var(--poker)     40%,
+        var(--blackjack) 40%, var(--blackjack) 60%,
+        var(--chinchiro) 60%, var(--chinchiro) 80%,
+        var(--keiba)     80%, var(--keiba)     100%
       );
-      z-index: 10;
     }
 
-    /* ── スポットライト（アクティブゲーム） ── */
-    .spotlight {
-      position: absolute;
-      width: 400px; height: 400px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(212,175,55,0.04) 0%, transparent 70%);
-      pointer-events: none;
-      transition: all 1s ease;
-      z-index: 1;
-    }
-
-    /* ── クラウン装飾 ── */
+    /* クラウン装飾 */
     .crown-deco {
-      position: absolute;
-      top: -8px; left: 50%;
-      transform: translateX(-50%);
-      font-size: 1.4rem;
-      opacity: 0;
-      transition: opacity 0.5s;
+      position:absolute; top:-8px; left:50%;
+      transform:translateX(-50%);
+      font-size:1.2rem; opacity:1;
     }
-    .game-panel.active .crown-deco { opacity: 1; }
-    .crown-deco { opacity: 1 !important; }
-
-    /* 総合パネル */
-    .g-all { --game-color: var(--gold); }
-    .all-row {
-      display: flex; align-items: center; gap: 14px;
-      padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
-      animation: fadeIn 0.4s ease both;
-    }
-    .all-row:last-child { border-bottom: none; }
-    .all-game-dots { display: flex; gap: 3px; }
-    .all-dot { width: 8px; height: 8px; border-radius: 50%; opacity: 0.8; }
   </style>
 </head>
 <body>
 
 <div class="bg"></div>
+<div class="bg-glow"></div>
+
 <div class="header">
   <div class="header-logo">♠ 不賭死</div>
-  <div class="header-title" id="header-title">— GAME RANKING TOP 5 —</div>
+  <div class="header-center">
+    <div class="header-title">— Ranking Top 5 —</div>
+    <div class="header-sub">〜君たちは生きて帰れるのか〜</div>
+  </div>
   <div class="header-time" id="clock">00:00:00</div>
 </div>
 
@@ -264,28 +225,44 @@
 <div class="footer"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
+<script src="auth.js"></script>
+<script src="common.js"></script>
 <script>
+const db = firebase.firestore();
+requireRole('staff');
+
 const GAMES_OBS = [
-  { id: 'poker',     label: 'ポーカー',        icon: '♠', cls: 'g-poker',     color: '#e74c3c' },
-  { id: 'blackjack', label: 'ブラックジャック', icon: '♥', cls: 'g-blackjack', color: '#3498db' },
-  { id: 'chinchiro', label: 'チンチロ',         icon: '🎲', cls: 'g-chinchiro', color: '#e67e22' },
-  { id: 'keiba',     label: '競馬',             icon: '🏇', cls: 'g-keiba',     color: '#27ae60' },
+  { id:'poker',     label:'ポーカー',        icon:'♠', cls:'g-poker',     color:'#e84040' },
+  { id:'blackjack', label:'ブラックジャック', icon:'♥', cls:'g-blackjack', color:'#4a8fd9' },
+  { id:'chinchiro', label:'チンチロ',         icon:'🎲', cls:'g-chinchiro', color:'#e89020' },
+  { id:'keiba',     label:'競馬',             icon:'🏇', cls:'g-keiba',     color:'#40c870' },
 ];
 
 const medals  = ['👑','🥈','🥉','4','5'];
 const rankCls = ['r1','r2','r3','rn','rn'];
 
-let allRankings = {}; // { gameId: [{name, score}, ...] }
-
-// ── パネル描画 ──
+let allRankings = {};
 const mainEl = document.getElementById('main-panels');
 
-// ゲーム別パネル（4枚）
+// 総合パネルを一番左に
+mainEl.innerHTML = `
+  <div class="game-panel g-all panel-all" id="panel-__all__">
+    <div class="crown-deco">🏆</div>
+    <div class="panel-head">
+      <span class="panel-icon">🏆</span>
+      <span class="panel-name" style="color:var(--gold);">総合ランキング</span>
+      <span class="panel-count" id="cnt-__all__">0 人参加</span>
+    </div>
+    <div id="rows-__all__" style="flex:1;display:flex;flex-direction:column;justify-content:center;"></div>
+  </div>`;
+
+// ゲーム別パネル（右4枚）
 GAMES_OBS.forEach(g => {
   mainEl.innerHTML += `
-    <div class="game-panel ${g.cls} active" id="panel-${g.id}">
+    <div class="game-panel ${g.cls}" id="panel-${g.id}">
       <div class="crown-deco">👑</div>
       <div class="panel-head">
         <span class="panel-icon">${g.icon}</span>
@@ -296,21 +273,9 @@ GAMES_OBS.forEach(g => {
     </div>`;
 });
 
-// 総合パネル（1枚）
-mainEl.innerHTML += `
-  <div class="game-panel g-all active" id="panel-__all__">
-    <div class="crown-deco">🏆</div>
-    <div class="panel-head">
-      <span class="panel-icon">🏆</span>
-      <span class="panel-name" style="color:var(--gold);">総合</span>
-      <span class="panel-count" id="cnt-__all__">0 人参加</span>
-    </div>
-    <div id="rows-__all__" style="flex:1;display:flex;flex-direction:column;justify-content:center;"></div>
-  </div>`;
-
-// ── ゲーム別レンダリング ──
+// ゲーム別レンダリング
 function renderGameRows(gameId, items) {
-  const el   = document.getElementById(`rows-${gameId}`);
+  const el    = document.getElementById(`rows-${gameId}`);
   const cntEl = document.getElementById(`cnt-${gameId}`);
   if (cntEl) cntEl.textContent = items.length + ' 人参加';
   if (items.length === 0) {
@@ -330,12 +295,12 @@ function renderGameRows(gameId, items) {
     </div>`).join('');
 }
 
-// ── 総合レンダリング（全ゲーム合計スコア） ──
+// 総合レンダリング
 function renderAllRows() {
   const totals = {};
   GAMES_OBS.forEach(g => {
     (allRankings[g.id] || []).forEach(it => {
-      if (!totals[it.name]) totals[it.name] = { name: it.name, score: 0, games: [] };
+      if (!totals[it.name]) totals[it.name] = { name:it.name, score:0, games:[] };
       totals[it.name].score += it.score ?? 0;
       totals[it.name].games.push(g);
     });
@@ -344,7 +309,6 @@ function renderAllRows() {
   const el    = document.getElementById('rows-__all__');
   const cntEl = document.getElementById('cnt-__all__');
   if (cntEl) cntEl.textContent = items.length + ' 人参加';
-
   if (items.length === 0) {
     el.innerHTML = '<div class="empty-msg">— まだスコアがありません —</div>';
     return;
@@ -362,7 +326,7 @@ function renderAllRows() {
         <div class="rank-bar" style="width:${(it.score/maxScore*100).toFixed(1)}%;background:var(--gold)"></div>
         <div class="rank-name">
           ${it.name}
-          <span style="margin-left:6px;" class="all-game-dots">${dots}</span>
+          <span class="all-game-dots">${dots}</span>
         </div>
       </div>
       <div class="rank-score" style="color:var(--gold)">${it.score.toLocaleString()}</div>
@@ -370,24 +334,23 @@ function renderAllRows() {
   }).join('');
 }
 
-// ── Firestoreリアルタイム ──
+// Firestoreリアルタイム
 GAMES_OBS.forEach(g => {
   db.collection('rankings')
-    .where('gameId', '==', g.id)
-    .orderBy('score', 'desc')
+    .where('gameId','==',g.id)
+    .orderBy('score','desc')
     .limit(5)
     .onSnapshot(snap => {
       allRankings[g.id] = snap.docs.map(d => d.data());
       renderGameRows(g.id, allRankings[g.id]);
-      renderAllRows(); // 総合も毎回再計算
+      renderAllRows();
     });
 });
 
 // 時計
 function updateClock() {
-  const now = new Date();
   document.getElementById('clock').textContent =
-    now.toLocaleTimeString('ja-JP', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+    new Date().toLocaleTimeString('ja-JP', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
 }
 updateClock();
 setInterval(updateClock, 1000);
