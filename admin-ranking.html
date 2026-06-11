@@ -795,6 +795,31 @@ if (cancelBtn) cancelBtn.style.display = 'inline-flex';
       alert('削除に失敗しました: ' + e.message);
     }
   }
+  let step = 0;
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('f-ticket').focus();
+
+  document.addEventListener('keydown', async (e) => {
+    if (e.key !== 'Enter') return;
+
+    e.preventDefault();
+
+    if (step === 0) {
+      await lookupTicket();
+      step = 1;
+      document.getElementById('f-score').focus();
+      return;
+    }
+
+    if (step === 1) {
+      await doSubmit();
+      step = 0;
+      resetForm();
+      document.getElementById('f-ticket').focus();
+    }
+  });
+});
 </script>
 </body>
 </html>
