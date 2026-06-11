@@ -538,6 +538,9 @@
 let currentUser = null;
 let authReady = false;
 
+const GAMES = window.GAMES || [{ id: "default", name: "default" }];
+let currentTab = GAMES[0].id;
+
 firebase.auth().onAuthStateChanged(user => {
   currentUser = user;
   authReady = true;
