@@ -782,9 +782,14 @@ async function doSubmit() {
     document.getElementById('f-name').value   = target.name || '';
     document.getElementById('f-score').value  = target.score || 0;
     document.getElementById('ticket-lookup-result').textContent = '';
-    document.getElementById('form-mode-label').textContent = '📝 スコアデータの編集';
-    document.getElementById('submit-label').textContent = '更新する';
-    document.getElementById('cancel-btn').style.display = 'inline-flex';
+   const modeLabel = document.getElementById('form-mode-label');
+if (modeLabel) modeLabel.textContent = '📝 スコアデータの編集';
+
+const submitLabel = document.getElementById('submit-label');
+if (submitLabel) submitLabel.textContent = '更新する';
+
+const cancelBtn = document.getElementById('cancel-btn');
+if (cancelBtn) cancelBtn.style.display = 'inline-flex';
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
