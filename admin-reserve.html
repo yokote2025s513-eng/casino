@@ -95,8 +95,6 @@
       <div class="vc-unit">人来場</div>
     </div>
     <div class="vc-btns">
-      <button class="vc-btn minus" onclick="changeVisitor(-1)">－</button>
-      <button class="vc-btn plus"  onclick="changeVisitor(+1)">＋</button>
       <button class="vc-btn reset" onclick="resetVisitor()">リセット</button>
     </div>
   </div>
@@ -162,11 +160,6 @@ db.collection('visitors').doc('total').onSnapshot(snap => {
   currentVisitors = snap.data()?.count ?? 0;
   document.getElementById('vc-num').textContent = currentVisitors.toLocaleString();
 });
-async function changeVisitor(delta) {
-  const next = Math.max(0, currentVisitors + delta);
-  try { await db.collection('visitors').doc('total').set({ count: next, updatedAt: firebase.firestore.FieldValue.serverTimestamp() }); }
-  catch(e) { showToast('エラー: ' + e.message, 'error'); }
-}
 async function resetVisitor() {
   if (!confirm('来場者数をリセットしますか？')) return;
   await db.collection('visitors').doc('total').set({ count: 0, updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
