@@ -535,6 +535,15 @@
 <script src="auth.js"></script>
 <script src="common.js"></script>
 <script>
+function setText(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
+}
+
+function setValue(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.value = value;
+}
   requireRole('staff');
 function setText(id, text) {
   const el = document.getElementById(id);
@@ -758,9 +767,6 @@ async function doSubmit() {
     document.getElementById('ticket-lookup-result').textContent = '';
    const modeLabel = document.getElementById('form-mode-label');
 if (modeLabel) modeLabel.textContent = '📝 スコアデータの編集';
-
-const submitLabel = document.getElementById('submit-label');
-if (submitLabel) submitLabel.textContent = '更新する';
 
 const cancelBtn = document.getElementById('cancel-btn');
 if (cancelBtn) cancelBtn.style.display = 'inline-flex';
