@@ -343,14 +343,6 @@
         `<tr><td colspan="5" style="text-align:center; color:var(--red-bright); padding:2rem;">データの読み込み権限がありません</td></tr>`;
     });
   });
-
-  function switchTab(gameId) {
-    currentTab = gameId;
-    document.querySelectorAll('.admin-tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector(`.id-tab-${gameId}`)?.classList.add('active');
-    renderTable();
-  }
-
   function renderTable() {
     const tbody = document.getElementById('ranking-tbody');
     const filtered = allDocs.filter(d => d.gameId === currentTab);
