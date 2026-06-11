@@ -365,17 +365,27 @@
   });
 
   let submitting = false;
-  async function doSubmit() {
-    const editId = document.getElementById('edit-id').value;
+  aasync function doSubmit() {
+
+  if (submitting) return;
+  submitting = true;
+
+  const submitBtn = document.getElementById('submit-btn');
+  if (submitBtn) submitBtn.disabled = true;
+
+  const editId = document.getElementById('edit-id').value;
     const gameId = document.getElementById('f-game').value;
     const name   = document.getElementById('f-name').value.trim();
     const score  = parseInt(document.getElementById('f-score').value, 10);
 
-    if (!gameId || !name || isNaN(score) || score < 0) {
-      alert('必須項目（*）を正しく入力してください');
-      return;
-    }
+  if (!gameId || !name || isNaN(score) || score < 0) {
+  alert('必須項目（*）を正しく入力してください');
 
+  submitting = false;
+  if (submitBtn) submitBtn.disabled = false;
+
+  return;
+}
     const payload = {
       gameId, name, score,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -398,6 +408,10 @@
     } catch(e) {
       alert('データの保存に失敗しました: ' + e.message);
     }
+    } finally {
+  submitting = false;
+  if (submitBtn) submitBtn.disabled = false;
+}
   }
 
   function editForm(id) {
