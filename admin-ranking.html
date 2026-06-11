@@ -130,6 +130,12 @@
   text-align:center;
   font-weight:700;
 }
+    .submit-main{
+  width:100%;
+  height:70px;
+  font-size:1.3rem;
+  font-weight:700;
+}
   </style>
 </head>
 <body>
@@ -192,8 +198,11 @@
       </div>
 
       <div class="form-actions">
-        <button type="button" id="cancel-btn" onclick="resetForm()" class="btn-gold"
-          style="background:transparent; border-color:var(--border); color:var(--text-muted); display:none; padding:0.5rem 1.5rem;">
+       <button
+  id="submit-btn"
+  type="button"
+  onclick="doSubmit()"
+  class="btn-gold submit-main">
           キャンセル
         </button>
         <button type="button" onclick="doSubmit()" class="btn-gold" style="padding:0.5rem 2rem;">
