@@ -727,6 +727,7 @@ async function doSubmit() {
 
   if (submitting) return;
   submitting = true;
+
   try {
 
     const editId = document.getElementById('edit-id').value;
@@ -747,40 +748,29 @@ async function doSubmit() {
     };
 
     if (editId) {
-
-      await db.collection('rankings')
-        .doc(editId)
-        .update(payload);
-
+      await db.collection('rankings').doc(editId).update(payload);
       showToast('スコアを更新しました');
-
     } else {
-
-      await db.collection('rankings')
-        .add({
-          ...payload,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
+      await db.collection('rankings').add({
+        ...payload,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
 
       showToast('スコアを登録しました');
-
       switchTab(gameId);
     }
 
     resetForm();
 
-    document.getElementById('f-ticket')?.focus();
+    // Enter専用UX
+    document.getElementById('f-ticket').focus();
 
   } catch (e) {
-
     alert('保存失敗: ' + e.message);
-
   } finally {
-
     submitting = false;
   }
-}
-  function editForm(id) {
+}  function editForm(id) {
     const target = allDocs.find(d => d.id === id);
     if (!target) return;
     document.getElementById('edit-id').value  = target.id;
