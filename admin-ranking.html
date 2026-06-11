@@ -377,48 +377,78 @@
 
   // 整理番号から呼出
   async function lookupTicket() {
-    const val = document.getElementById('f-ticket').value.trim();
-    const resultEl = document.getElementById('ticket-lookup-result');
-    if (!val) { resultEl.textContent = '番号を入力してください'; return; }
+  const val = document.getElementById('f-ticket').value.trim();
+  const resultEl = document.getElementById('ticket-lookup-result');
 
-    resultEl.textContent = '検索中...';
-    try {
-      const snap = await db.collection('reserveHistory')
-        .where('ticketId', '==', val.padStart(3, '0'))
-        .limit(1).get();
-
-      if (snap.empty) {
-        resultEl.innerHTML = '<span style="color:var(--red-bright)">❌ 見つかりません</span>';
-        return;
-      }
-     const data = snap.docs[0].data();
-
-resultEl.innerHTML =
-  `<span style="color:#27ae60">
-    ✓ ${esc(data.nickname)} さん
-  </span>`;
-
-document.getElementById('f-game').value = data.gameId || '';
-document.getElementById('f-name').value = data.nickname || '';
-
-const scoreInput = document.getElementById('f-score');
-scoreInput.value = '';
-scoreInput.focus();
-scoreInput.select();
-    } catch(e) {
-      resultEl.innerHTML = '<span style="color:var(--red-bright)">エラーが発生しました</span>';
-    }
+  if (!val) {
+    resultEl.textContent = '番号を入力してください';
+    return;
   }
 
-  // Enterキーで参照
-  document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('f-ticket').addEventListener('keydown', e => {
-      if (e.key === 'Enter') lookupTicket();
-    });
-    document.getElementById('f-score').addEventListener('keydown', e => {
-      if (e.key === 'Enter') doSubmit();
-    });
+  resultEl.textContent = '検索中...';
+
+  try {
+    const snap = await db.collection('reserveHistory')
+      .where('ticketId', '==', val.padStart(3, '0'))
+      .limit(1)
+      .get();
+
+    if (snap.empty) {
+      resultEl.innerHTML =
+        '<span style="color:var(--red-bright)">❌ 見つかりません</span>';
+      return;
+    }
+
+    const data = snap.docs[0].data();
+
+    resultEl.innerHTML =
+      `<span style="color:#27ae60">✓ ${esc(data.nickname)} さん</span>`;
+
+    document.getElementById('f-game').value = data.gameId || '';
+    document.getElementById('f-name').value = data.nickname || '';
+
+    const scoreInput = document.getElementById('f-score');
+    scoreInput.value = '';
+    scoreInput.focus();
+    scoreInput.select();
+
+  } catch (e) {
+    resultEl.innerHTML =
+      '<span style="color:var(--red-bright)">エラーが発生しました</span>';
+  }
+}
+// 入力高速化
+document.addEventListener('DOMContentLoaded', () => {
+
+  const ticket = document.getElementById('f-ticket');
+  const score  = document.getElementById('f-score');
+
+  // 整理番号 Enter → 参照
+  ticket.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      lookupTicket();
+    }
   });
+
+  // 3桁入力で自動参照
+  ticket.addEventListener('input', () => {
+    const v = ticket.value.replace(/\D/g, '');
+
+    if (v.length === 3) {
+      lookupTicket();
+    }
+  });
+
+  // 得点 Enter → 登録
+  score.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      doSubmit();
+    }
+  });
+
+});
 
   let submitting = false;
 
