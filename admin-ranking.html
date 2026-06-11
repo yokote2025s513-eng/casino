@@ -197,19 +197,26 @@
         </div>
       </div>
 
-      <div class="form-actions">
-       <button
-  id="submit-btn"
-  type="button"
-  onclick="doSubmit()"
-  class="btn-gold submit-main">
-          キャンセル
-        </button>
-        <button type="button" onclick="doSubmit()" class="btn-gold" style="padding:0.5rem 2rem;">
-          <span id="submit-label">登録する</span>
-        </button>
-      </div>
-    </div>
+     <div class="form-actions">
+
+  <button
+    type="button"
+    id="cancel-btn"
+    onclick="resetForm()"
+    class="btn-gold"
+    style="display:none;">
+    キャンセル
+  </button>
+
+  <button
+    id="submit-btn"
+    type="button"
+    onclick="doSubmit()"
+    class="btn-gold submit-main">
+    <span id="submit-label">登録する</span>
+  </button>
+
+</div>
 
     <!-- ランキング一覧 -->
     <div>
