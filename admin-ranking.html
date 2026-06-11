@@ -727,13 +727,6 @@ async function doSubmit() {
 
   if (submitting) return;
   submitting = true;
-
-  const submitBtn = document.getElementById('submit-btn');
-
-  if (submitBtn) {
-    submitBtn.disabled = true;
-  }
-
   try {
 
     const editId = document.getElementById('edit-id').value;
@@ -785,10 +778,6 @@ async function doSubmit() {
   } finally {
 
     submitting = false;
-
-    if (submitBtn) {
-      submitBtn.disabled = false;
-    }
   }
 }
   function editForm(id) {
