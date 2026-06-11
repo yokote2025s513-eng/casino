@@ -155,70 +155,111 @@
 <div class="container" style="padding:2rem 1rem 5rem;">
   <div class="admin-layout">
 
-    <!-- スコア登録フォーム -->
-    <div class="form-card">
-      <div class="form-card-title" id="form-mode-label">▸ 新規スコア登録</div>
-      <input type="hidden" id="edit-id">
+  <!-- スコア登録フォーム -->
+<div class="form-card">
+  <div class="form-card-title" id="form-mode-label">
+    ▸ 新規スコア登録
+  </div>
 
-      <div class="form-grid">
-        <div class="form-group">
-          <label class="form-label">整理番号から呼出（任意）</label>
-          <div class="lookup-group">
-            <input type="text" id="f-ticket" class="form-input" placeholder="例: 001" style="text-transform:uppercase;">
-            <button type="button" onclick="lookupTicket()" class="btn-gold" style="padding:0 0.8rem; font-size:0.8rem; flex-shrink:0;">参照</button>
-          </div>
-          <div id="ticket-lookup-result"></div>
-        </div>
+  <input type="hidden" id="edit-id">
+  <input type="hidden" id="f-game">
 
-        <div class="form-group">
-          <label class="form-label">対象ゲーム <span style="color:var(--crimson-hot)">*</span></label>
-          <div class="game-picker">
-  <button type="button" onclick="setGame(this,'poker')">♠ ポーカー</button>
-<button type="button" onclick="setGame(this,'blackjack')">♥ BJ</button>
-<button type="button" onclick="setGame(this,'chinchiro')">🎲 チンチロ</button>
-<button type="button" onclick="setGame(this,'keiba')">🏇 競馬</button>
-</div>
+  <div class="form-grid">
 
-<input type="hidden" id="f-game">
-        </div>
+    <!-- 整理番号 -->
+    <div class="form-group">
+      <label class="form-label">
+        整理番号
+      </label>
 
-        <div class="form-group">
-          <label class="form-label">プレイヤー名 <span style="color:var(--crimson-hot)">*</span></label>
-          <input type="text" id="f-name" class="form-input" placeholder="ニックネーム" maxlength="12">
-        </div>
+      <div class="lookup-group">
+        <input
+          type="text"
+          id="f-ticket"
+          class="form-input"
+          placeholder="例: 001"
+          autocomplete="off"
+          inputmode="numeric">
 
-        <div class="form-group">
-          <label class="form-label">獲得スコア <span style="color:var(--crimson-hot)">*</span></label>
-         <input
-  type="number"
-  id="f-score"
-  class="form-input score-big"
-  placeholder="0">
-        </div>
+        <button
+          type="button"
+          onclick="lookupTicket()"
+          class="btn-gold">
+          参照
+        </button>
       </div>
 
-     <div class="form-actions">
+      <div id="ticket-lookup-result"></div>
+    </div>
 
-  <button
-    type="button"
-    id="cancel-btn"
-    onclick="resetForm()"
-    class="btn-gold"
-    style="display:none;">
-    キャンセル
-  </button>
+    <!-- ゲーム表示 -->
+    <div class="form-group">
+      <label class="form-label">
+        ゲーム
+      </label>
 
-  <button
-    id="submit-btn"
-    type="button"
-    onclick="doSubmit()"
-    class="btn-gold submit-main">
-    <span id="submit-label">登録する</span>
-  </button>
+      <input
+        type="text"
+        id="game-display"
+        class="form-input"
+        readonly
+        placeholder="整理番号参照で自動入力">
+    </div>
 
+    <!-- 名前 -->
+    <div class="form-group">
+      <label class="form-label">
+        プレイヤー名
+      </label>
+
+      <input
+        type="text"
+        id="f-name"
+        class="form-input"
+        maxlength="12"
+        readonly>
+    </div>
+
+    <!-- 得点 -->
+    <div class="form-group">
+      <label class="form-label">
+        獲得スコア
+      </label>
+
+      <input
+        type="number"
+        id="f-score"
+        class="form-input score-big"
+        placeholder="0"
+        min="0"
+        inputmode="numeric">
+    </div>
+
+  </div>
+
+  <div class="form-actions">
+
+    <button
+      type="button"
+      id="cancel-btn"
+      onclick="resetForm()"
+      class="btn-gold"
+      style="display:none;">
+      キャンセル
+    </button>
+
+    <button
+      id="submit-btn"
+      type="button"
+      onclick="doSubmit()"
+      class="btn-gold submit-main">
+      <span id="submit-label">登録する</span>
+    </button>
+
+  </div>
 </div>
 
-    <!-- ランキング一覧 -->
+<!-- ランキング一覧 -->
     <div>
       <div class="admin-tabs" id="tab-container"></div>
       <div class="admin-table-wrap">
