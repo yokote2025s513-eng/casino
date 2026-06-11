@@ -2,51 +2,90 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // 管理者（スタッフまたはスーパー管理者）かどうかを判定
+    // =========================
+    // スタッフ判定関数（安全版）
+    // =========================
     function isStaff() {
-      return request.auth != null &&
-        get(/databases/$(database)/documents/roles/$(request.auth.uid)).data.roles in ['staff', 'super'];
+      return request.auth != null
+        && hasRole(['staff', 'super']);
     }
 
-    // 予約履歴（誰でも読み書き可、削除・更新はスタッフのみ）
-    match /reserveHistory/{document} {
+    function hasRole(allowedRoles) {
+      let roleDoc = get(/databases/$(database)/documents/roles/$(request.auth.uid));
+
+      return roleDoc.exists()
+        && roleDoc.data.roles in allowedRoles;
+    }
+
+    // =========================
+    // ランキング
+    // =========================
+    match /rankings/{document} {
+
+      // 全員閲覧OK
       allow read: if true;
-      allow create: if true;
+
+      // 作成・更新・削除はスタッフのみ
+      allow create, update, delete: if isStaff();
+    }
+
+    // =========================
+    // 予約履歴
+    // =========================
+    match /reserveHistory/{document} {
+
+      allow read: if true;
+
+      // 認証ユーザーのみ作成（スパム防止）
+      allow create: if request.auth != null;
+
       allow update, delete: if isStaff();
     }
 
-    // ランキング（誰でも読める、書き込みはスタッフのみ）
-    match /rankings/{document} {
-      allow read: if true;
-      allow write, delete: if isStaff();
-    }
-
-    // 整理番号カウンター（誰でも読み・更新可、削除禁止）
+    // =========================
+    // 整理番号カウンター
+    // =========================
     match /reserves/global {
-      allow read, update: if true;
+
+      allow read, update: if request.auth != null;
       allow delete: if false;
     }
 
-    // 来場者数カウンター（誰でも読み・更新可、削除禁止）
+    // =========================
+    // 来場者数
+    // =========================
     match /visitors/total {
-      allow read, update: if true;
+
+      allow read, update: if request.auth != null;
       allow delete: if false;
     }
 
-    // rolesコレクション（認証済みなら誰でも読める、書き込み禁止）
+    // =========================
+    // roles（権限データ）
+    // =========================
     match /roles/{userId} {
+
+      // ログイン済みなら読める
       allow read: if request.auth != null;
+
+      // 直接書き込みは禁止（Admin SDKのみ想定）
       allow write: if false;
     }
 
-    // 待ち時間（誰でも読める、書き込みはスタッフのみ）
+    // =========================
+    // 待ち時間
+    // =========================
     match /waitTimes/{document} {
+
       allow read: if true;
       allow write: if isStaff();
     }
 
-    // サイトログ（読み・作成はログイン済みのみ、更新・削除禁止）
+    // =========================
+    // ログ
+    // =========================
     match /siteLogs/{document} {
+
       allow read, create: if request.auth != null;
       allow update, delete: if false;
     }
