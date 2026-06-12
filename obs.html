@@ -25,10 +25,11 @@
     .header{
       position:relative;z-index:10;
       display:flex;flex-direction:column;align-items:center;justify-content:center;
-      height:200px;
+      height:230px;
       border-bottom:1px solid var(--border-red);
       background:linear-gradient(180deg,rgba(12,4,5,0.98) 0%,rgba(12,4,5,0.75) 100%);
-      gap:10px;
+      gap:8px;
+      padding:16px 0;
     }
     .header::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--crimson-hot),var(--gold),var(--crimson-hot),transparent);}
     .header-logo{font-family:'Cinzel Decorative',serif;font-size:2.6rem;font-weight:900;color:var(--crimson-hot);text-shadow:0 0 24px var(--crimson-glow),0 0 70px rgba(184,0,0,0.35);letter-spacing:0.1em;}
@@ -50,8 +51,8 @@
     /* ══ メイン：総合ランキング1枚 ══ */
     .main{
       position:relative;z-index:10;
-      height:calc(1080px - 200px - 6px);
-      padding:36px 90px 30px;
+      height:calc(1080px - 230px - 6px);
+      padding:60px 90px 30px;
       display:flex;flex-direction:column;
     }
 
