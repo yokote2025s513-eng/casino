@@ -4,10 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ランキング ♠ 不賭死</title>
-  <!-- Google Fonts: preconnect for speed -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-      <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css">
   <style>
     .rank-row {
       display: flex; align-items: center; gap: 1rem;
@@ -30,39 +29,20 @@
     .empty-state { text-align:center; color:var(--text-muted); padding:3rem; font-size:0.85rem; }
     .empty-icon { font-size:2.5rem; margin-bottom:0.5rem; opacity:0.3; }
 
-    /* タブ */
-    .game-tabs { display:flex; gap:0.5rem; margin-bottom:1.2rem; flex-wrap:wrap; }
-    .game-tab {
-      font-family:'Cinzel',serif; font-size:0.8rem; letter-spacing:0.1em;
-      padding:0.6rem 1.4rem; border:1px solid var(--border); border-radius:4px;
-      background:transparent; color:var(--text-muted); cursor:pointer; transition:all 0.2s;
-      display:flex; align-items:center; gap:0.4rem;
-    }
-    .game-tab.active.game-poker     { color:var(--poker);     border-color:var(--poker);     background:rgba(231,76,60,0.08); }
-    .game-tab.active.game-blackjack { color:var(--blackjack); border-color:var(--blackjack); background:rgba(52,152,219,0.08); }
-    .game-tab.active.game-chinchiro { color:var(--chinchiro); border-color:var(--chinchiro); background:rgba(230,126,34,0.08); }
-    .game-tab.active.game-keiba     { color:var(--keiba);     border-color:var(--keiba);     background:rgba(39,174,96,0.08); }
-    .game-tab:not(.active):hover { border-color:var(--gold); color:var(--gold); }
-
     /* 検索 */
-    .search-wrap {
-      display:flex; gap:0.6rem; margin-bottom:1.5rem; align-items:center;
-    }
+    .search-wrap { display:flex; gap:0.6rem; margin-bottom:1.5rem; align-items:center; }
     .search-input {
       flex:1; background:rgba(255,255,255,0.04); border:1px solid var(--border);
       border-radius:6px; color:var(--text); font-family:'Noto Sans JP',sans-serif;
       font-size:0.95rem; padding:0.6rem 1rem; outline:none; transition:border-color 0.2s;
     }
     .search-input:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(212,175,55,0.1); }
-    .search-clear {
-      font-size:0.75rem; color:var(--text-muted); background:none; border:none;
-      cursor:pointer; padding:0.3rem 0.5rem;
-    }
+    .search-clear { font-size:0.75rem; color:var(--text-muted); background:none; border:none; cursor:pointer; padding:0.3rem 0.5rem; }
     .search-clear:hover { color:var(--gold); }
     .search-result-label { font-size:0.78rem; color:var(--text-muted); margin-bottom:1rem; }
     .highlight { background:rgba(212,175,55,0.25); border-radius:2px; padding:0 2px; }
 
-    .section-label { font-family:'Cinzel Decorative',serif; font-size:1.5rem; color:var(--game-color,var(--gold)); margin-bottom:0.3rem; }
+    .section-label { font-family:'Cinzel Decorative',serif; font-size:1.5rem; color:var(--gold); margin-bottom:0.3rem; }
     .section-desc { color:var(--text-muted); font-size:0.8rem; margin-bottom:1.5rem; }
 
     .top3-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin-bottom:2rem; }
@@ -97,7 +77,7 @@
 
 <div class="container">
   <h1 class="page-title">ランキング</h1>
-  <p class="page-subtitle">〜各ゲームの得点ランキング〜</p>
+  <p class="page-subtitle">〜君たちは生きて帰れるのか〜</p>
   <div class="divider"></div>
 
   <!-- 検索 -->
@@ -115,7 +95,6 @@
 
   <!-- 通常モード -->
   <div id="normal-section">
-    <div class="game-tabs" id="game-tabs"></div>
     <div id="ranking-content">
       <div class="loading"><div class="spinner"></div>Loading...</div>
     </div>
@@ -129,9 +108,6 @@
 <script src="firebase-config.js"></script>
 <script src="common.js"></script>
 <script>
-const ALL_TAB = '__all__';
-let currentGame = GAMES[0].id;
-let unsubscribe = null;
 let allDocs = [];
 
 function esc(str) {
@@ -140,117 +116,40 @@ function esc(str) {
 
 db.collection('rankings').orderBy('score','desc').onSnapshot(snap => {
   allDocs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  if (currentGame === ALL_TAB) renderAllRanking();
+  renderRanking();
   const q = document.getElementById('search-input').value.trim();
   if (q) renderSearch(q);
 });
 
-// タブ描画（ゲーム別 + 総合）
-const tabsEl = document.getElementById('game-tabs');
-const TABS = [...GAMES, { id: ALL_TAB, label: '総合', icon: '🏆' }];
-TABS.forEach(g => {
-  const btn = document.createElement('button');
-  btn.className = `game-tab game-${g.id}`;
-  btn.dataset.game = g.id;
-  btn.innerHTML = `${g.icon} ${g.label}`;
-  btn.onclick = () => selectGame(g.id);
-  tabsEl.appendChild(btn);
-});
-
-function selectGame(gameId) {
-  currentGame = gameId;
-  document.querySelectorAll('.game-tab').forEach(b =>
-    b.classList.toggle('active', b.dataset.game === gameId));
-  if (gameId === ALL_TAB) {
-    if (unsubscribe) { unsubscribe(); unsubscribe = null; }
-    renderAllRanking();
-  } else {
-    loadRanking(gameId);
-  }
-}
-
-function loadRanking(gameId) {
-  if (unsubscribe) unsubscribe();
-  document.getElementById('ranking-content').innerHTML =
-    '<div class="loading"><div class="spinner"></div>Loading...</div>';
-  unsubscribe = db.collection('rankings')
-    .where('gameId','==',gameId)
-    .orderBy('score','desc')
-    .limit(50)
-    .onSnapshot(snap => {
-      const items = snap.docs.map((d,i) => ({ id:d.id, ...d.data(), rank:i+1 }));
-      renderRanking(gameId, items);
-    });
-}
-
-function renderRanking(gameId, items) {
-  const g = GAMES.find(x => x.id === gameId);
+// 総合ランキング表示
+function renderRanking() {
+  const items = [...allDocs].sort((a,b) => (b.score??0) - (a.score??0));
   const medals = ['🥇','🥈','🥉'];
   const top3 = items.slice(0,3);
   const rest  = items.slice(3);
+
   const top3HTML = `<div class="top3-grid">${[0,1,2].map(i => {
     const it = top3[i];
     return `<div class="top3-card rank-${i+1}">
       <div class="top3-medal">${medals[i]}</div>
-      ${it ? `<div class="top3-name">${esc(it.name)}</div><div class="top3-score">${it.score.toLocaleString()}</div>`
+      ${it ? `<div class="top3-name">${esc(it.name)}</div><div class="top3-score">${(it.score??0).toLocaleString()}</div>`
            : `<div class="top3-empty">—</div>`}
     </div>`;
   }).join('')}</div>`;
-  const restHTML = rest.length === 0 ? '' : `<div class="card">${rest.map(it => `
-    <div class="rank-row other-rank">
-      <div class="rank-num-big other-rank">${it.rank}</div>
-      <div class="rank-info">
-        <div class="rank-name-big">${esc(it.name)}</div>
-        <div class="rank-time">${fmtTime(it.createdAt)}</div>
-      </div>
-      <div><div class="rank-score-big">${it.score.toLocaleString()}</div><div class="rank-score-unit">pt</div></div>
-    </div>`).join('')}</div>`;
-  document.getElementById('ranking-content').innerHTML = `
-    <div class="game-${gameId}" style="--game-color:var(--${gameId})">
-      <div class="section-label">${g.icon} ${g.label}</div>
-      <div class="section-desc">${items.length} 件のスコア登録中</div>
-      ${items.length === 0
-        ? `<div class="empty-state"><div class="empty-icon">🃏</div>まだスコアがありません</div>`
-        : top3HTML + restHTML}
-    </div>`;
-}
 
-// 総合ランキング（全ゲーム合計スコア）
-function renderAllRanking() {
-  const totals = {};
-  allDocs.forEach(d => {
-    if (!totals[d.name]) totals[d.name] = { name: d.name, score: 0, games: [] };
-    totals[d.name].score += d.score ?? 0;
-    totals[d.name].games.push(d.gameId);
-  });
-  const items = Object.values(totals).sort((a,b) => b.score - a.score);
-  const medals = ['🥇','🥈','🥉'];
-  const top3 = items.slice(0,3);
-  const rest  = items.slice(3);
-  const top3HTML = `<div class="top3-grid">${[0,1,2].map(i => {
-    const it = top3[i];
-    return `<div class="top3-card rank-${i+1}">
-      <div class="top3-medal">${medals[i]}</div>
-      ${it ? `<div class="top3-name">${esc(it.name)}</div><div class="top3-score">${it.score.toLocaleString()}</div>`
-           : `<div class="top3-empty">—</div>`}
-    </div>`;
-  }).join('')}</div>`;
   const restHTML = rest.length === 0 ? '' : `<div class="card">${rest.map((it,i) => `
     <div class="rank-row other-rank">
       <div class="rank-num-big other-rank">${i+4}</div>
       <div class="rank-info">
         <div class="rank-name-big">${esc(it.name)}</div>
-        <div class="rank-time">${it.games.map(gid => {
-          const g = GAMES.find(x => x.id === gid);
-          return `<span class="game-badge game-${gid}" style="font-size:0.65rem;">${g?.icon} ${g?.label}</span>`;
-        }).join(' ')}</div>
       </div>
-      <div><div class="rank-score-big">${it.score.toLocaleString()}</div><div class="rank-score-unit">pt</div></div>
+      <div><div class="rank-score-big">${(it.score??0).toLocaleString()}</div><div class="rank-score-unit">pt</div></div>
     </div>`).join('')}</div>`;
+
   document.getElementById('ranking-content').innerHTML = `
     <div>
       <div class="section-label">🏆 総合ランキング</div>
-      <div class="section-desc">${items.length} 人参加中 — 全ゲーム合計スコア</div>
+      <div class="section-desc">${items.length} 人参加中</div>
       ${items.length === 0
         ? `<div class="empty-state"><div class="empty-icon">🏆</div>まだスコアがありません</div>`
         : top3HTML + restHTML}
@@ -279,53 +178,31 @@ function clearSearch() {
 
 function renderSearch(q) {
   const ql = q.toLowerCase();
-  const hits = allDocs.filter(d => (d.name||'').toLowerCase().includes(ql));
+  const sorted = [...allDocs].sort((a,b) => (b.score??0) - (a.score??0));
+  const hits = sorted
+    .map((d,i) => ({ ...d, rank: i+1 }))
+    .filter(d => (d.name||'').toLowerCase().includes(ql));
+
   document.getElementById('search-label').textContent = `「${q}」の検索結果: ${hits.length} 件`;
   if (hits.length === 0) {
     document.getElementById('search-results').innerHTML =
       '<div class="empty-state"><div class="empty-icon">🔍</div>見つかりません</div>';
     return;
   }
-  const rankMap = {};
-  GAMES.forEach(g => {
-    let r = 1;
-    allDocs.filter(d => d.gameId === g.id).forEach(d => { rankMap[d.id] = r++; });
-  });
-  const nameGroups = {};
-  hits.forEach(it => {
-    const name = it.name || '';
-    if (!nameGroups[name]) nameGroups[name] = [];
-    nameGroups[name].push(it);
-  });
+
   const re = new RegExp(esc(q).replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
-  document.getElementById('search-results').innerHTML = Object.entries(nameGroups).map(([name, items]) => {
-    const highlighted = esc(name).replace(re, m => `<span class="highlight">${m}</span>`);
-    const total = items.reduce((s,it) => s + (it.score||0), 0);
-    const gamesHTML = items.map(it => {
-      const g = GAMES.find(x => x.id === it.gameId);
-      const rankN = rankMap[it.id] || '?';
-      const rankCls = rankN <= 3 ? `rank-${rankN}` : 'other-rank';
-      return `<div style="display:flex;align-items:center;gap:0.6rem;padding:0.4rem 0;border-top:1px solid rgba(212,175,55,0.06);">
-        <div class="rank-num-big ${rankCls}" style="font-size:1rem;width:2rem;">${rankN}</div>
-        <span class="game-badge game-${it.gameId}" style="font-size:0.75rem;">${g?.icon} ${g?.label}</span>
-        <div style="flex:1;font-size:0.75rem;color:var(--text-muted);">${fmtTime(it.createdAt)}</div>
-        <div><span class="rank-score-big" style="font-size:1.1rem;">${(it.score||0).toLocaleString()}</span><span class="rank-score-unit">pt</span></div>
-      </div>`;
-    }).join('');
-    return `<div class="rank-row" style="flex-direction:column;align-items:stretch;gap:0;">
-      <div style="display:flex;align-items:center;gap:0.6rem;padding-bottom:0.4rem;">
-        <div class="rank-info"><div class="rank-name-big">${highlighted}</div></div>
-        <div style="font-size:0.75rem;color:var(--text-muted);">${items.length}ゲーム / 合計 ${total.toLocaleString()}pt</div>
+  document.getElementById('search-results').innerHTML = hits.map(it => {
+    const highlighted = esc(it.name).replace(re, m => `<span class="highlight">${m}</span>`);
+    const rankCls = it.rank <= 3 ? `rank-${it.rank}` : 'other-rank';
+    return `<div class="rank-row ${rankCls}">
+      <div class="rank-num-big ${rankCls}">${it.rank}</div>
+      <div class="rank-info">
+        <div class="rank-name-big">${highlighted}</div>
       </div>
-      ${gamesHTML}
+      <div><div class="rank-score-big">${(it.score??0).toLocaleString()}</div><div class="rank-score-unit">pt</div></div>
     </div>`;
   }).join('');
 }
-
-// 初期表示
-const hash = location.hash.replace('#','');
-const initGame = TABS.find(g => g.id === hash) ? hash : '__all__';
-selectGame(initGame);
 </script>
 </body>
 </html>

@@ -116,10 +116,6 @@
     <div class="ds-desc">ランキングデータの削除操作</div>
     <div class="action-grid">
       <button class="action-btn" onclick="confirmAction('deleteAllRankings')"><span class="btn-icon">🗑</span>ランキング全削除</button>
-      <button class="action-btn" onclick="confirmAction('deleteGameRanking','poker')"><span class="btn-icon">♠</span>ポーカーのみ削除</button>
-      <button class="action-btn" onclick="confirmAction('deleteGameRanking','blackjack')"><span class="btn-icon">♥</span>ブラックジャックのみ削除</button>
-      <button class="action-btn" onclick="confirmAction('deleteGameRanking','chinchiro')"><span class="btn-icon">🎲</span>チンチロのみ削除</button>
-      <button class="action-btn" onclick="confirmAction('deleteGameRanking','keiba')"><span class="btn-icon">🏇</span>競馬のみ削除</button>
     </div>
   </div>
 
@@ -246,7 +242,6 @@ function doLogout() {
 let pendingAction = null, pendingArg = null;
 const actionMeta = {
   deleteAllRankings: { title:'ランキング全削除', body:'全ゲームのランキングデータを削除します。\nこの操作は元に戻せません。' },
-  deleteGameRanking: { title:'ゲームランキング削除', body:(a)=>`${gameLabel(a)} のランキングを全件削除します。` },
   resetAllTickets:   { title:'整理番号リセット', body:'整理番号を 001 に戻します。' },
   resetNicknames:    { title:'ニックネーム全リセット', body:'登録済みプレイヤーを全削除します。\n整理番号・来場者数は変わりません。' },
   resetVisitors:     { title:'来場者数リセット', body:'来場者数を 0 にリセットします。' },
@@ -274,7 +269,6 @@ async function execAction() {
   try {
     switch(action) {
       case 'deleteAllRankings':   await deleteCollection('rankings'); break;
-      case 'deleteGameRanking':   await deleteCollectionWhere('rankings','gameId','==',arg); break;
       case 'resetAllTickets':     await db.collection('reserves').doc('global').set({ next:1 }); break;
       case 'resetNicknames':      await deleteCollection('players'); break;
       case 'resetVisitors':       await db.collection('visitors').doc('total').set({ count:0, updatedAt:firebase.firestore.FieldValue.serverTimestamp() }); break;

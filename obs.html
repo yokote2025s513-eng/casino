@@ -188,16 +188,10 @@ requireRole('staff');
 // ══════════════════════════════════════
 //  データ・定数
 // ══════════════════════════════════════
-const GAMES_OBS = [
-  {id:'poker',     label:'ポーカー',        icon:'♠', color:'#e84040', rgb:'232,64,64'},
-  {id:'blackjack', label:'ブラックジャック', icon:'♥', color:'#4a8fd9', rgb:'74,143,217'},
-  {id:'chinchiro', label:'チンチロ',         icon:'🎲', color:'#e89020', rgb:'232,144,32'},
-  {id:'keiba',     label:'競馬',             icon:'🏇', color:'#40c870', rgb:'64,200,112'},
-];
 const MEDALS   = ['👑','🥈','🥉','4','5'];
 const RANK_CLS = ['r1','r2','r3','rn','rn'];
-let allRankings = {}; // gameId → [{name,score}]
-let prevTop1    = null;
+let allDocs  = []; // [{name,score}]
+let prevTop1 = null;
 const prevScores = {}; // name → score
 
 // ══════════════════════════════════════
@@ -218,15 +212,7 @@ function animateCount(el, from, to, duration = 900) {
 //  総合ランキング描画
 // ══════════════════════════════════════
 function renderAllRows() {
-  const totals = {};
-  GAMES_OBS.forEach(g => {
-    (allRankings[g.id] || []).forEach(it => {
-      if (!totals[it.name]) totals[it.name] = {name: it.name, score: 0, games: []};
-      totals[it.name].score += it.score ?? 0;
-      totals[it.name].games.push(g);
-    });
-  });
-  const items = Object.values(totals).sort((a,b) => b.score - a.score);
+  const items = [...allDocs].sort((a,b) => (b.score??0) - (a.score??0));
   const el    = document.getElementById('rows-__all__');
   const cntEl = document.getElementById('cnt-__all__');
   const panel = document.getElementById('panel-__all__');
@@ -249,21 +235,15 @@ function renderAllRows() {
     const prev = prevScores[it.name];
     const changed = prev !== undefined && prev !== it.score;
     if (changed) anyChanged = true;
-    const barW = (it.score / maxScore * 100).toFixed(1);
-    const dots = it.games.map(g =>
-      `<div class="all-dot" style="background:${g.color};box-shadow:0 0 6px ${g.color};" title="${g.label}"></div>`
-    ).join('');
+    const barW = ((it.score??0) / maxScore * 100).toFixed(1);
     return `<div class="rank-item${changed ? ' flash' : ''}${i===0 ? ' is-1st' : ''}" style="animation:slideIn 0.4s ${i*0.08}s ease both;">
       <div class="rank-num ${RANK_CLS[i]}">${MEDALS[i]}</div>
       <div class="rank-bar-wrap">
         <div class="rank-bar" style="width:${barW}%;background:var(--gold)"></div>
         <div class="rank-bar-shine"></div>
-        <div class="rank-name">
-          ${escHtml(it.name)}
-          <span class="all-dots">${dots}</span>
-        </div>
+        <div class="rank-name">${escHtml(it.name)}</div>
       </div>
-      <div class="rank-score" id="score-${i}">${it.score.toLocaleString()}<span class="rank-score-unit">pt</span></div>
+      <div class="rank-score" id="score-${i}">${(it.score??0).toLocaleString()}<span class="rank-score-unit">pt</span></div>
     </div>`;
   }).join('');
 
@@ -404,16 +384,13 @@ setInterval(() => {
 // ══════════════════════════════════════
 //  Firestore リアルタイム
 // ══════════════════════════════════════
-GAMES_OBS.forEach(g => {
-  db.collection('rankings')
-    .where('gameId', '==', g.id)
-    .orderBy('score', 'desc')
-    .limit(10)
-    .onSnapshot(snap => {
-      allRankings[g.id] = snap.docs.map(d => d.data());
-      renderAllRows();
-    });
-});
+db.collection('rankings')
+  .orderBy('score', 'desc')
+  .limit(10)
+  .onSnapshot(snap => {
+    allDocs = snap.docs.map(d => d.data());
+    renderAllRows();
+  });
 
 // ══════════════════════════════════════
 //  時計
