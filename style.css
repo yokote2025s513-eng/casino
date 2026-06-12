@@ -47,37 +47,80 @@ body {
   min-height: 100vh;
   line-height: 1.65;
   overflow-x: hidden;
-  /* カジノフェルト＋暗闇の質感 */
   background-image:
-    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(184,0,0,0.12) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 20% 80%, rgba(184,0,0,0.06) 0%, transparent 50%),
-    /* ダイヤ格子パターン */
+    /* 上部の深紅グロー（強化） */
+    radial-gradient(ellipse 110% 60% at 50% 0%, rgba(184,0,0,0.24) 0%, transparent 62%),
+    /* 中央やや上のゴールドグロー */
+    radial-gradient(ellipse 70% 50% at 50% 25%, rgba(201,168,76,0.07) 0%, transparent 60%),
+    /* 左下の深紅 */
+    radial-gradient(ellipse 55% 45% at 0% 100%, rgba(140,0,0,0.14) 0%, transparent 58%),
+    /* 右下のゴールド */
+    radial-gradient(ellipse 50% 40% at 100% 95%, rgba(201,168,76,0.09) 0%, transparent 55%),
+    /* 右上の深紅アクセント */
+    radial-gradient(ellipse 35% 30% at 95% 5%, rgba(184,0,0,0.08) 0%, transparent 55%),
+    /* ダイヤ格子 */
     repeating-linear-gradient(
       45deg,
-      transparent 0px,
-      transparent 18px,
-      rgba(184,0,0,0.025) 18px,
-      rgba(184,0,0,0.025) 19px
+      transparent 0px, transparent 22px,
+      rgba(184,0,0,0.05) 22px, rgba(184,0,0,0.05) 23px
     ),
     repeating-linear-gradient(
       -45deg,
-      transparent 0px,
-      transparent 18px,
-      rgba(184,0,0,0.025) 18px,
-      rgba(184,0,0,0.025) 19px
+      transparent 0px, transparent 22px,
+      rgba(184,0,0,0.05) 22px, rgba(184,0,0,0.05) 23px
+    ),
+    /* 大きめのダイヤ格子（金） */
+    repeating-linear-gradient(
+      45deg,
+      transparent 0px, transparent 110px,
+      rgba(201,168,76,0.025) 110px, rgba(201,168,76,0.025) 111px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent 0px, transparent 110px,
+      rgba(201,168,76,0.025) 110px, rgba(201,168,76,0.025) 111px
     );
+  background-attachment: fixed;
+}
+/* 疑似要素でビネット + トランプスート透かし柄 */
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    /* 周囲を暗くするビネット */
+    radial-gradient(ellipse 120% 100% at 50% 50%, transparent 38%, rgba(0,0,0,0.6) 100%);
+}
+/* スート柄の繰り返し透かし（SVGタイル） */
+body::after {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  opacity: 0.05;
+  mix-blend-mode: screen;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240' viewBox='0 0 240 240'%3E%3Ctext x='10' y='60' font-size='52' fill='%23e80000' font-family='Georgia,serif'%3E%E2%99%A0%3C/text%3E%3Ctext x='130' y='60' font-size='52' fill='%23c9a84c' font-family='Georgia,serif'%3E%E2%99%A6%3C/text%3E%3Ctext x='10' y='180' font-size='52' fill='%23c9a84c' font-family='Georgia,serif'%3E%E2%99%A3%3C/text%3E%3Ctext x='130' y='180' font-size='52' fill='%23e80000' font-family='Georgia,serif'%3E%E2%99%A5%3C/text%3E%3C/svg%3E");
+  background-size: 240px 240px;
+  background-repeat: repeat;
 }
 
 /* ══════════════════════════════════
    ヘッダー
 ══════════════════════════════════ */
 .site-header {
-  background: linear-gradient(180deg, rgba(5,2,3,0.98) 0%, rgba(5,2,3,0.95) 100%);
+  background: linear-gradient(180deg, rgba(5,2,3,0.99) 0%, rgba(12,4,5,0.97) 100%);
   border-bottom: 1px solid var(--border-red);
   padding: 0 2rem;
   position: sticky; top: 0; z-index: 100;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 1px 0 rgba(201,168,76,0.1), 0 4px 30px rgba(0,0,0,0.6);
+  backdrop-filter: blur(24px);
+  box-shadow:
+    0 1px 0 rgba(201,168,76,0.15),
+    0 2px 0 rgba(184,0,0,0.1),
+    0 8px 40px rgba(0,0,0,0.7);
+}
+/* ヘッダー下のゴールドグロー */
+.site-header::after {
+  content: '';
+  position: absolute; bottom: -1px; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--crimson-hot) 20%, var(--gold) 50%, var(--crimson-hot) 80%, transparent 100%);
+  opacity: 0.4;
 }
 .header-inner {
   max-width: 1200px; margin: 0 auto;
@@ -129,10 +172,16 @@ body {
   text-align: center;
   letter-spacing: 0.18em;
   text-shadow:
-    0 0 30px var(--crimson-glow),
-    0 0 80px rgba(184,0,0,0.25),
+    0 0 20px var(--crimson-glow),
+    0 0 60px rgba(184,0,0,0.35),
+    0 0 100px rgba(184,0,0,0.15),
     2px 2px 0 rgba(0,0,0,0.9);
   margin-bottom: 0.3rem;
+  animation: titleGlow 4s ease-in-out infinite;
+}
+@keyframes titleGlow {
+  0%,100% { text-shadow: 0 0 20px var(--crimson-glow), 0 0 60px rgba(184,0,0,0.35), 0 0 100px rgba(184,0,0,0.15), 2px 2px 0 rgba(0,0,0,0.9); }
+  50%     { text-shadow: 0 0 30px var(--crimson-glow), 0 0 80px rgba(184,0,0,0.5),  0 0 120px rgba(184,0,0,0.2),  2px 2px 0 rgba(0,0,0,0.9); }
 }
 
 .page-subtitle {
@@ -145,8 +194,9 @@ body {
 
 /* 金の区切り線 */
 .divider {
-  width: 220px; height: 1px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  width: 320px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--crimson-hot), var(--gold), var(--crimson-hot), transparent);
+  box-shadow: 0 0 12px rgba(201,168,76,0.25);
   margin: 0.6rem auto 2rem;
   position: relative;
 }
@@ -155,13 +205,13 @@ body {
   position: absolute; top: 50%;
   transform: translateY(-50%);
   color: var(--gold);
-  font-size: 0.45rem;
+  font-size: 0.55rem;
   background: var(--obsidian);
-  padding: 0 0.4rem;
-  text-shadow: 0 0 8px rgba(201,168,76,0.6);
+  padding: 0 0.5rem;
+  text-shadow: 0 0 12px rgba(201,168,76,0.8), 0 0 24px rgba(201,168,76,0.4);
 }
-.divider::before { left: 20%; }
-.divider::after  { right: 20%; }
+.divider::before { left: 15%; }
+.divider::after  { right: 15%; }
 
 /* ══════════════════════════════════
    カード
@@ -180,21 +230,24 @@ body {
   content: '';
   position: absolute; inset: 0;
   background: linear-gradient(135deg,
-    rgba(255,255,255,0.025) 0%,
-    transparent 40%,
-    rgba(184,0,0,0.03) 100%);
+    rgba(255,255,255,0.04) 0%,
+    transparent 35%,
+    rgba(184,0,0,0.04) 100%);
   pointer-events: none; border-radius: inherit;
 }
 /* 上部のゴールドライン */
 .card::after {
   content: '';
-  position: absolute; top: 0; left: 10%; right: 10%;
+  position: absolute; top: 0; left: 8%; right: 8%;
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.3), transparent);
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.45), transparent);
+  box-shadow: 0 0 8px rgba(201,168,76,0.2);
 }
 .card:hover {
-  border-color: var(--border-red);
-  box-shadow: var(--shadow-red), var(--shadow-card);
+  border-color: rgba(184,0,0,0.4);
+  box-shadow: var(--shadow-red), var(--shadow-card), inset 0 0 40px rgba(184,0,0,0.03);
+  transform: translateY(-1px);
+  transition: all 0.25s;
 }
 
 /* ══════════════════════════════════
@@ -412,12 +465,67 @@ select.form-control-lg option { background: var(--obsidian-3); }
    装飾
 ══════════════════════════════════ */
 .suit-deco {
-  position:fixed; font-size:14rem; opacity:0.018;
+  position:fixed; font-size:18rem; opacity:0;
   pointer-events:none; z-index:0; user-select:none; font-family:serif;
   color: var(--crimson-hot);
+  animation: suitPulse 8s ease-in-out infinite;
 }
-.suit-deco.tl { top:-3rem; left:-2rem; transform:rotate(-12deg); }
-.suit-deco.br { bottom:-3rem; right:-2rem; transform:rotate(12deg); }
+@keyframes suitPulse {
+  0%,100% { opacity:0.035; }
+  50%      { opacity:0.07; }
+}
+@keyframes suitPulseGold {
+  0%,100% { opacity:0.03; }
+  50%      { opacity:0.06; }
+}
+.suit-deco.tl {
+  top:-4rem; left:-3rem; transform:rotate(-15deg);
+  text-shadow: 0 0 100px rgba(184,0,0,0.5);
+  animation-delay: 0s;
+}
+.suit-deco.br {
+  bottom:-4rem; right:-3rem; transform:rotate(15deg);
+  text-shadow: 0 0 100px rgba(184,0,0,0.5);
+  animation-delay: 4s;
+}
+/* 追加の透かし */
+.suit-deco.tr {
+  top:-3rem; right:-3rem; transform:rotate(10deg);
+  font-size:12rem; color:var(--gold);
+  text-shadow: 0 0 80px rgba(201,168,76,0.4);
+  animation: suitPulseGold 8s ease-in-out infinite;
+  animation-delay: 2s;
+}
+.suit-deco.bl {
+  bottom:-3rem; left:-3rem; transform:rotate(-10deg);
+  font-size:12rem; color:var(--gold);
+  text-shadow: 0 0 80px rgba(201,168,76,0.4);
+  animation: suitPulseGold 8s ease-in-out infinite;
+  animation-delay: 6s;
+}
+/* 中央付近の控えめな大型透かし（追加レイヤー） */
+.suit-deco.center {
+  top:50%; left:50%; transform:translate(-50%,-50%) rotate(-8deg);
+  font-size:34rem; color:var(--crimson-hot);
+  text-shadow: 0 0 140px rgba(184,0,0,0.5);
+  animation: suitPulse 14s ease-in-out infinite;
+  animation-delay: 1s;
+}
+/* 4隅以外の小型アクセント透かし */
+.suit-deco.float1 {
+  top:18%; right:8%; transform:rotate(20deg);
+  font-size:8rem; color:var(--gold);
+  text-shadow: 0 0 60px rgba(201,168,76,0.4);
+  animation: suitPulseGold 10s ease-in-out infinite;
+  animation-delay: 3s;
+}
+.suit-deco.float2 {
+  bottom:15%; left:6%; transform:rotate(-18deg);
+  font-size:9rem; color:var(--crimson-hot);
+  text-shadow: 0 0 70px rgba(184,0,0,0.5);
+  animation: suitPulse 11s ease-in-out infinite;
+  animation-delay: 5s;
+}
 
 /* セクション */
 .section-head { display:flex; align-items:center; gap:0.8rem; margin-bottom:1.2rem; }
